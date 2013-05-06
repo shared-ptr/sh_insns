@@ -1223,7 +1223,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-    <li>Slot illegal instruction</li>
+<li>Slot illegal instruction</li>
 )"})
 )
 
@@ -1708,8 +1708,9 @@ ADDI (long i, long n)
   (description
 {R"(
 Adds together the contents of general registers Rn and Rm and the T bit, and
-stores the result in Rn. A carry resulting from the operation is reflected in
-the T bit. This instruction can be used to implement additions exceeding 32 bits.
+stores the result in Rn.  A carry resulting from the operation is reflected in
+the T bit.  This instruction can be used to implement additions exceeding 32
+bits.
 
 )"})
 
@@ -1765,6 +1766,8 @@ ADDC (long m, long n)
 
   (description
 {R"(
+Adds together the contents of general registers Rn and Rm and stores the result
+in Rn.  If overflow occurs, the T bit is set.
 
 )"})
 
@@ -1775,11 +1778,53 @@ ADDC (long m, long n)
 
   (operation
 {R"(
+ADDV (long m, long n)
+{
+  long dest, src, ans;
+
+  if ((long)R[n] >= 0)
+    dest = 0;
+  else
+    dest = 1;
+
+  if ((long)R[m] >= 0)
+    src = 0;
+  else
+    src = 1;
+
+  src += dest;
+  R[n] += R[m];
+
+  if ((long)R[n] >= 0)
+    ans = 0;
+  else
+    ans = 1;
+
+  ans += dest;
+
+  if (src == 0 || src == 2)
+  {
+    if (ans == 1)
+      T = 1;
+    else
+      T = 0;
+  }
+  else
+    T = 0;
+
+  PC += 2;
+}
 
 )"})
 
   (example
 {R"(
+
+ADDV  R0,R1  ! Before execution: R0 = H'00000001, R1 = H'7FFFFFFE, T = 0
+             ! After execution:  R1 = H'7FFFFFFF, T = 0
+
+ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
+             ! After execution:  R1 = H'80000000, T = 1
 
 )"})
 
@@ -3113,7 +3158,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+ANDs the contents of general registers Rn and Rm and stores the result in Rn.
 )"})
 
   (note
@@ -3123,7 +3168,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+AND(long m, long n)
+{
+  R[n] &= R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -3149,17 +3198,23 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+ANDs the contents of general register R0 and the zero-extended immediate value
+and stores the result in R0.
 )"})
 
   (note
 {R"(
-
+Since the 8-bit immediate value is zero-extended, the upper 24 bits of R0 are
+always cleared to zero.
 )"})
 
   (operation
 {R"(
-
+ANDI (long i)
+{
+  R[0] &= (0x000000FF & (long)i);
+  PC += 2;
+}
 )"})
 
   (example
@@ -3185,7 +3240,8 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+ANDs the contents of the memory byte indicated by the indirect GBR address with
+the immediate value and writes the result back to the memory byte.
 )"})
 
   (note
@@ -3195,7 +3251,14 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+ANDM (long i)
+{
+  long temp;
+  temp = (long)Read_Byte (GBR + R[0]);
+  temp &= 0x000000FF & (long)i;
+  Write_Byte (GBR + R[0], temp);
+  PC += 2;
+}
 )"})
 
   (example
@@ -3205,7 +3268,14 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Initial page write exception</li>
+<li>Data address error</li>
+<br/>
+Exceptions are checked taking a data access by this instruction as a byte load
+and a byte store.
 )"})
 )
 
@@ -4220,17 +4290,39 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+This is a conditional branch instruction that references the T bit. The branch
+is taken if T = 0, and not taken if T = 1. The branch destination is address
+(PC + 4 + displacement * 2).  The PC source value is the BF instruction address.
+As the 8-bit displacement is multiplied by two after sign-extension, the branch
+destination can be located in the range from -256 to +254 bytes from the BF
+instruction.
 )"})
 
   (note
 {R"(
-
+If the branch destination cannot be reached, the branch must be handled by using
+BF in combination with a BRA or JMP instruction, for example.
+<br/><br/>
+On some SH4 HW a branch with a displacement value of zero does not cause the
+pipeline I-stage to be stalled even if the branch is taken.  This can be
+utilized for efficient conditional operations.
 )"})
 
   (operation
 {R"(
+BF (int d)
+{
+  int disp;
+  if ((d & 0x80) == 0)
+    disp = (0x000000FF & d);
+  else
+    disp = (0xFFFFFF00 | d);
 
+  if (T == 0)
+    PC = PC + 4 + (disp << 1);
+  else
+    PC += 2;
+}
 )"})
 
   (example
@@ -4240,7 +4332,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -4256,17 +4348,54 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+This is a delayed conditional branch instruction that references the T bit.
+If T = 1, the next instruction is executed and the branch is not taken.
+If T = 0, the branch is taken after execution of the next instruction.
+<br/><br/>
+The branch destination is address (PC + 4 + displacement * 2). The PC source
+value is the BF/S instruction address.  As the 8-bit displacement is multiplied
+by two after sign-extension, the branch destination can be located in the range
+from -256 to +254 bytes from the BF/S instruction.
 )"})
 
   (note
 {R"(
-
+As this is a delayed branch instruction, when the branch condition is satisfied,
+the instruction following this instruction is executed before the branch
+destination instruction.
+<br/></br>
+Interrupts are not accepted between this instruction and the following
+instruction.
+<br/></br>
+If the following instruction is a branch instruction, it is identified as a slot
+illegal instruction.
+<br/></br>
+If this instruction is located in the delay slot immediately following a delayed
+branch instruction, it is identified as a slot illegal instruction.
+<br/></br>
+If the branch destination cannot be reached, the branch must be handled by using
+BF/S in combination with a BRA or JMP instruction, for example.
 )"})
 
   (operation
 {R"(
+BFS (int d)
+{
+  int disp;
+  unsigned int temp;
+  temp = PC;
+  if ((d & 0x80) == 0)
+    disp = (0x000000FF & d);
+  else
+    disp = (0xFFFFFF00 | d);
 
+  if (T == 0)
+    PC = PC + 4 + (disp << 1);
+  else
+    PC += 4;
+
+  Delay_Slot (temp + 2);
+}
 )"})
 
   (example
@@ -4276,7 +4405,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -4292,17 +4421,39 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+This is a conditional branch instruction that references the T bit. The branch
+is taken if T = 1, and not taken if T = 0.  The branch destination is address
+(PC + 4 + displacement * 2). The PC source value is the BT instruction address.
+As the 8-bit displacement is multiplied by two after sign-extension, the branch
+destination can be located in the range from -256 to +254 bytes from the BT
+instruction.
 )"})
 
   (note
 {R"(
-
+If the branch destination cannot be reached, the branch must be handled by using
+BT in combination with a BRA or JMP instruction, for example.
+<br/><br/>
+On some SH4 HW a branch with a displacement value of zero does not cause the
+pipeline I-stage to be stalled even if the branch is taken.  This can be
+utilized for efficient conditional operations.
 )"})
 
   (operation
 {R"(
+BT (int d)
+{
+  int disp;
+  if ((d & 0x80) == 0)
+    disp = (0x000000FF & d);
+  else
+    disp = (0xFFFFFF00 | d);
 
+  if (T == 1)
+    PC = PC + 4 + (disp << 1);
+  else
+    PC += 2;
+}
 )"})
 
   (example
@@ -4312,7 +4463,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -4328,17 +4479,49 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+This is a conditional branch instruction that references the T bit. The branch
+is taken if T = 1, and not taken if T = 0.  The PC source value is the BT/S
+instruction address. As the 8-bit displacement is multiplied by two after
+sign-extension, the branch destination can be located in the range from -256 to
++254 bytes from the BT/S instruction.
 )"})
 
   (note
 {R"(
-
+As this is a delayed branch instruction, when the branch condition is satisfied,
+the instruction following this instruction is executed before the branch
+destination instruction.
+<br/><br/>
+Interrupts are not accepted between this instruction and the following
+instruction.
+<br/><br/>
+If the following instruction is a branch instruction, it is identified as a slot
+illegal instruction.
+<br/><br/>
+If the branch destination cannot be reached, the branch must be handled by using
+BT/S in combination with a BRA or JMP instruction, for example.
 )"})
 
   (operation
 {R"(
+BTS (int d)
+{
+  int disp;
+  unsigned temp;
+  temp = PC;
 
+  if ((d & 0x80) == 0)
+    disp = (0x000000FF & d);
+  else
+    disp = (0xFFFFFF00 | d);
+
+  if (T == 1)
+    PC = PC + 4 + (disp << 1);
+  else
+    PC += 4;
+
+  Delay_Slot (temp + 2);
+}
 )"})
 
   (example
@@ -4348,7 +4531,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -4364,17 +4547,42 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+This is an unconditional branch instruction. The branch destination is address
+(PC + 4 + displacement * 2). The PC source value is the BRA instruction address.
+As the 12-bit displacement is multiplied by two after sign-extension, the branch
+destination can be located in the range from -4096 to +4094 bytes from the BRA
+instruction. If the branch destination cannot be reached, this branch can be
+performed with a JMP instruction.
 )"})
 
   (note
 {R"(
-
+As this is a delayed branch instruction, the instruction following this
+instruction is executed before the branch destination instruction.
+<br/><br/>
+Interrupts are not accepted between this instruction and the following
+instruction.
+<br/><br/>
+If the following instruction is a branch instruction, it is identified as a slot
+illegal instruction.
 )"})
 
   (operation
 {R"(
+BRA (int d)
+{
+  int disp;
+  unsigned int temp;
+  temp = PC;
 
+  if ((d & 0x800) == 0)
+    disp = (0x00000FFF & d);
+  else
+    disp = (0xFFFFF000 | d);
+
+  PC = PC + 4 + (disp << 1);
+  Delay_Slot(temp + 2);
+}
 )"})
 
   (example
@@ -4384,7 +4592,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -4400,17 +4608,31 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+This is an unconditional branch instruction. The branch destination is address
+(PC + 4 + Rm).
 )"})
 
   (note
 {R"(
-
+As this is a delayed branch instruction, the instruction following this
+instruction is executed before the branch destination instruction.
+<br/><br/>
+Interrupts are not accepted between this instruction and the following
+instruction.
+<br/><br/>
+If the following instruction is a branch instruction, it is identified as a slot
+illegal instruction.
 )"})
 
   (operation
 {R"(
-
+BRAF (int m)
+{
+  unsigned int temp;
+  temp = PC;
+  PC = PC + 4 + R[m];
+  Delay_Slot (temp + 2);
+}
 )"})
 
   (example
@@ -4420,7 +4642,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -4436,17 +4658,43 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+This instruction branches to address (PC + 4 + displacement * 2), and stores
+address (PC + 4) in PR. The PC source value is the BSR instruction address.
+As the 12-bit displacement is multiplied by two after sign-extension, the branch
+destination can be located in the range from -4096 to +4094 bytes from the BSR
+instruction. If the branch destination cannot be reached, this branch can be
+performed with a JSR instruction.
 )"})
 
   (note
 {R"(
-
+As this is a delayed branch instruction, the instruction following this
+instruction is executed before the branch destination instruction.
+<br/><br/>
+Interrupts are not accepted between this instruction and the following
+instruction.
+<br/><br/>
+If the following instruction is a branch instruction, it is identified as a slot
+illegal instruction.
 )"})
 
   (operation
 {R"(
+BSR (int d)
+{
+  int disp;
+  unsigned int temp;
+  temp = PC;
 
+  if ((d & 0x800) == 0)
+    disp = (0x00000FFF & d);
+  else
+    disp = (0xFFFFF000 | d);
+
+  PR = PC + 4;
+  PC = PC + 4 + (disp << 1);
+  Delay_Slot (temp + 2);
+}
 )"})
 
   (example
@@ -4456,7 +4704,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -4472,17 +4720,34 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+This instruction branches to address (PC + 4 + Rm), and stores address (PC + 4)
+in PR. The PC source value is the BSRF instruction address. The branch
+destination address is the result of adding the 32-bit contents of general
+register Rm to PC + 4.
 )"})
 
   (note
 {R"(
-
+As this is a delayed branch instruction, the instruction following this
+instruction is executed before the branch destination instruction.
+<br/><br/>
+Interrupts are not accepted between this instruction and the following
+instruction.
+<br/><br/>
+If the following instruction is a branch instruction, it is identified as a slot
+illegal instruction.
 )"})
 
   (operation
 {R"(
-
+BSRF (int m)
+{
+  unsigned int temp;
+  temp = PC;
+  PR = PC + 4;
+  PC = PC + 4 + R[m];
+  Delay_Slot (temp + 2);
+}
 )"})
 
   (example
@@ -4492,7 +4757,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -4508,17 +4773,30 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Unconditionally makes a delayed branch to the address specified by Rm.
 )"})
 
   (note
 {R"(
-
+As this is a delayed branch instruction, the instruction following this
+instruction is executed before the branch destination instruction.
+<br/><br/>
+Interrupts are not accepted between this instruction and the following
+instruction.
+<br/><br/>
+If the following instruction is a branch instruction, it is identified as a slot
+illegal instruction.
 )"})
 
   (operation
 {R"(
-
+JMP (int m)
+{
+  unsigned int temp;
+  temp = PC;
+  PC = R[m];
+  Delay_Slot (temp + 2);
+}
 )"})
 
   (example
@@ -4528,7 +4806,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -4544,17 +4822,35 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+This instruction makes a delayed branch to the subroutine procedure at the
+specified address after execution of the following instruction. Return address
+(PC + 4) is saved in PR, and a branch is made to the address indicated by
+general register Rm. JSR is used in combination with RTS for subroutine
+procedure calls.
 )"})
 
   (note
 {R"(
-
+As this is a delayed branch instruction, the instruction following this
+instruction is executed before the branch destination instruction.
+<br/><br/>
+Interrupts are not accepted between this instruction and the following
+instruction.
+<br/><br/>
+If the following instruction is a branch instruction, it is identified as a slot
+illegal instruction.
 )"})
 
   (operation
 {R"(
-
+JSR (int m)
+{
+  unsigned int temp;
+  temp = PC;
+  PR = PC + 4;
+  PC = R[m];
+  Delay_Slot (temp + 2);
+}
 )"})
 
   (example
@@ -4564,14 +4860,14 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "jsr/n	@Rm"
   SH2A
-  (abstract "PC + 2 -> PR, Rn -> PC")
+  (abstract "PC + 2 -> PR, Rm -> PC")
   (code "0100mmmm01001011")
 
   (issue SH2A "3")
@@ -4579,17 +4875,27 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Branches to a subroutine procedure at the designated address. The contents of
+PC are stored in PR and execution branches to the address indicated by the
+contents of general register Rm as 32-bit data. The stored contents of PC
+indicate the starting address of the second instruction after the present
+instruction. This instruction is used with RTS as a subroutine procedure call.
 )"})
 
   (note
 {R"(
-
+This is not a delayed branch instruction.
 )"})
 
   (operation
 {R"(
-
+JSRN (long m)
+{
+  unsigned long temp;
+  temp = PC;
+  PR = PC + 2;
+  PC = R[m];
+}
 )"})
 
   (example
@@ -4599,7 +4905,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -4614,12 +4920,16 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Branches to a subroutine procedure at the designated address. The contents of PC
+are stored in PR and execution branches to the address indicated by the address
+read from memory address (disp × 4 + TBR). The stored contents of PC indicate
+the starting address of the second instruction after the present instruction.
+This instruction is used with RTS as a subroutine procedure call.
 )"})
 
   (note
 {R"(
-
+This is not a delayed branch instruction.
 )"})
 
   (operation
@@ -4629,12 +4939,20 @@ __sexpr (insn_blocks.push_back
 
   (example
 {R"(
-
+JSRNM (long d)
+{
+  unsigned long temp;
+  long disp;
+  temp = PC;
+  PR = PC + 2;
+  disp = (0x000000FF & d);
+  PC = Read_Long (TBR + (disp << 2));
+}
 )"})
 
   (exceptions
 {R"(
-
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -4650,17 +4968,36 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+This instruction returns from a subroutine procedure by restoring the PC from
+PR. Processing continues from the address indicated by the restored PC value.
+This instruction can be used to return from a subroutine procedure called by a
+BSR or JSR instruction to the source of the call.
 )"})
 
   (note
 {R"(
-
+As this is a delayed branch instruction, the instruction following this
+instruction is executed before the branch destination instruction.
+<br/><br/>
+Interrupts are not accepted between this instruction and the following
+instruction. 
+<br/><br/>
+If the following instruction is a branch instruction, it is identified as a
+slot illegal instruction.
+<br/><br/>
+The instruction that restores PR must be executed before the RTS instruction.
+This restore instruction cannot be in the RTS delay slot.
 )"})
 
   (operation
 {R"(
-
+RTS ()
+{
+  unsigned int temp;
+  temp = PC;
+  PC = PR;
+  Delay_Slot (temp + 2);
+}
 )"})
 
   (example
@@ -4670,7 +5007,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -4685,16 +5022,23 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Performs a return from a subroutine procedure. That is, the PC is restored from
+PR, and processing is resumed from the address indicated by the PC. This
+instruction enables a return to be made from a subroutine procedure called by a
+BSR or JSR instruction to the origin of the call.
 )"})
 
   (note
 {R"(
-
+This is not a delayed branch instruction.
 )"})
 
   (operation
 {R"(
+RTSN ()
+{
+  PC = PR;
+}
 
 )"})
 
@@ -4705,7 +5049,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -4720,17 +5064,25 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Performs a return from a subroutine procedure after a transfer from specified
+general register Rm to R0. That is, after the Rm value is stored in R0, the PC
+is restored from PR, and processing is resumed from the address indicated by the
+PC. This instruction enables a return to be made from a subroutine procedure
+called by a BSR or JSR instruction to the origin of the call.
 )"})
 
   (note
 {R"(
-
+This is not a delayed branch instruction.
 )"})
 
   (operation
 {R"(
-
+RTVN (int m)
+{
+  R[0] = R[m];
+  PC = PR;
+}
 )"})
 
   (example
@@ -4740,7 +5092,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
