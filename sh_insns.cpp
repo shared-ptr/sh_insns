@@ -686,7 +686,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-Stores immediate data, which is sign-extended to a 32-bit value, into general
+This instruction stores immediate data, sign-extended to longword, in general
 register Rn.
 )"})
 
@@ -697,7 +697,15 @@ register Rn.
 
   (operation
 {R"(
+MOVI (int i, int n)
+{
+  if ((i & 0x80) == 0)
+    R[n] = (0x000000FF & i);
+  else
+    R[n] = (0xFFFFFF00 | i);
 
+  PC += 2;
+}
 )"})
 
   (example
@@ -723,17 +731,33 @@ register Rn.
 
   (description
 {R"(
-
+This instruction stores immediate data, sign-extended to longword, in general
+register Rn.  The data is stored from memory address (PC + 4 + displacement * 2).
+The 8-bit displacement is multiplied by two after zero-extension, and so the
+relative distance from the table is in the range up to PC + 4 + 510 bytes. The
+PC value is the address of this instruction.
 )"})
 
   (note
 {R"(
-
+If the following instruction is a branch instruction, it is identified as a slot
+illegal instruction.
 )"})
 
   (operation
 {R"(
+MOVWI (int d, int n)
+{
+  unsigned int disp;
+  disp = (unsigned int)(0x000000FF & d);
+  R[n] = (int)Read_Word (PC + 4 + (disp << 1));
+  if ((R[n] & 0x8000) == 0)
+    R[n] &= 0x0000FFFF;
+  else
+    R[n] |= 0xFFFF0000;
 
+  PC += 2;
+}
 )"})
 
   (example
@@ -743,7 +767,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Slot illegal instruction exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
 )"})
 )
 
@@ -759,17 +786,29 @@ register Rn.
 
   (description
 {R"(
-
+This instruction stores immediate data, sign-extended to longword, in general
+register Rn.  the data is stored from memory address (PC + 4 + displacement * 4).
+The 8-bit displacement is multiplied by four after zero-extension, and so the
+relative distance from the operand is in the range up to PC + 4 + 1020 bytes.
+The PC value is the address of this instruction. A value with the lower 2 bits
+adjusted to 00 is used in address calculation.
 )"})
 
   (note
 {R"(
-
+If the following instruction is a branch instruction, it is identified as a slot
+illegal instruction.
 )"})
 
   (operation
 {R"(
-
+MOVLI (int d, int n)
+{
+  unsigned int disp;
+  disp = (unsigned int)(0x000000FF & (int)d);
+  R[n] = Read_Long ((PC & 0xFFFFFFFC) + 4 + (disp << 2));
+  PC += 2;
+}
 )"})
 
   (example
@@ -779,7 +818,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Slot illegal instruction exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
 )"})
 )
 
@@ -794,13 +836,9 @@ register Rn.
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH2A "0" SH4 "0" SH4A "1")
 
-  (description {R"(
-    Copies the contents of general register Rm to the general register Rn.
-    The source register is not modified. )"})
-
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
 )"})
 
   (note
@@ -810,7 +848,11 @@ register Rn.
 
   (operation
 {R"(
-
+MOV (int m, int n)
+{
+  R[n] = R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -836,7 +878,7 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
 )"})
 
   (note
@@ -846,7 +888,11 @@ register Rn.
 
   (operation
 {R"(
-
+MOVBS (int m, int n)
+{
+  Write_Byte (R[n], R[m]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -856,7 +902,11 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -872,7 +922,7 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
 )"})
 
   (note
@@ -882,7 +932,11 @@ register Rn.
 
   (operation
 {R"(
-
+MOVWS (int m, int n)
+{
+  Write_Word (R[n], R[m]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -892,7 +946,11 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -908,7 +966,7 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
 )"})
 
   (note
@@ -918,7 +976,11 @@ register Rn.
 
   (operation
 {R"(
-
+MOVLS (int m, int n)
+{
+  Write_Long (R[n], R[m]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -928,7 +990,11 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -944,7 +1010,9 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The loaded data is sign-extended to 32 bit before being stored in the
+destination register.
 )"})
 
   (note
@@ -954,7 +1022,16 @@ register Rn.
 
   (operation
 {R"(
+MOVBL (int m, int n)
+{
+  R[n] = (long)Read_Byte(R[m]);
+  if ((R[n] & 0x80) == 0)
+    R[n] &= 0x000000FF;
+  else
+    R[n] |= 0xFFFFFF00;
 
+  PC += 2;
+}
 )"})
 
   (example
@@ -964,7 +1041,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -980,7 +1060,9 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The loaded data is sign-extended to 32 bit before being stored in the
+destination register.
 )"})
 
   (note
@@ -990,7 +1072,16 @@ register Rn.
 
   (operation
 {R"(
+MOVWL (int m, int n)
+{
+  R[n] = (long)Read_Word (R[m]);
+  if ((R[n] & 0x8000) == 0)
+    R[n] &= 0x0000FFFF;
+  else
+    R[n] |= 0xFFFF0000;
 
+  PC += 2;
+}
 )"})
 
   (example
@@ -1000,7 +1091,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -1016,7 +1110,7 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
 )"})
 
   (note
@@ -1026,7 +1120,11 @@ register Rn.
 
   (operation
 {R"(
-
+MOVLL (int m, int n)
+{
+  R[n] = Read_Long (R[m]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -1036,7 +1134,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -1052,7 +1153,7 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
 )"})
 
   (note
@@ -1062,7 +1163,12 @@ register Rn.
 
   (operation
 {R"(
-
+MOVBM (int m, int n)
+{
+  Write_Byte (R[n] - 1, R[m]);
+  R[n] -= 1;
+  PC += 2;
+}
 )"})
 
   (example
@@ -1072,7 +1178,11 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -1088,7 +1198,7 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
 )"})
 
   (note
@@ -1098,7 +1208,12 @@ register Rn.
 
   (operation
 {R"(
-
+MOVWM (int m, int n)
+{
+  Write_Word (R[n] - 2, R[m]);
+  R[n] -= 2;
+  PC += 2;
+}
 )"})
 
   (example
@@ -1108,7 +1223,11 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -1124,7 +1243,7 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
 )"})
 
   (note
@@ -1134,7 +1253,12 @@ register Rn.
 
   (operation
 {R"(
-
+MOVLM (int m, int n)
+{
+  Write_Long (R[n] - 4, R[m]);
+  R[n] -= 4;
+  PC += 2;
+}
 )"})
 
   (example
@@ -1144,7 +1268,11 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -1160,7 +1288,9 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The loaded data is sign-extended to 32 bit before being stored in the
+destination register.
 )"})
 
   (note
@@ -1170,7 +1300,19 @@ register Rn.
 
   (operation
 {R"(
+MOVBP (int m, int n)
+{
+  R[n] = (long)Read_Byte (R[m]);
+  if ((R[n] & 0x80) == 0)
+    R[n] &= 0x000000FF;
+  else
+    R[n] |= 0xFFFFFF00;
 
+  if (n != m)
+    R[m] += 1;
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -1180,7 +1322,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -1196,7 +1341,9 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The loaded data is sign-extended to 32 bit before being stored in the
+destination register.
 )"})
 
   (note
@@ -1206,7 +1353,19 @@ register Rn.
 
   (operation
 {R"(
+MOVWP (int m, int n)
+{
+  R[n] = (long)Read_Word (R[m]);
+  if ((R[n] & 0x8000) == 0)
+    R[n] &= 0x0000FFFF;
+  else
+    R[n] |= 0xFFFF0000;
 
+  if (n != m)
+    R[m] += 2;
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -1216,7 +1375,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -1232,7 +1394,7 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
 )"})
 
   (note
@@ -1242,6 +1404,15 @@ register Rn.
 
   (operation
 {R"(
+MOVLP (int m, int n)
+{
+  R[n] = Read_Long (R[m]);
+
+  if (n != m)
+    R[m] += 4;
+
+  PC += 2;
+}
 
 )"})
 
@@ -1252,7 +1423,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -1268,7 +1442,10 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The 4-bit displacement is only zero-extended, so a range up to +15 bytes
+can be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can
+be used instead.
 )"})
 
   (note
@@ -1278,7 +1455,13 @@ register Rn.
 
   (operation
 {R"(
-
+MOVBS4 (int d, int n)
+{
+  long disp;
+  disp = (0x0000000F & (long)d);
+  Write_Byte (R[n] + disp, R[0]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -1288,7 +1471,11 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -1304,7 +1491,10 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The 4-bit displacement is multiplied by two after zero-extension, enabling a
+range up to +30 bytes to be specified.  If a memory operand cannot be reached,
+the @(R0,Rn) mode can be used instead.
 )"})
 
   (note
@@ -1314,7 +1504,13 @@ register Rn.
 
   (operation
 {R"(
-
+MOVWS4 (int d, int n)
+{
+  long disp;
+  disp = (0x0000000F & (long)d);
+  Write_Word (R[n] + (disp << 1), R[0]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -1324,7 +1520,11 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -1340,7 +1540,10 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The 4-bit displacement is multiplied by four after zero-extension, enabling a
+range up to +60 bytes to be specified.  If a memory operand cannot be reached,
+the @(R0,Rn) mode can be used instead.
 )"})
 
   (note
@@ -1350,7 +1553,13 @@ register Rn.
 
   (operation
 {R"(
-
+MOVLS4 (int m, int d, int n)
+{
+  long disp;
+  disp = (0x0000000F & (long)d);
+  Write_Long (R[n] + (disp << 2), R[m]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -1360,7 +1569,11 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -1376,7 +1589,12 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The 4-bit displacement is only zero-extended, so a range up to +15 bytes
+can be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can
+be used instead.
+The loaded data is sign-extended to 32 bit before being stored in the
+destination register.
 )"})
 
   (note
@@ -1386,7 +1604,19 @@ register Rn.
 
   (operation
 {R"(
+MOVBL4 (int m, int d)
+{
+  long disp;
+  disp = (0x0000000F & (long)d);
+  R[0] = Read_Byte (R[m] + disp);
 
+  if ((R[0] & 0x80) == 0)
+    R[0] &= 0x000000FF;
+  else
+    R[0] |= 0xFFFFFF00;
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -1396,7 +1626,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -1412,7 +1645,12 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The 4-bit displacement is multiplied by two after zero-extension, enabling a
+range up to +30 bytes to be specified.  If a memory operand cannot be reached,
+the @(R0,Rn) mode can be used instead.
+The loaded data is sign-extended to 32 bit before being stored in the
+destination register.
 )"})
 
   (note
@@ -1422,7 +1660,19 @@ register Rn.
 
   (operation
 {R"(
+MOVWL4 (int m, int d)
+{
+  long disp;
+  disp = (0x0000000F & (long)d);
+  R[0] = Read_Word (R[m] + (disp << 1));
 
+  if ((R[0] & 0x8000) == 0)
+    R[0] &= 0x0000FFFF;
+  else
+    R[0] |= 0xFFFF0000;
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -1432,7 +1682,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -1448,7 +1701,10 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The 4-bit displacement is multiplied by four after zero-extension, enabling a
+range up to +60 bytes to be specified.  If a memory operand cannot be reached,
+the @(R0,Rn) mode can be used instead.
 )"})
 
   (note
@@ -1458,7 +1714,13 @@ register Rn.
 
   (operation
 {R"(
-
+MOVLL4 (int m, int d, int n)
+{
+  long disp;
+  disp = (0x0000000F & (long)d);
+  R[n] = Read_Long (R[m] + (disp << 2));
+  PC += 2;
+}
 )"})
 
   (example
@@ -1468,7 +1730,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -1484,7 +1749,7 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
 )"})
 
   (note
@@ -1494,7 +1759,11 @@ register Rn.
 
   (operation
 {R"(
-
+MOVBS0 (int m, int n)
+{
+  Write_Byte (R[n] + R[0], R[m]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -1504,7 +1773,11 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -1520,7 +1793,7 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
 )"})
 
   (note
@@ -1530,7 +1803,11 @@ register Rn.
 
   (operation
 {R"(
-
+MOVWS0 (int m, int n)
+{
+  Write_Word (R[n] + R[0], R[m]);
+  PC+=2;
+}
 )"})
 
   (example
@@ -1540,7 +1817,11 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -1556,7 +1837,7 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
 )"})
 
   (note
@@ -1566,7 +1847,11 @@ register Rn.
 
   (operation
 {R"(
-
+MOVLS0 (int m, int n)
+{
+  Write_Long (R[n] + R[0], R[m]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -1576,7 +1861,11 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -1592,7 +1881,9 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The loaded data is sign-extended to 32 bit before being stored in the
+destination register.
 )"})
 
   (note
@@ -1602,7 +1893,16 @@ register Rn.
 
   (operation
 {R"(
+MOVBL0 (int m, int n)
+{
+  R[n] = (long)Read_Byte (R[m] + R[0]);
 
+  if ((R[n] & 0x80) == 0)
+    R[n] &= 0x000000FF;
+  else R[n] |= 0xFFFFFF00;
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -1612,7 +1912,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -1628,7 +1931,9 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The loaded data is sign-extended to 32 bit before being stored in the
+destination register.
 )"})
 
   (note
@@ -1638,7 +1943,17 @@ register Rn.
 
   (operation
 {R"(
+MOVWL0 (int m, int n)
+{
+  R[n] = (long)Read_Word (R[m] + R[0]);
 
+  if ((R[n] & 0x8000) == 0)
+    R[n] &= 0x0000FFFF;
+  else
+    R[n] |= 0xFFFF0000;
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -1648,7 +1963,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -1664,7 +1982,7 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
 )"})
 
   (note
@@ -1674,6 +1992,11 @@ register Rn.
 
   (operation
 {R"(
+MOVLL0 (int m, int n)
+{
+  R[n] = Read_Long (R[m] + R[0]);
+  PC += 2;
+}
 
 )"})
 
@@ -1684,7 +2007,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -1700,7 +2026,9 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The 8-bit displacement is only zero-extended, so a range up to +255 bytes can be
+specified.
 )"})
 
   (note
@@ -1710,7 +2038,13 @@ register Rn.
 
   (operation
 {R"(
-
+MOVBSG (int d)
+{
+  unsigned int disp;
+  disp = (unsigned int)(0x000000FF & d);
+  Write_Byte (GBR + disp, R[0]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -1720,7 +2054,11 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -1736,7 +2074,9 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The 8-bit displacement is multiplied by two after zero-extension, enabling a
+range up to +510 bytes to be specified.
 )"})
 
   (note
@@ -1746,7 +2086,13 @@ register Rn.
 
   (operation
 {R"(
-
+MOVWSG (int d)
+{
+  unsigned int disp;
+  disp = (unsigned int)(0x000000FF & d);
+  Write_Word (GBR + (disp << 1), R[0]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -1756,7 +2102,11 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -1772,7 +2122,9 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The 8-bit displacement is multiplied by four after zero-extension, enabling a
+range up to +1020 bytes to be specified.
 )"})
 
   (note
@@ -1782,7 +2134,13 @@ register Rn.
 
   (operation
 {R"(
-
+MOVLSG (int d)
+{
+  unsigned int disp;
+  disp = (unsigned int)(0x000000FF & (long)d);
+  Write_Long (GBR + (disp << 2), R[0]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -1792,7 +2150,11 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -1808,7 +2170,11 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The 8-bit displacement is only zero-extended, so a range up to +255 bytes can be
+specified.
+The loaded data is sign-extended to 32 bit before being stored in the
+destination register.
 )"})
 
   (note
@@ -1818,7 +2184,19 @@ register Rn.
 
   (operation
 {R"(
+MOVBLG (int d)
+{
+  unsigned int disp;
+  disp = (unsigned int)(0x000000FF & d);
+  R[0] = (int)Read_Byte (GBR + disp);
 
+  if ((R[0] & 0x80) == 0)
+    R[0] &= 0x000000FF;
+  else
+    R[0] |= 0xFFFFFF00;
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -1828,7 +2206,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -1844,7 +2225,11 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The 8-bit displacement is multiplied by two after zero-extension, enabling a
+range up to +510 bytes to be specified.
+The loaded data is sign-extended to 32 bit before being stored in the
+destination register.
 )"})
 
   (note
@@ -1854,7 +2239,19 @@ register Rn.
 
   (operation
 {R"(
+MOVWLG (int d)
+{
+  unsigned int disp;
+  disp = (unsigned int)(0x000000FF & d);
+  R[0] = (int)Read_Word (GBR + (disp << 1));
 
+  if ((R[0] & 0x8000) == 0)
+    R[0] &= 0x0000FFFF;
+  else
+    R[0] |= 0xFFFF0000;
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -1864,7 +2261,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -1880,7 +2280,9 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The 8-bit displacement is multiplied by four after zero-extension, enabling a
+range up to +1020 bytes to be specified.
 )"})
 
   (note
@@ -1890,7 +2292,13 @@ register Rn.
 
   (operation
 {R"(
-
+MOVLLG (int d)
+{
+  unsigned int disp;
+  disp = (unsigned int)(0x000000FF & d);
+  R[0] = Read_Long (GBR + (disp << 2));
+  PC += 2;
+}
 )"})
 
   (example
@@ -1900,7 +2308,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -1915,7 +2326,7 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
 )"})
 
   (note
@@ -1925,7 +2336,12 @@ register Rn.
 
   (operation
 {R"(
-
+MOVRSBP (int n)
+{
+  Write_Byte (R[n], R[0]);
+  R[n] += 1;
+  PC += 2;
+}
 )"})
 
   (example
@@ -1935,7 +2351,7 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -1950,7 +2366,7 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
 )"})
 
   (note
@@ -1960,7 +2376,12 @@ register Rn.
 
   (operation
 {R"(
-
+MOVRSWP (int n)
+{
+  Write_Word (R[n], R[0]);
+  R[n] += 2;
+  PC += 2;
+}
 )"})
 
   (example
@@ -1970,7 +2391,7 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -1985,7 +2406,7 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
 )"})
 
   (note
@@ -1995,7 +2416,12 @@ register Rn.
 
   (operation
 {R"(
-
+MOVRSLP (int n)
+{
+  Write_Long (R[n], R[0]);
+  R[n] += 4;
+  PC += 2;
+}
 )"})
 
   (example
@@ -2005,7 +2431,7 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -2020,7 +2446,9 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The loaded data is sign-extended to 32 bit before being stored in the
+destination register.
 )"})
 
   (note
@@ -2030,7 +2458,18 @@ register Rn.
 
   (operation
 {R"(
+MOVRSBM (int m)
+{
+  R[m] -= 1;
+  R[0] = (long)Read_Word (R[m]);
 
+  if ((R[0] & 0x80) == 0)
+    R[0] &= 0x000000FF;
+  else
+    R[0] |= 0xFFFFFF00;
+
+  PC+=2;
+}
 )"})
 
   (example
@@ -2040,7 +2479,7 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -2055,7 +2494,9 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
+The loaded data is sign-extended to 32 bit before being stored in the
+destination register.
 )"})
 
   (note
@@ -2065,7 +2506,18 @@ register Rn.
 
   (operation
 {R"(
+MOVRSWM (int m)
+{
+  R[m]-= 2;
+  R[0] = (long)Read_Word (R[m]);
 
+  if ((R[0] & 0x8000) == 0)
+    R[0] &= 0x0000FFFF;
+  else
+    R[0] |= 0xFFFF0000;
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -2075,7 +2527,7 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -2090,7 +2542,7 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.
 )"})
 
   (note
@@ -2100,7 +2552,12 @@ register Rn.
 
   (operation
 {R"(
-
+MOVRSLM (int m)
+{
+  R[m] -= 4;
+  R[0] = Read_Long (R[m]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -2110,7 +2567,7 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -2125,7 +2582,8 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.  This
+instruction is ideal for data access in a structure or the stack.
 )"})
 
   (note
@@ -2135,7 +2593,13 @@ register Rn.
 
   (operation
 {R"(
-
+MOVBS12 (int d, int m, int n)
+{
+  long disp;
+  disp = (0x00000FFF & (long)d);
+  Write_Byte (R[n] + disp, R[m]);
+  PC += 4;
+}
 )"})
 
   (example
@@ -2145,7 +2609,7 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -2160,7 +2624,8 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.  This
+instruction is ideal for data access in a structure or the stack.
 )"})
 
   (note
@@ -2170,6 +2635,13 @@ register Rn.
 
   (operation
 {R"(
+MOVWS12 (int d, int m, int n)
+{
+  long disp;
+  disp = (0x00000FFF & (long)d);
+  Write_Word (R[n] + (disp << 1), R[m]);
+  PC += 4;
+}
 
 )"})
 
@@ -2180,7 +2652,7 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -2195,7 +2667,8 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.  This
+instruction is ideal for data access in a structure or the stack.
 )"})
 
   (note
@@ -2205,7 +2678,13 @@ register Rn.
 
   (operation
 {R"(
-
+MOVLS12 (int d, int m, int n)
+{
+  long disp;
+  disp = (0x00000FFF & (long)d);
+  Write_Long (R[n] + (disp << 2), R[m]);
+  PC += 4;
+}
 )"})
 
   (example
@@ -2215,7 +2694,7 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -2230,7 +2709,10 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.  This
+instruction is ideal for data access in a structure or the stack.
+The loaded data is sign-extended to 32 bit before being stored in the
+destination register.
 )"})
 
   (note
@@ -2240,6 +2722,19 @@ register Rn.
 
   (operation
 {R"(
+MOVBL12 (int d, int m, int n)
+{
+  long disp;
+  disp = (0x00000FFF & (long)d);
+  R[n] = Read_Byte (R[m] + disp);
+
+  if ((R[n] & 0x80) == 0)
+    R[n] &= 0x000000FF;
+  else
+    R[n] |= 0xFFFFFF00;
+
+  PC += 4;
+}
 
 )"})
 
@@ -2250,7 +2745,7 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -2265,7 +2760,10 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.  This
+instruction is ideal for data access in a structure or the stack.
+The loaded data is sign-extended to 32 bit before being stored in the
+destination register.
 )"})
 
   (note
@@ -2275,7 +2773,19 @@ register Rn.
 
   (operation
 {R"(
+MOVWL12 (int d, int m, int n)
+{
+  long disp;
+  disp = (0x00000FFF & (long)d);
+  R[n] = Read_Word (R[m] + (disp << 1));
 
+  if ((R[n] & 0x8000) == 0)
+    R[n] &= 0x0000FFFF;
+  else
+    R[n] |= 0xFFFF0000;
+
+  PC += 4;
+}
 )"})
 
   (example
@@ -2285,7 +2795,7 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -2300,7 +2810,8 @@ register Rn.
 
   (description
 {R"(
-
+This instruction transfers the source operand to the destination.  This
+instruction is ideal for data access in a structure or the stack.
 )"})
 
   (note
@@ -2310,7 +2821,13 @@ register Rn.
 
   (operation
 {R"(
-
+MOVLL12 (int d, int m, int n)
+{
+  long disp;
+  disp = (0x00000FFF & (long)d);
+  R[n] = Read_Long (R[m] + (disp << 2));
+  PC += 4;
+}
 )"})
 
   (example
@@ -2320,7 +2837,7 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -2336,28 +2853,34 @@ register Rn.
 
   (description
 {R"(
-    Stores the effective address of the source operand into general register R0.
-    The 8-bit displacement is zero-extended and quadrupled.  Consequently, the
-    relative interval from the operand is PC + 1020 bytes.  The PC is the
-    address four bytes after this instruction, but the lowest two bits of the
-    PC are fixed at 00.
+This instruction stores the effective address of the source operand into general
+register R0.  The 8-bit displacement is zero-extended and quadrupled.
+Consequently, the relative interval from the operand is PC + 1020 bytes.  The PC
+is the address four bytes after this instruction, but the lowest two bits of the
+PC are fixed at 00.
 )"})
 
   (note
 {R"(
-    <u>SH1*, SH2*, SH3*</u><br/>
-    If this instruction is placed immediately after a
-    delayed branch instruction, the PC must point to an address specified by
-    (the starting address of the branch destination) + 2.<br/><br/>
+SH1*, SH2*, SH3*:<br/>
+If this instruction is placed immediately after a delayed branch instruction,
+the PC must point to an address specified by (the starting address of the branch
+destination) + 2.<br/><br/>
 
-    <u>SH4*</u><br/>
-    If this instruction is executed in a delay slot, a slot illegal instruction
-    exception will be generated.
+SH4*:<br/>
+If this instruction is executed in a delay slot, a slot illegal instruction
+exception will be generated.
 )"})
 
   (operation
 {R"(
-
+MOVA (int d)
+{
+  unsigned int disp;
+  disp = (unsigned int)(0x000000FF & d);
+  R[0] = (PC & 0xFFFFFFFC) + 4 + (disp << 2);
+  PC += 2;
+}
 )"})
 
   (example
@@ -2382,7 +2905,9 @@ register Rn.
 
   (description
 {R"(
-
+Stores immediate data that has been sign-extended to longword in general register
+Rn.
+// FIXME: add diagram.
 )"})
 
   (note
@@ -2392,6 +2917,15 @@ register Rn.
 
   (operation
 {R"(
+MOVI20 (int i, int n)
+{
+  if (i & 0x00080000) == 0)
+    R[n] = (0x000FFFFF & (long)i);
+  else
+    R[n] = (0xFFF00000 | (long)i);
+
+  PC += 4;
+}
 
 )"})
 
@@ -2417,7 +2951,12 @@ register Rn.
 
   (description
 {R"(
+Shifts immediate data 8 bits to the left and performs sign extension to
+longword, then stores the resulting data in general register Rn. Using an OR or
+ADD instruction as the next instruction enables a 28-bit absolute address to be
+generated.
 
+// FIXME: add diagram.
 )"})
 
   (note
@@ -2427,7 +2966,16 @@ register Rn.
 
   (operation
 {R"(
+MOVI20S (int i, int n)
+{
+  if (i & 0x00080000) == 0)
+    R[n] = (0x000FFFFF & (long)i);
+  else
+    R[n] = (0xFFF00000 | (long)i);
 
+  R[n] <<= 8;
+  PC += 4;
+}
 )"})
 
   (example
@@ -2454,7 +3002,14 @@ register Rn.
 
   (description
 {R"(
-
+MOVCO is used in combination with MOVLI to realize an atomic read-modify-write
+operation in a single processor.<br/><br/>
+This instruction copies the value of the LDST flag to the T bit. When the T bit
+is set to 1, the value of R0 is stored at the address in Rm. If the T bit is
+cleared to 0, the value is not stored at the address in Rm. Finally, the LDST
+flag is cleared to 0. Since the LDST flag is cleared by an instruction or
+exception, storage by the MOVCO instruction only proceeds when no interrupt or
+exception has occurred between the execution of the MOVLI and MOVCO instructions.
 )"})
 
   (note
@@ -2464,7 +3019,15 @@ register Rn.
 
   (operation
 {R"(
+MOVCO (int n)
+{
+  T = LDST;
+  if (T == 1)
+    Write_Long (R[n], R[0]);
 
+  LDST = 0;
+  PC += 2
+}
 )"})
 
   (example
@@ -2474,7 +3037,11 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Initial page write exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -2490,7 +3057,14 @@ register Rn.
 
   (description
 {R"(
-
+MOVLI is used in combination with MOVCO to realize an atomic read-modify-write
+operation in a single processor.<br/><br/>
+This instruction sets the LDST flag to 1 and reads the four bytes of data
+indicated by Rm into R0. If, however, an interrupt or exception occurs, LDST is
+cleared to 0. Storage by the MOVCO instruction only proceeds when the
+instruction is executed after the LDST bit has been set by the MOVLI instruction
+and not cleared by an interrupt or other exception.  When LDST has been cleared
+to 0, the MOVCO instruction clears the T bit and does not proceed with storage.
 )"})
 
   (note
@@ -2500,7 +3074,12 @@ register Rn.
 
   (operation
 {R"(
-
+MOVLINK (int m)
+{
+  LDST = 1;
+  R[0] = Read_Long (R[m]);
+  PC += 2
+}
 )"})
 
   (example
@@ -2510,7 +3089,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -2526,7 +3108,12 @@ register Rn.
 
   (description
 {R"(
-
+This instruction loads the longword of data from the effective address indicated
+by the contents of Rm in memory to R0. The address is not restricted to longword
+boundaries address (4n).  This instruction allows loading from
+non-longword-boundary addresses (4n + 1, 4n + 2, and 4n + 3). Data address error
+exceptions do not occur when access is to non-longword-boundary addresses
+(4n + 1, 4n + 2, and 4n + 3).
 )"})
 
   (note
@@ -2536,7 +3123,11 @@ register Rn.
 
   (operation
 {R"(
-
+MOVUAL (int m)
+{
+  Read_Unaligned_Long (R0, R[m]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -2546,7 +3137,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error (when the privileged area is accessed from user mode)</li>
 )"})
 )
 
@@ -2562,7 +3156,12 @@ register Rn.
 
   (description
 {R"(
-
+This instruction loads the longword of data from the effective address indicated
+by the contents of Rm in memory to R0. The address is not restricted to longword
+boundaries address (4n).  This instruction allows loading from
+non-longword-boundary addresses (4n + 1, 4n + 2, and 4n + 3). Data address error
+exceptions do not occur when access is to non-longword-boundary addresses
+(4n + 1, 4n + 2, and 4n + 3).
 )"})
 
   (note
@@ -2572,7 +3171,15 @@ register Rn.
 
   (operation
 {R"(
+MOVUALP (int m)
+{
+  Read_Unaligned_Long(R0,R[m]);
 
+  if (m != 0)
+    R[m] += 4;
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -2582,7 +3189,10 @@ register Rn.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error (when the privileged area is accessed from user mode)</li>
 )"})
 )
 
@@ -2603,7 +3213,13 @@ Note: When Rm = R15, read Rm as PR)"})
 
   (description
 {R"(
-
+Transfers a source operand to a destination. This instruction performs transfer
+between a number of general registers (R0 to Rn/Rm) not exceeding the specified
+register number and memory with the contents of R15 as its address.
+<br/><br/>
+If R15 is specified, PR is transferred instead of R15. That is, when
+nnnn(mmmm) = 1111 is specified, R0 to R14 and PR are the general registers
+subject to transfer.
 )"})
 
   (note
@@ -2613,7 +3229,21 @@ Note: When Rm = R15, read Rm as PR)"})
 
   (operation
 {R"(
+MOVLMML (int m)
+{
+  int i;
+  for (i = m; i >= 0; i--)
+  {
+    if (i == 15)
+      Write_Long (R[15] - 4, PR);
+    else
+      Write_Long (R[15] - 4, R[i]);
 
+    R[15] -= 4;
+  }
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -2623,7 +3253,7 @@ Note: When Rm = R15, read Rm as PR)"})
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -2644,7 +3274,13 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (description
 {R"(
-
+Transfers a source operand to a destination. This instruction performs transfer
+between a number of general registers (R0 to Rn/Rm) not exceeding the specified
+register number and memory with the contents of R15 as its address.
+<br/><br/>
+If R15 is specified, PR is transferred instead of R15. That is, when
+nnnn(mmmm) = 1111 is specified, R0 to R14 and PR are the general registers
+subject to transfer.
 )"})
 
   (note
@@ -2654,7 +3290,21 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (operation
 {R"(
+MOVLPML (int n)
+{
+  int i;
+  for (i = 0; i <= n; i++)
+  {
+    if (i == 15)
+      PR = Read_Long (R[15]);
+    else
+      R[i] = Read_Long (R[15]);
 
+    R[15] += 4;
+  }
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -2664,7 +3314,7 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -2685,7 +3335,11 @@ Note: When Rm = R15, read Rm as PR)"})
 
   (description
 {R"(
-
+Transfers a source operand to a destination. This instruction performs transfer
+between a number of general registers (Rn/Rm to R14, PR) not lower than the
+specified register number and memory with the contents of R15 as its address.
+<br/><br/>
+If R15 is specified, PR is transferred instead of R15.
 )"})
 
   (note
@@ -2695,7 +3349,20 @@ Note: When Rm = R15, read Rm as PR)"})
 
   (operation
 {R"(
+MOVLMMU (int m)
+{
+  int i;
+  Write_Long (R[15] - 4, PR);
+  R[15] -= 4;
 
+  for (i = 14; i >= m; i--)
+  {
+    Write_Long (R[15] - 4, R[i]);
+    R[15]-=4;
+  }
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -2705,7 +3372,7 @@ Note: When Rm = R15, read Rm as PR)"})
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -2727,7 +3394,11 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (description
 {R"(
-
+Transfers a source operand to a destination. This instruction performs transfer
+between a number of general registers (Rn/Rm to R14, PR) not lower than the
+specified register number and memory with the contents of R15 as its address.
+<br/><br/>
+If R15 is specified, PR is transferred instead of R15.
 )"})
 
   (note
@@ -2737,7 +3408,19 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (operation
 {R"(
+MOVLPMU (int n)
+{
+  int i;
+  for (i = n; i <= 14; i++)
+  {
+    R[i] = Read_Long (R[15]);
+    R[15] += 4;
+  }
 
+  PR = Read_Long (R[15]);
+  R[15] += 4;
+  PC += 2;
+}
 )"})
 
   (example
@@ -2747,7 +3430,7 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -2762,7 +3445,8 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (description
 {R"(
-
+Reverses the T bit and then stores the resulting value in general register Rn.
+The value of Rn is 0 when T = 1 and 1 when T = 0.
 )"})
 
   (note
@@ -2772,7 +3456,15 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (operation
 {R"(
+MOVRT (int n)
+{
+  if (T == 1)
+    R[n] = 0x00000000;
+  else
+    R[n] = 0x00000001;
 
+  PC += 2;
+}
 )"})
 
   (example
@@ -2798,7 +3490,8 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (description
 {R"(
-
+This instruction stores the T bit in general register Rn.
+The value of Rn is 1 when T = 1 and 0 when T = 0.
 )"})
 
   (note
@@ -2808,7 +3501,14 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (operation
 {R"(
-
+MOVT (int n)
+{
+  if (T == 1)
+    R[n] = 0x00000001;
+  else
+    R[n] = 0x00000000;
+  PC += 2;
+}
 )"})
 
   (example
@@ -2833,7 +3533,10 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (description
 {R"(
-
+Transfers a source operand to a destination, performing unsigned data transfer.
+This instruction is ideal for data access in a structure or the stack.
+The loaded data is zero-extended to 32 bit before being stored in the
+destination register.
 )"})
 
   (note
@@ -2843,7 +3546,14 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (operation
 {R"(
-
+MOVBUL12 (int d, int m, int n)
+{
+  long disp;
+  disp = (0x00000FFF & (long)d);
+  R[n] = Read_Byte (R[m] + disp);
+  R[n] &= 0x000000FF;
+  PC += 4;
+}
 )"})
 
   (example
@@ -2868,7 +3578,10 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (description
 {R"(
-
+Transfers a source operand to a destination, performing unsigned data transfer.
+This instruction is ideal for data access in a structure or the stack.
+The loaded data is zero-extended to 32 bit before being stored in the
+destination register.
 )"})
 
   (note
@@ -2878,7 +3591,14 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (operation
 {R"(
-
+MOVWUL12 (int d, int m, int n)
+{
+  long disp;
+  disp = (0x00000FFF & (long)d);
+  R[n] = Read_Word (R[m] + (disp << 1));
+  R[n] &= 0x0000FFFF;
+  PC += 4;
+}
 )"})
 
   (example
@@ -2904,7 +3624,7 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (description
 {R"(
-
+Inverts the T bit, then stores the resulting value in the T bit.
 )"})
 
   (note
@@ -2914,7 +3634,15 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (operation
 {R"(
+NOTT ()
+{
+  if (T == 1)
+    T = 0;
+  else
+    T = 1;
 
+  PC += 2;
+}
 )"})
 
   (example
@@ -2940,7 +3668,11 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (description
 {R"(
-
+This instruction swaps the upper and lower parts of the contents of general
+register Rm, and stores the result in Rn.
+The 8 bits from bit 15 to bit 8 of Rm are swapped with the 8 bits from bit 7 to
+bit 0. The upper 16 bits of Rm are transferred directly to the upper 16 bits of
+Rn.
 )"})
 
   (note
@@ -2950,7 +3682,15 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (operation
 {R"(
-
+SWAPB (int m, int n)
+{
+  unsigned long temp0, temp1;
+  temp0 = R[m] & 0xFFFF0000;
+  temp1 = (R[m] & 0x000000FF) << 8;
+  R[n] = (R[m] & 0x0000FF00) >> 8;
+  R[n] = R[n] | temp1 | temp0;
+  PC += 2;
+}
 )"})
 
   (example
@@ -2976,7 +3716,10 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (description
 {R"(
-
+This instruction swaps the upper and lower parts of the contents of general
+register Rm, and stores the result in Rn.
+The 16 bits from bit 31 to bit 16 of Rm are swapped with the 16 bits from bit
+15 to bit 0.
 )"})
 
   (note
@@ -2986,7 +3729,14 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (operation
 {R"(
-
+SWAPW (int m, int n)
+{
+  unsigned long temp;
+  temp = (R[m] >> 16) & 0x0000FFFF;
+  R[n] = R[m] << 16;
+  R[n] |= temp;
+  PC += 2;
+}
 )"})
 
   (example
@@ -3012,7 +3762,9 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (description
 {R"(
-
+This instruction extracts the middle 32 bits from the 64-bit contents of linked
+general registers Rm and Rn, and stores the result in Rn.
+// FIXME: add diagram.
 )"})
 
   (note
@@ -3022,7 +3774,14 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (operation
 {R"(
-
+XTRCT (int m, int n)
+{
+  unsigned long temp;
+  temp = (R[m] << 16) & 0xFFFF0000;
+  R[n] = (R[n] >> 16) & 0x0000FFFF;
+  R[n] |= temp;
+  PC += 2;
+}
 )"})
 
   (example
