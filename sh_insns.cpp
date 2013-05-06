@@ -684,9 +684,31 @@ __sexpr (insn_blocks.push_back
   (issue SH_ANY "1")
   (latency SH_ANY "1")
 
-  (description {R"(
-    Stores immediate data, which has been sign-extended to a 32-bit value,
-    into general register Rn. )"})
+  (description
+{R"(
+Stores immediate data, which is sign-extended to a 32-bit value, into general
+register Rn.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -698,6 +720,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -709,6 +756,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 
@@ -725,19 +797,31 @@ __sexpr (insn_blocks.push_back
   (description {R"(
     Copies the contents of general register Rm to the general register Rn.
     The source register is not modified. )"})
-/*
-  (note {R"(
-    This is a note. )"})
 
-  (operation {R"(
-    Operation pseudo code follows here. )"})
+  (description
+{R"(
 
-  (example {R"(
-    Example code follows here. )"})
+)"})
 
-  (exceptions {R"(
-    <li>Invalid operation</li> )"})
-*/
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -749,6 +833,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -760,6 +869,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -771,6 +905,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -782,6 +941,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -793,6 +977,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -804,6 +1013,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -815,6 +1049,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "1/1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -826,6 +1085,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "1/1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -837,6 +1121,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "1/1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -848,6 +1157,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "1/2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -859,6 +1193,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "1/2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -870,6 +1229,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "1/2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -881,6 +1265,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -892,6 +1301,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -903,6 +1337,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -914,6 +1373,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -925,6 +1409,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -936,6 +1445,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -947,6 +1481,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -958,6 +1517,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -969,6 +1553,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -980,6 +1589,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -991,6 +1625,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1002,6 +1661,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1013,6 +1697,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1024,6 +1733,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1035,6 +1769,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1046,6 +1805,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1057,6 +1841,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1068,6 +1877,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1078,6 +1912,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "1")
   (latency SH2A "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1088,6 +1947,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "1")
   (latency SH2A "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1098,6 +1982,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "1")
   (latency SH2A "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1108,6 +2017,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "1")
   (latency SH2A "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1118,6 +2052,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "1")
   (latency SH2A "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1128,6 +2087,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "1")
   (latency SH2A "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1138,6 +2122,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "1")
   (latency SH2A "0")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1148,6 +2157,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "1")
   (latency SH2A "0")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1158,6 +2192,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "1")
   (latency SH2A "0")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1168,6 +2227,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "1")
   (latency SH2A "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1178,6 +2262,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "1")
   (latency SH2A "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1188,6 +2297,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "1")
   (latency SH2A "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1221,6 +2355,16 @@ __sexpr (insn_blocks.push_back
     exception will be generated.
 )"})
 
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
   (exceptions
 {R"(
 <li>Slot illegal instruction</li>
@@ -1235,6 +2379,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "1")
   (latency SH2A "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1245,6 +2414,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "1")
   (latency SH2A "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1257,6 +2451,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "CO")
   (issue SH4A "1")
   (latency SH4A "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1268,6 +2487,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "CO")
   (issue SH4A "1")
   (latency SH4A "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1279,6 +2523,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS")
   (issue SH4A "2")
   (latency SH4A "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1290,6 +2559,31 @@ __sexpr (insn_blocks.push_back
   (group SH4A "LS")
   (issue SH4A "2")
   (latency SH4A "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1306,6 +2600,31 @@ Note: When Rm = R15, read Rm as PR)"})
   (code "0100mmmm11110001")
   (issue SH2A "1-16")
   (latency SH2A "1-16")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1322,6 +2641,31 @@ Note: When Rn = R15, read Rn as PR)"})
   (code "0100nnnn11110101")
   (issue SH2A "1-16")
   (latency SH2A "2-17")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1338,6 +2682,31 @@ Note: When Rm = R15, read Rm as PR)"})
   (code "0100mmmm11110000")
   (issue SH2A "1-16")
   (latency SH2A "1-16")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1355,6 +2724,31 @@ Note: When Rn = R15, read Rn as PR)"})
   (code "0100nnnn11110100")
   (issue SH2A "1-16")
   (latency SH2A "2-17")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1365,6 +2759,31 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (issue SH2A "1")
   (latency SH2A "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1376,6 +2795,31 @@ Note: When Rn = R15, read Rn as PR)"})
   (group SH4 "EX" SH4A "EX")
   (issue SH_ANY "1")
   (latency SH_ANY "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1386,6 +2830,31 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (issue SH2A "1")
   (latency SH2A "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1396,6 +2865,31 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (issue SH2A "1")
   (latency SH2A "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1407,6 +2901,31 @@ Note: When Rn = R15, read Rn as PR)"})
 
   (issue SH2A "1")
   (latency SH2A "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1418,6 +2937,31 @@ Note: When Rn = R15, read Rn as PR)"})
   (group SH4 "EX" SH4A "EX")
   (issue SH_ANY "1")
   (latency SH_ANY "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1429,6 +2973,31 @@ Note: When Rn = R15, read Rn as PR)"})
   (group SH4 "EX" SH4A "EX")
   (issue SH_ANY "1")
   (latency SH_ANY "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1440,6 +3009,31 @@ Note: When Rn = R15, read Rn as PR)"})
   (group SH4 "EX" SH4A "EX")
   (issue SH_ANY "1")
   (latency SH_ANY "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1458,6 +3052,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "3")
   (latency SH2A "3")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1469,6 +3088,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "3")
   (latency SH2A "3")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1479,6 +3123,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "3")
   (latency SH2A "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1489,6 +3158,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "1")
   (latency SH2A "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1500,6 +3194,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "3")
   (latency SH2A "3")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1511,6 +3230,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "1")
   (latency SH2A "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1522,6 +3266,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "3")
   (latency SH2A "3")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1533,6 +3302,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "3")
   (latency SH2A "3")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1544,6 +3338,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "3")
   (latency SH2A "3")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1554,6 +3373,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "3")
   (latency SH2A "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1564,6 +3408,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "1")
   (latency SH2A "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1574,6 +3443,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "3")
   (latency SH2A "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1584,6 +3478,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "1")
   (latency SH2A "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1595,6 +3514,31 @@ __sexpr (insn_blocks.push_back
 
   (issue SH2A "3")
   (latency SH2A "3")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1738,7 +3682,6 @@ ADDC (long m, long n)
 
   PC += 2;
 }
-
 )"})
 
   (example
@@ -1814,7 +3757,6 @@ ADDV (long m, long n)
 
   PC += 2;
 }
-
 )"})
 
   (example
@@ -1825,7 +3767,6 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000001, R1 = H'7FFFFFFE, T = 0
 
 ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
              ! After execution:  R1 = H'80000000, T = 1
-
 )"})
 
   (exceptions
