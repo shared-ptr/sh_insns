@@ -3763,7 +3763,7 @@ SWAPW (int m, int n)
 {R"(
 This instruction extracts the middle 32 bits from the 64-bit contents of linked
 general registers Rm and Rn, and stores the result in Rn.
-// FIXME: add diagram.
+<br/><img src="xtrct.svg" height="110"/>
 )"})
 
   (note
