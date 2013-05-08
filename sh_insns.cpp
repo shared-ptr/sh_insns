@@ -2905,9 +2905,9 @@ MOVA (int d)
 
   (description
 {R"(
-Stores immediate data that has been sign-extended to longword in general register
-Rn.
-// FIXME: add diagram.
+Stores immediate data that has been sign-extended to longword in general
+register Rn.
+<br/><img src="movi20.svg" height="140"/>
 )"})
 
   (note
@@ -2955,8 +2955,7 @@ Shifts immediate data 8 bits to the left and performs sign extension to
 longword, then stores the resulting data in general register Rn. Using an OR or
 ADD instruction as the next instruction enables a 28-bit absolute address to be
 generated.
-
-// FIXME: add diagram.
+<br/><img src="movi20s.svg" height="150"/>
 )"})
 
   (note
