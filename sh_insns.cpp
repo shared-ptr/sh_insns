@@ -3813,8 +3813,12 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+ANDs a specified bit in memory at the address indicated by (disp + Rn) with the
+T bit, and stores the result in the T bit. The bit number is specified by 3-bit
+immediate data. With this instruction, data is read from memory as a byte unit.
 )"})
+
+// FIXME: <br/><img src="band.b.svg" height="110"/>
 
   (note
 {R"(
@@ -3823,7 +3827,21 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+BANDM (int d, int i, int n)
+{
+  long disp, imm, temp, assignbit;
+  disp = (0x00000FFF & (long)d);
+  imm = (0x00000007 & (long)i);
+  temp = (long)Read_Byte (R[n] + disp);
+  assignbit =(0x00000001 << imm) & temp;
 
+  if ((T == 0) || (assignbit == 0))
+    T = 0;
+  else
+    T = 1;
+
+  PC += 4;
+}
 )"})
 
   (example
@@ -3833,7 +3851,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -3849,8 +3867,13 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+ANDs the value obtained by inverting a specified bit of memory at the address
+indicated by (disp + Rn) with the T bit, and stores the result in the T bit.
+The bit number is specified by 3-bit immediate data. With this instruction, data
+is read from memory as a byte unit.
 )"})
+
+// FIXME: <br/><img src="bandnot.b.svg" height="110"/>
 
   (note
 {R"(
@@ -3859,7 +3882,21 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+BANDNOTM (int d, int i, int n)
+{
+  long disp, imm, temp, assignbit;
+  disp = (0x00000FFF & (long)d);
+  imm = (0x00000007 & (long)i);
+  temp = (long)Read_Byte (R[n] + disp);
+  assignbit =(0x00000001 << imm) & temp;
 
+  if ((T == 1) && (assignbit == 0))
+    T = 1;
+  else
+    T = 0;
+
+  PC += 4;
+}
 )"})
 
   (example
@@ -3869,7 +3906,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -3884,8 +3921,13 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Clears a specified bit of memory at the address indicated by (disp + Rn).
+The bit number is specified by 3-bit immediate data. After data is read from
+memory as a byte unit, clearing of the specified bit is executed and the
+resulting data is then written to memory as a byte unit.
 )"})
+
+// FIXME: <br/><img src="bclr.b.svg" height="110"/>
 
   (note
 {R"(
@@ -3894,7 +3936,16 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+BCLRM (int d, int i, int n)
+{
+  long disp, imm, temp;
+  disp = (0x00000FFF & (long)d);
+  imm = (0x00000007 & (long)i);
+  temp = (long)Read_Byte (R[n] + disp);
+  temp &= (~(0x00000001 < <imm));
+  Write_Byte (R[n] + disp, temp);
+  PC+=4;
+}
 )"})
 
   (example
@@ -3904,7 +3955,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -3919,8 +3970,11 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Clears a specified bit of the LSB 8 bits of a general register Rn.
+The bit number is specified by 3-bit immediate data.
 )"})
+
+// FIXME: <br/><img src="bclr.svg" height="110"/>
 
   (note
 {R"(
@@ -3929,7 +3983,13 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+CLR (int i, int n)
+{
+  long imm, temp;
+  imm = (0x00000007 & (long)i);
+  R[n] &= (~(0x00000001 << imm));
+  PC += 2;
+}
 )"})
 
   (example
@@ -3955,8 +4015,12 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Stores a specified bit of memory at the address indicated by (disp + Rn) in the
+T bit. The bit number is specified by 3-bit immediate data. Data is read from
+memory as a byte unit.
 )"})
+
+// FIXME: <br/><img src="bld.b.svg" height="110"/>
 
   (note
 {R"(
@@ -3965,7 +4029,21 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+BLDM (int d, int i, int n)
+{
+  long disp, imm, temp, assignbit;
+  disp = (0x00000FFF & (long)d);
+  imm = (0x00000007 & (long)i);
+  temp = (long)Read_Byte (R[n] + disp);
+  assignbit = (0x00000001 << imm) & temp;
 
+  if (assignbit == 0)
+    T = 0;
+  else
+    T = 1;
+
+  PC += 4;
+}
 )"})
 
   (example
@@ -3975,7 +4053,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -3991,8 +4069,11 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Stores a specified bit of the LSB 8 bits of a general register Rn in the T bit.
+The bit number is specified by 3-bit immediate data.
 )"})
+
+// FIXME: <br/><img src="bld.svg" height="110"/>
 
   (note
 {R"(
@@ -4001,7 +4082,19 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+BLD (int i, int n)
+{
+  long imm, assignbit;
+  imm = (0x00000007 & (long)i);
+  assignbit = (0x00000001 << imm) & R[n];
 
+  if (assignbit == 0)
+    T = 0;
+  else
+    T = 1;
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -4027,8 +4120,12 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Inverts a specified bit of memory at the address indicated by (disp + Rn), and
+stores the resulting value in the T bit. The bit number is specified by 3-bit
+immediate data. Data is read from memory as a byte unit.
 )"})
+
+// FIXME: <br/><img src="bldnot.svg" height="110"/>
 
   (note
 {R"(
@@ -4037,7 +4134,21 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+BLDNOTM (int d, int i, int n)
+{
+  long disp, imm, temp, assignbit;
+  disp = (0x00000FFF & (long)d);
+  imm = (0x00000007 & (long)i);
+  temp = (long)Read_Byte (R[n] + disp);
+  assignbit = (0x00000001 << imm) & temp;
 
+  if (assignbit == 0)
+    T = 1;
+  else
+    T = 0;
+
+  PC += 4;
+}
 )"})
 
   (example
@@ -4047,7 +4158,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -4063,8 +4174,12 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+ORs a specified bit in memory at the address indicated by (disp + Rn) with the
+T bit, and stores the result in the T bit. The bit number is specified by 3-bit
+immediate data. Data is read from memory as a byte unit.
 )"})
+
+// FIXME: <br/><img src="bor.b.svg" height="110"/>
 
   (note
 {R"(
@@ -4073,7 +4188,21 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+BORM (int d, int i, int n)
+{
+  long disp, imm, temp, assignbit;
+  disp = (0x00000FFF & (long)d);
+  imm = (0x00000007 & (long)i);
+  temp = (long)Read_Byte (R[n] + disp);
+  assignbit = (0x00000001 << imm) & temp;
 
+  if ((T == 0) && (assignbit == 0))
+    T = 0;
+  else
+    T = 1;
+
+  PC += 4;
+}
 )"})
 
   (example
@@ -4083,7 +4212,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -4099,8 +4228,13 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+ORs the value obtained by inverting a specified bit of memory at the address
+indicated by (disp + Rn) with the T bit, and stores the result in the T bit.
+The bit number is specified by 3-bit immediate data. With this instruction,
+data is read from memory as a byte unit.
 )"})
+
+// FIXME: <br/><img src="bornot.b.svg" height="110"/>
 
   (note
 {R"(
@@ -4109,7 +4243,21 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+BORNOTM (int d, int i, int n)
+{
+  long disp, imm, temp, assignbit;
+  disp = (0x00000FFF & (long)d);
+  imm = (0x00000007 & (long)i);
+  temp = (long)Read_Byte (R[n] + disp);
+  assignbit = (0x00000001 << imm) & temp;
 
+  if ((T == 1) || (assignbit == 0))
+    T = 1;
+  else
+    T = 0;
+
+  PC += 4;
+}
 )"})
 
   (example
@@ -4119,7 +4267,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -4134,8 +4282,13 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Sets to 1 a specified bit of memory at the address indicated by (disp + Rn).
+The bit number is specified by 3-bit immediate data. After data is read from
+memory as a byte unit, the specified bit is set to 1, and the resulting data is
+then written to memory as a byte unit.
 )"})
+
+// FIXME: <br/><img src="bset.b.svg" height="110"/>
 
   (note
 {R"(
@@ -4144,7 +4297,16 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+BSETM (int d, int i, int n)
+{
+  long disp, imm, temp;
+  disp = (0x00000FFF & (long)d);
+  imm = (0x00000007 & (long)i);
+  temp = (long)Read_Byte (R[n] + disp);
+  temp |= (0x00000001 << imm);
+  Write_Byte (R[n] + disp, temp);
+  PC += 4;
+}
 )"})
 
   (example
@@ -4154,7 +4316,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -4169,8 +4331,11 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Sets to 1 a specified bit of the LSB 8 bits of a general register Rn. The bit
+number is specified by 3-bit immediate data.
 )"})
+
+// FIXME: <br/><img src="bset.svg" height="110"/>
 
   (note
 {R"(
@@ -4179,7 +4344,13 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+BSET (int i, int n)
+{
+  long imm, temp;
+  imm = (0x00000007 & (long)i);
+  R[n] |= (0x00000001 << imm);
+  PC += 2;
+}
 )"})
 
   (example
@@ -4204,8 +4375,14 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the contents of the T bit to a specified 1-bit location of memory at
+the address indicated by (disp + Rn). The bit number is specified by 3-bit
+immediate data. After data is read from memory as a byte unit, transfer from the
+T bit to the specified bit is executed, and the resulting data is then written
+to memory as a byte unit.
 )"})
+
+// FIXME: <br/><img src="bst.b.svg" height="110"/>
 
   (note
 {R"(
@@ -4214,7 +4391,21 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+BSTM (int d, int i, int n)
+{
+  long disp, imm, temp;
+  disp = (0x00000FFF & (long)d);
+  imm = (0x00000007 & (long)i);
+  temp = (long) Read_Byte (R[n] + disp);
 
+  if (T == 0)
+    temp &= (~(0x00000001 << imm));
+  else
+    temp |= (0x00000001 << imm);
+
+  Write_Byte (R[n] + disp, temp);
+  PC += 4;
+}
 )"})
 
   (example
@@ -4224,7 +4415,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -4239,8 +4430,12 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the contents of the T bit to a specified 1-bit location of the
+LSB 8 bits of a general register Rn. The bit number is specified by 3-bit
+immediate data.
 )"})
+
+// FIXME: <br/><img src="bst.svg" height="110"/>
 
   (note
 {R"(
@@ -4249,7 +4444,19 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+BST (int i, int n)
+{
+  long disp, imm;
+  disp = (0x00000FFF & (long)d);
+  imm = (0x00000007 & (long)i);
 
+  if (T == 0)
+    R[n] &= (~(0x00000001 << imm));
+  else
+    R[n] |= (0x00000001 << imm);
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -4275,8 +4482,13 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Exclusive-ORs a specified bit in memory at the address indicated by (disp + Rn)
+with the T bit, and stores the result in the T bit. The bit number is specified
+by 3-bit immediate data. With this instruction, data is read from memory as a
+byte unit.
 )"})
+
+// FIXME: <br/><img src="bxor.b.svg" height="110"/>
 
   (note
 {R"(
@@ -4285,7 +4497,31 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+BXORM (int d, int i, int n)
+{
+  long disp, imm, temp, assignbit;
+  disp = (0x00000FFF & (long)d);
+  imm = (0x00000007 & (long)i);
+  temp = (long)Read_Byte (R[n] + disp);
+  assignbit = (0x00000001 << imm) & temp;
 
+  if (assignbit == 0)
+  {
+    if (T == 0)
+      T = 0;
+    else
+      T = 1;
+  }
+  else
+  {
+    if (T == 0)
+      T = 1;
+    else
+      T = 0;
+  }
+
+  PC += 4;
+}
 )"})
 
   (example
@@ -4295,7 +4531,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
