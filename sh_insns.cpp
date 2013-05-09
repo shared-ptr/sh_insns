@@ -18890,7 +18890,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct pdec	Sx,Dz"
   SH_DSP
-  (abstract "If DC = 1: MSW of Sx - 1 -> MSW of DZ, clear LSW of Dz; else: nop")
+  (abstract "If DC = 1: MSW of Sx - 1 -> MSW of DZ, clear LSW of Dz\nElse: nop")
   (code "111110********** 10001010xx00zzzz")
 
   (issue SH_DSP "1")
@@ -18925,7 +18925,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct pdec	Sy,Dz"
   SH_DSP
-  (abstract "If DC = 1: MSW of Sy - 1 -> MSW of DZ, clear LSW of Dz; else: nop")
+  (abstract "If DC = 1: MSW of Sy - 1 -> MSW of DZ, clear LSW of Dz\nElse: nop")
   (code "111110********** 1010101000yyzzzz")
 
   (issue SH_DSP "1")
@@ -18960,7 +18960,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf pdec	Sx,Dz"
   SH_DSP
-  (abstract "If DC = 0: MSW of Sx - 1 -> MSW of DZ, clear LSW of Dz; else: nop")
+  (abstract "If DC = 0: MSW of Sx - 1 -> MSW of DZ, clear LSW of Dz\nElse: nop")
   (code "111110********** 10001011xx00zzzz")
 
   (issue SH_DSP "1")
@@ -18995,7 +18995,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf pdec	Sy,Dz"
   SH_DSP
-  (abstract "If DC = 0: MSW of Sy - 1 -> MSW of DZ, clear LSW of Dz; else: nop")
+  (abstract "If DC = 0: MSW of Sy - 1 -> MSW of DZ, clear LSW of Dz\nElse: nop")
   (code "111110********** 1010101100yyzzzz")
 
   (issue SH_DSP "1")
@@ -19102,7 +19102,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct pinc	Sx,Dz"
   SH_DSP
-  (abstract "If DC = 1: MSW of Sx + 1 -> MSW of Dz, clear LSW of Dz; else: nop")
+  (abstract "If DC = 1: MSW of Sx + 1 -> MSW of Dz, clear LSW of Dz\nElse: nop")
   (code "111110********** 10011010xx00zzzz")
 
   (issue SH_DSP "1")
@@ -19137,7 +19137,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct pinc	Sy,Dz"
   SH_DSP
-  (abstract "If DC = 1: MSW of Sy + 1 -> MSW of Dz, clear LSW of Dz; else: nop")
+  (abstract "If DC = 1: MSW of Sy + 1 -> MSW of Dz, clear LSW of Dz\nElse: nop")
   (code "111110********** 1011101000yyzzzz")
 
   (issue SH_DSP "1")
@@ -19172,7 +19172,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf pinc	Sx,Dz"
   SH_DSP
-  (abstract "If DC = 0: MSW of Sx + 1 -> MSW of Dz, clear LSW of Dz; else: nop")
+  (abstract "If DC = 0: MSW of Sx + 1 -> MSW of Dz, clear LSW of Dz\nElse: nop")
   (code "111110********** 10011011xx00zzzz")
 
   (issue SH_DSP "1")
@@ -19207,7 +19207,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf pinc	Sy,Dz"
   SH_DSP
-  (abstract "If DC = 0: MSW of Sy + 1 -> MSW of Dz, clear LSW of Dz; else: nop")
+  (abstract "If DC = 0: MSW of Sy + 1 -> MSW of Dz, clear LSW of Dz\nElse: nop")
   (code "111110********** 1011101100yyzzzz")
 
   (issue SH_DSP "1")
@@ -19314,7 +19314,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct pdmsb	Sx,Dz"
   SH_DSP
-  (abstract "If DC = 1: Sx data MSB position -> MSW of Dz, clear LSW of Dz; else: nop")
+  (abstract "If DC = 1: Sx data MSB position -> MSW of Dz, clear LSW of Dz\nElse: nop")
   (code "111110********** 10011110xx00zzzz")
 
   (issue SH_DSP "1")
@@ -19349,7 +19349,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct pdmsb	Sy,Dz"
   SH_DSP
-  (abstract "If DC = 1: Sy data MSB position -> MSW of Dz, clear LSW of Dz; else: nop")
+  (abstract "If DC = 1: Sy data MSB position -> MSW of Dz, clear LSW of Dz\nElse: nop")
   (code "111110********** 1011111000yyzzzz")
 
   (issue SH_DSP "1")
@@ -19384,7 +19384,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf pdmsb	Sx,Dz"
   SH_DSP
-  (abstract "If DC = 0: Sx data MSB position -> MSW of Dz, clear LSW of Dz; else: nop")
+  (abstract "If DC = 0: Sx data MSB position -> MSW of Dz, clear LSW of Dz\nElse: nop")
   (code "111110********** 10011111xx00zzzz")
 
   (issue SH_DSP "1")
@@ -19419,7 +19419,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf pdmsb	Sy,Dz"
   SH_DSP
-  (abstract "If DC = 0: Sy data MSB position -> MSW of Dz, clear LSW of Dz; else: nop")
+  (abstract "If DC = 0: Sy data MSB position -> MSW of Dz, clear LSW of Dz\nElse: nop")
   (code "111110********** 1011111100yyzzzz")
 
   (issue SH_DSP "1")
@@ -19567,7 +19567,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct pand	Sx,Sy,Dz"
   SH_DSP
-  (abstract "If DC = 1: Sx & Sy -> Dz, clear LSW of Dz; else: nop")
+  (abstract "If DC = 1: Sx & Sy -> Dz, clear LSW of Dz\nElse: nop")
   (code "111110********** 10010110xxyyzzzz")
 
   (issue SH_DSP "1")
@@ -19602,7 +19602,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf pand	Sx,Sy,Dz"
   SH_DSP
-  (abstract "If DC = 0: Sx & Sy -> Dz, clear LSW of Dz; else: nop")
+  (abstract "If DC = 0: Sx & Sy -> Dz, clear LSW of Dz\nElse: nop")
   (code "111110********** 10010111xxyyzzzz")
 
   (issue SH_DSP "1")
@@ -19673,7 +19673,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct por		Sx,Sy,Dz"
   SH_DSP
-  (abstract "If DC = 1: Sx | Sy -> Dz, clear LSW of Dz; else: nop")
+  (abstract "If DC = 1: Sx | Sy -> Dz, clear LSW of Dz\nElse: nop")
   (code "111110********** 10110110xxyyzzzz")
 
   (issue SH_DSP "1")
@@ -19708,7 +19708,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf por		Sx,Sy,Dz"
   SH_DSP
-  (abstract "If DC = 0: Sx | Sy -> Dz, clear LSW of Dz; else: nop")
+  (abstract "If DC = 0: Sx | Sy -> Dz, clear LSW of Dz\nElse: nop")
   (code "111110********** 10110111xxyyzzzz")
 
   (issue SH_DSP "1")
@@ -19779,7 +19779,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct pxor	Sx,Sy,Dz"
   SH_DSP
-  (abstract "If DC = 1: Sx ^ Sy -> Dz, clear LSW of Dz; else: nop")
+  (abstract "If DC = 1: Sx ^ Sy -> Dz, clear LSW of Dz\nElse: nop")
   (code "111110********** 10100110xxyyzzzz")
 
   (issue SH_DSP "1")
@@ -19814,7 +19814,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf pxor	Sx,Sy,Dz"
   SH_DSP
-  (abstract "If DC = 0: Sx ^ Sy -> Dz, clear LSW of Dz; else: nop")
+  (abstract "If DC = 0: Sx ^ Sy -> Dz, clear LSW of Dz\nElse: nop")
   (code "111110********** 10100111xxyyzzzz")
 
   (issue SH_DSP "1")
