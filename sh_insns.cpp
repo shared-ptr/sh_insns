@@ -12219,6 +12219,14 @@ Power-Down Modes in the target product's hardware manual, for details.
 <br/><br/>
 The number of cycles given is for the transition to sleep mode. "ud" means
 the number of cycles is undefined.
+<br/><br/>
+Some SH4 implementations have a hardware bug which restricts the instructions
+that should follow this instruction for safe operation.  There are two
+recommended workarounds:
+<li>Put 8 NOP instructions following the SLEEP instruction.</li>
+<li>Put 5 "OR R0,R0" instructions following the SLEEP instruction</li>
+<br/>
+For more information see the document "tnsh7456ae.pdf".
 )"})
 
   (operation
@@ -12477,7 +12485,7 @@ This instruction can also be issued in user mode.
 {R"(
 STCMGBR (int n)
 {
-  R[n] –= 4;
+  R[n] -= 4;
   Write_Long (R[n],GBR);
   PC += 2;
 }
@@ -12510,7 +12518,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores control register VBR in the destination.
 )"})
 
   (note
@@ -12520,7 +12528,11 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STCVBR (int n)
+{
+  R[n] = VBR;
+  PC += 2;
+}
 )"})
 
   (example
@@ -12530,7 +12542,8 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -12546,7 +12559,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores control register VBR in the destination.
 )"})
 
   (note
@@ -12556,7 +12569,12 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STCMVBR (int n)
+{
+  R[n] -= 4;
+  Write_Long (R[n], VBR);
+  PC += 2;
+}
 )"})
 
   (example
@@ -12566,7 +12584,13 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Initial page write exception</li>
+<li>Data address error</li>
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -12581,7 +12605,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores control register MOD in the destination.
 )"})
 
   (note
@@ -12591,7 +12615,11 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STCMOD (int n)
+{
+  R[n] = MOD;
+  PC += 2;
+}
 )"})
 
   (example
@@ -12614,20 +12642,24 @@ STCMGBR (int n)
   (issue SH_DSP "1")
   (latency SH_DSP "1/2")
 
-  // SH1-DSP latency: 2
-
   (description
 {R"(
-
+Stores control register MOD in the destination.
 )"})
 
   (note
 {R"(
-
+On the SH-DSP the latency of this instruction is 2 cycles.
 )"})
 
   (operation
 {R"(
+STCMMOD (int n)
+{
+  R[n] -= 4;
+  Write_Long (R[n], MOD);
+  PC += 2;
+}
 
 )"})
 
@@ -12638,7 +12670,7 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -12653,7 +12685,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores control register RE in the destination.
 )"})
 
   (note
@@ -12663,7 +12695,11 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STCRE (int n)
+{
+  R[n] = RE;
+  PC += 2;
+}
 )"})
 
   (example
@@ -12686,21 +12722,24 @@ STCMGBR (int n)
   (issue SH_DSP "1")
   (latency SH_DSP "1/2")
 
-  // SH1-DSP latency: 2
-
   (description
 {R"(
-
+Stores control register RE in the destination.
 )"})
 
   (note
 {R"(
-
+On the SH-DSP the latency of this instruction is 2 cycles.
 )"})
 
   (operation
 {R"(
-
+STCMRE (int n)
+{
+  R[n] -= 4;
+  Write_Long (R[n], RE);
+  PC += 2;
+}
 )"})
 
   (example
@@ -12710,7 +12749,7 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -12725,7 +12764,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores control register RS in the destination.
 )"})
 
   (note
@@ -12735,7 +12774,11 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STCRS (int n)
+{
+  R[n] = RS;
+  PC += 2;
+}
 )"})
 
   (example
@@ -12758,21 +12801,24 @@ STCMGBR (int n)
   (issue SH_DSP "1")
   (latency SH_DSP "1/2")
 
-  // SH1-DSP latency: 2
-
   (description
 {R"(
-
+Stores control register RS in the destination.
 )"})
 
   (note
 {R"(
-
+On the SH-DSP the latency of this instruction is 2 cycles.
 )"})
 
   (operation
 {R"(
-
+STCMRS (int n)
+{
+  R[n] -= 4;
+  Write_Long (R[n], RS);
+  PC += 2;
+}
 )"})
 
   (example
@@ -12782,7 +12828,7 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -12798,7 +12844,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores control register SGR in the destination.
 )"})
 
   (note
@@ -12808,7 +12854,11 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STCSGR (int n)
+{
+  R[n] = SGR;
+  PC += 2;
+}
 )"})
 
   (example
@@ -12818,7 +12868,8 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -12834,7 +12885,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores control register SGR in the destination.
 )"})
 
   (note
@@ -12844,7 +12895,12 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STCMSGR (int n)
+{
+  R[n] -= 4;
+  Write_Long (R[n], SGR);
+  PC += 2;
+}
 )"})
 
   (example
@@ -12854,7 +12910,13 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Initial page write exception</li>
+<li>Data address error</li>
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -12870,7 +12932,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores control register SSR in the destination.
 )"})
 
   (note
@@ -12880,7 +12942,11 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STCSSR (int n)
+{
+  R[n] = SSR;
+  PC += 2;
+}
 )"})
 
   (example
@@ -12890,7 +12956,8 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -12906,7 +12973,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores control register SSR in the destination.
 )"})
 
   (note
@@ -12916,7 +12983,12 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STCMSSR (int n)
+{
+  R[n] -= 4;
+  Write_Long (R[n], SSR);
+  PC += 2;
+}
 )"})
 
   (example
@@ -12926,7 +12998,13 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Initial page write exception</li>
+<li>Data address error</li>
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -12942,7 +13020,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores control register SPC in the destination.
 )"})
 
   (note
@@ -12952,7 +13030,11 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STCSPC (int n)
+{
+  R[n] = SPC;
+  PC += 2;
+}
 )"})
 
   (example
@@ -12962,7 +13044,8 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -12978,7 +13061,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores control register SPC in the destination.
 )"})
 
   (note
@@ -12988,7 +13071,12 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STCMSPC (int n)
+{
+  R[n] -= 4;
+  Write_Long (R[n], SPC);
+  PC += 2;
+}
 )"})
 
   (example
@@ -12998,7 +13086,13 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Initial page write exception</li>
+<li>Data address error</li>
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -13014,7 +13108,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores control register DBR in the destination.
 )"})
 
   (note
@@ -13024,7 +13118,11 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STCDBR (int n)
+{
+  R[n] = DBR;
+  PC += 2;
+}
 )"})
 
   (example
@@ -13034,7 +13132,8 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -13050,7 +13149,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores control register DBR in the destination.
 )"})
 
   (note
@@ -13060,7 +13159,12 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STCMDBR (int n)
+{
+  R[n] -= 4;
+  Write_Long (R[n], DBR);
+  PC += 2;
+}
 )"})
 
   (example
@@ -13070,7 +13174,13 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Initial page write exception</li>
+<li>Data address error</li>
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -13086,7 +13196,8 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores a banked general register in the destination. Rn_BANK0 is accessed when
+the RB bit in the SR register is 1, and Rn_BANK1 is accessed when this bit is 0. 
 )"})
 
   (note
@@ -13096,7 +13207,11 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STCRm_BANK (int n)
+{
+  R[n] = Rm_BANK;
+  PC += 2;
+}
 )"})
 
   (example
@@ -13106,7 +13221,8 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -13122,7 +13238,8 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores a banked general register in the destination. Rn_BANK0 is accessed when
+the RB bit in the SR register is 1, and Rn_BANK1 is accessed when this bit is 0. 
 )"})
 
   (note
@@ -13132,7 +13249,12 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STCMRm_BANK (int n)
+{
+  R[n] -= 4;
+  Write_Long (R[n], Rm_BANK);
+  PC += 2;
+}
 )"})
 
   (example
@@ -13142,7 +13264,13 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Initial page write exception</li>
+<li>Data address error</li>
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -13158,17 +13286,31 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores system register MACH in the destination.
 )"})
 
   (note
 {R"(
-
+On SH1, the value of bit 9 is transferred to and stored in the higher 22 bits
+(bits 31 to 10) of the destination.
 )"})
 
   (operation
 {R"(
+STSMACH (int n)
+{
+  R[n] = MACH;
 
+  #if SH1
+  if ((R[n] & 0x00000200) == 0)
+    R[n] &= 0x000003FF; 
+  else
+    R[n] |= 0xFFFFFC00;
+
+  #endif
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -13194,17 +13336,34 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores system register MACH in the destination.
 )"})
 
   (note
 {R"(
-
+On SH1, the value of bit 9 is transferred to and stored in the higher 22 bits
+(bits 31 to 10) of the destination.
 )"})
 
   (operation
 {R"(
+STSMMACH (int n)
+{
+  R[n] -= 4;
 
+  #if SH1
+  if ((MACH & 0x00000200) == 0)
+    Write_Long (R[n], MACH & 0x000003FF);
+  else
+    Write_Long (R[n], MACH | 0xFFFFFC00)
+
+  #else
+  Write_Long (R[n], MACH);
+
+  #endif
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -13214,7 +13373,11 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Initial page write exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -13230,7 +13393,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores system register MACL in the destination.
 )"})
 
   (note
@@ -13240,7 +13403,11 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STSMACL (int n)
+{
+  R[n] = MACL;
+  PC += 2;
+}
 )"})
 
   (example
@@ -13250,7 +13417,6 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
 )"})
 )
 
@@ -13266,7 +13432,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores system register MACL in the destination.
 )"})
 
   (note
@@ -13276,7 +13442,12 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STSMMACL (int n)
+{
+  R[n] -= 4;
+  Write_Long (R[n], MACL);
+  PC += 2;
+}
 )"})
 
   (example
@@ -13286,7 +13457,11 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Initial page write exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -13302,7 +13477,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores system register PR in the destination.
 )"})
 
   (note
@@ -13312,7 +13487,11 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STSPR (int n)
+{
+  R[n] = PR;
+  PC += 2;
+}
 )"})
 
   (example
@@ -13338,7 +13517,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores system register PR in the destination.
 )"})
 
   (note
@@ -13348,7 +13527,12 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STSMPR (int n)
+{
+  R[n] -= 4;
+  Write_Long (R[n], PR);
+  PC += 2;
+}
 )"})
 
   (example
@@ -13358,7 +13542,11 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Initial page write exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -13373,7 +13561,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores DSP register DSR in the destination.
 )"})
 
   (note
@@ -13383,7 +13571,11 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STSDSR (int n)
+{
+  R[n] = DSR;
+  PC += 2;
+}
 )"})
 
   (example
@@ -13408,7 +13600,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores DSP register DSR in the destination.
 )"})
 
   (note
@@ -13418,7 +13610,12 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STSMDSR (int n)
+{
+  R[n] -= 4;
+  Write_Long (R[n], DSR);
+  PC += 2;
+}
 )"})
 
   (example
@@ -13428,7 +13625,7 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -13444,7 +13641,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores DSP register A0 in the destination.
 )"})
 
   (note
@@ -13454,7 +13651,11 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STSA0 (int n)
+{
+  R[n] = A0;
+  PC += 2;
+}
 )"})
 
   (example
@@ -13479,7 +13680,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores DSP register A0 in the destination.
 )"})
 
   (note
@@ -13489,7 +13690,12 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STSMA0 (int n)
+{
+  R[n] -= 4;
+  Write_Long (R[n], A0);
+  PC += 2;
+}
 )"})
 
   (example
@@ -13499,7 +13705,7 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -13514,7 +13720,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores DSP register X0 in the destination.
 )"})
 
   (note
@@ -13524,7 +13730,11 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STSX0 (int n)
+{
+  R[n] = X0;
+  PC += 2;
+}
 )"})
 
   (example
@@ -13549,7 +13759,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores DSP register X0 in the destination.
 )"})
 
   (note
@@ -13559,7 +13769,12 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STSMX0 (int n)
+{
+  R[n] -= 4;
+  Write_Long (R[n], X0);
+  PC += 2;
+}
 )"})
 
   (example
@@ -13569,7 +13784,7 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -13584,7 +13799,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores DSP register X1 in the destination.
 )"})
 
   (note
@@ -13594,7 +13809,11 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STSX1 (int n)
+{
+  R[n] = X1;
+  PC += 2;
+}
 )"})
 
   (example
@@ -13619,7 +13838,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores DSP register X1 in the destination.
 )"})
 
   (note
@@ -13629,7 +13848,12 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STSMX1 (int n)
+{
+  R[n] -= 4;
+  Write_Long (R[n], X1);
+  PC += 2;
+}
 )"})
 
   (example
@@ -13639,7 +13863,7 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -13654,7 +13878,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores DSP register Y0 in the destination.
 )"})
 
   (note
@@ -13664,7 +13888,11 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STSY0 (int n)
+{
+  R[n] = Y0;
+  PC += 2;
+}
 )"})
 
   (example
@@ -13689,7 +13917,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores DSP register Y0 in the destination.
 )"})
 
   (note
@@ -13699,7 +13927,12 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STSMY0 (int n)
+{
+  R[n] -= 4;
+  Write_Long (R[n], Y0);
+  PC += 2;
+}
 )"})
 
   (example
@@ -13709,7 +13942,7 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -13724,7 +13957,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores DSP register Y1 in the destination.
 )"})
 
   (note
@@ -13734,7 +13967,11 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STSY1 (int n)
+{
+  R[n] = Y1;
+  PC += 2;
+}
 )"})
 
   (example
@@ -13759,7 +13996,7 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+Stores DSP register Y1 in the destination.
 )"})
 
   (note
@@ -13769,7 +14006,12 @@ STCMGBR (int n)
 
   (operation
 {R"(
-
+STSMY1 (int n)
+{
+  R[n] -= 4;
+  Write_Long (R[n], Y1);
+  PC += 2;
+}
 )"})
 
   (example
@@ -13779,7 +14021,7 @@ STCMGBR (int n)
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -13795,17 +14037,32 @@ STCMGBR (int n)
 
   (description
 {R"(
-
+This instruction is used to synchronize data operations. When this instruction
+is executed, the subsequent bus accesses are not executed until the execution of
+all preceding bus accesses has been completed.
 )"})
 
   (note
 {R"(
-
+The SYNCO instruction can not guarantee the ordering of receipt timing which is
+notified by the memory-mapped peripheral resources through the method except bus
+when the register is changed by bus accesses. Refer to the description of each
+registers to guarantee this ordering.
+<br/><br/>
+Common example usages are:
+<li>Ordering access to memory areas which are shared with other memory users</li>
+<li>Flushing all write buffers</li>
+<li>Stopping memory-access operations from merging and becoming ineffective</li>
+<li>Waiting for the completion of cache-control instructions</li>
 )"})
 
   (operation
 {R"(
-
+SYNCO ()
+{
+  synchronize_data_operaiton ();
+  PC += 2;
+}
 )"})
 
   (example
@@ -13832,17 +14089,66 @@ SH3*,SH4*: PC/SR -> SPC/SSR, imm*4 -> TRA, 0x160 -> EXPEVT, VBR + 0x0100 -> PC)"
 
   (description
 {R"(
+Starts trap exception handling.
 
+SH1, SH2 and SH2A:
+<br/>
+The PC and SR values are stored on the stack, and the program branches to an
+address specified by the vector. The vector is a memory address obtained by
+zero-extending the 8-bit immediate data and then quadrupling it. The PC is the
+start address of the next instruction. TRAPA and RTE are both used together for
+system calls.
+<br/><br/>
+
+SH3, SH4 and SH4A:
+<br/>
+The values of (PC + 2), SR, and R15 are saved to SPC, SSR and SGR, and 8-bit
+immediate data is stored in the TRA register (bits 9 to 2). The processor mode
+is switched to privileged mode (the MD bit in SR is set to 1), and the BL bit
+and RB bit in SR are set to 1.  As a result, exception and interrupt requests
+are masked (not accepted), and the BANK1 registers (R0_BANK1 to R7_BANK1) are
+selected. Exception code 0x160 is written to the EXPEVT register (bits 11 to 0).
+The program branches to address (VBR + 0x00000100), indicated by the sum of the
+VBR register contents and offset 0x00000100.
 )"})
 
   (note
 {R"(
-
+Some SH4 implementations have a hardware bug which restricts the instructions
+that should follow this instruction for safe operation.  There are two
+recommended workarounds:
+<li>Put 8 NOP instructions following the TRAPA instruction.</li>
+<li>Put 5 "OR R0,R0" instructions following the TRAPA instruction</li>
+<br/>
+For more information see the document "tnsh7456ae.pdf".
 )"})
 
   (operation
 {R"(
+TRAPA (int i)
+{
+  int imm = (0x000000FF & i);
 
+  #if SH1 || SH2 || SH2A
+  R[15] -= 4;
+  Write_Long (R[15], SR);
+  R[15] -= 4;
+  Write_Long (R[15], PC);
+  PC = Read_Long (VBR + (imm << 2));
+
+  #elif SH3 || SH4 || SH4A
+  TRA = imm << 2;
+  SSR = SR;
+  SPC = PC + 2;
+  SGR = R15;
+  SR.MD = 1;
+  SR.BL = 1;
+  SR.RB = 1;
+  EXPEVT = 0x00000160;
+  PC = VBR + 0x00000100;
+
+  #endif
+}
 )"})
 
   (example
@@ -13852,7 +14158,8 @@ SH3*,SH4*: PC/SR -> SPC/SSR, imm*4 -> TRA, 0x160 -> EXPEVT, VBR + 0x0100 -> PC)"
 
   (exceptions
 {R"(
-
+<li>Unconditional trap</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
