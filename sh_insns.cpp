@@ -7005,7 +7005,7 @@ ANDs the contents of general registers Rn and Rm and stores the result in Rn.
 
   (operation
 {R"(
-AND(long m, long n)
+AND (int m, int n)
 {
   R[n] &= R[m];
   PC += 2;
@@ -7047,7 +7047,7 @@ always cleared to zero.
 
   (operation
 {R"(
-ANDI (long i)
+ANDI (int i)
 {
   R[0] &= (0x000000FF & (long)i);
   PC += 2;
@@ -7128,7 +7128,9 @@ and a byte store.
 
   (description
 {R"(
-
+This instruction finds the one's complement of the contents of general register
+Rm and stores the result in Rn. That is, it inverts the Rm bits and stores the
+result in Rn.
 )"})
 
   (note
@@ -7138,7 +7140,11 @@ and a byte store.
 
   (operation
 {R"(
-
+NOT (int m, int n)
+{
+  R[n] = ∼R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -7164,7 +7170,7 @@ and a byte store.
 
   (description
 {R"(
-
+ORs the contents of general registers Rn and Rm and stores the result in Rn.
 )"})
 
   (note
@@ -7174,7 +7180,11 @@ and a byte store.
 
   (operation
 {R"(
-
+OR (int m, int n)
+{
+  R[n] |= R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -7200,17 +7210,23 @@ and a byte store.
 
   (description
 {R"(
-
+ORs the contents of general register R0 and the zero-extended immediate value
+and stores the result in R0.
 )"})
 
   (note
 {R"(
-
+Since the 8-bit immediate value is zero-extended, the upper 24 bits of R0 are
+not modified.
 )"})
 
   (operation
 {R"(
-
+ORI (int i)
+{
+  R[0] |= (0x000000FF & (long)i);
+  PC += 2;
+}
 )"})
 
   (example
@@ -7236,7 +7252,8 @@ and a byte store.
 
   (description
 {R"(
-
+ORs the contents of the memory byte indicated by the indirect GBR address with
+the immediate value and writes the result back to the memory byte.
 )"})
 
   (note
@@ -7246,7 +7263,14 @@ and a byte store.
 
   (operation
 {R"(
-
+ORM (int i)
+{
+  long temp;
+  temp = (long)Read_Byte (GBR + R[0]);
+  temp |= (0x000000FF & (long)i);
+  Write_Byte (GBR + R[0], temp);
+  PC += 2;
+}
 )"})
 
   (example
@@ -7256,7 +7280,14 @@ and a byte store.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Initial page write exception</li>
+<li>Data address error</li>
+<br/>
+Exceptions are checked taking a data access by this instruction as a byte load
+and a byte store.
 )"})
 )
 
@@ -7273,17 +7304,49 @@ and a byte store.
 
   (description
 {R"(
+Reads byte data from the address specified by general register Rn, and sets the
+T bit to 1 if the data is 0, or clears the T bit to 0 if the data is not 0.
+Then, data bit 7 is set to 1, and the data is written to the address specified
+by Rn. During this operation, the bus is not released.
+<br/><br/>
 
+On SH4 and SH4A this instruction purges the cache block corresponding to the
+memory area specified by the contents of general register Rn. 
+The purge operation is executed as follows.<br/>
+In a purge operation, data is accessed using the contents of general register Rn
+as the effective address. If there is a cache hit and the corresponding cache
+block is dirty (U bit = 1), the contents of that cache block are written back to
+external memory, and the cache block is then invalidated (by clearing the V bit
+to 0). If there is a cache hit and the corresponding cache block is clean (U bit
+= 0), the cache block is simply invalidated (by clearing the V bit to 0). A
+purge is not executed in the event of a cache miss, or if the accessed memory
+location is non-cacheable.
 )"})
 
   (note
 {R"(
-
+The two TAS.B memory accesses are executed automatically. Another memory access
+is not executed between the two TAS.B accesses.
+<br/><br/>
+On SH3 the destination of the TAS instruction should be placed in a
+non-cacheable space when the cache is enabled.
 )"})
 
   (operation
 {R"(
+TAS (int n)
+{
+  int temp = (int)Read_Byte (R[n]); // Bus Lock
 
+  if (temp == 0)
+    T = 1;
+  else
+    T = 0;
+
+  temp |= 0x00000080;
+  Write_Byte (R[n], temp);  // Bus unlock
+  PC += 2;
+}
 )"})
 
   (example
@@ -7293,7 +7356,14 @@ and a byte store.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Initial page write exception</li>
+<li>Data address error</li>
+<br/>
+Exceptions are checked taking a data access by this instruction as a byte load
+and a byte store.
 )"})
 )
 
@@ -7310,7 +7380,9 @@ and a byte store.
 
   (description
 {R"(
-
+ANDs the contents of general registers Rn and Rm, and sets the T bit if the
+result is zero. If the result is nonzero, the T bit is cleared. The contents of
+Rn are not changed.
 )"})
 
   (note
@@ -7320,7 +7392,15 @@ and a byte store.
 
   (operation
 {R"(
+TST (int m, int n)
+{
+  if ((R[n] & R[m]) == 0)
+    T = 1;
+  else
+    T = 0;
 
+  PC += 2;
+}
 )"})
 
   (example
@@ -7347,17 +7427,30 @@ and a byte store.
 
   (description
 {R"(
-
+ANDs the contents of general register R0 and the zero-extended immediate value
+and sets the T bit if the result is zero. If the result is nonzero, the T bit
+is cleared. The contents of Rn are not changed.
 )"})
 
   (note
 {R"(
-
+Since the 8-bit immediate value is zero-extended, this instruction can only be
+used to test the lower 8 bits of R0.
 )"})
 
   (operation
 {R"(
+TSTI (int i)
+{
+  long temp = R[0] & (0x000000FF & (long)i);
 
+  if (temp == 0)
+    T = 1;
+  else
+    T = 0;
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -7384,7 +7477,10 @@ and a byte store.
 
   (description
 {R"(
-
+ANDs the contents of the memory byte indicated by the indirect GBR address with
+the zero-extended immediate value and sets the T bit if the result is zero.
+If the result is nonzero, the T bit is cleared.
+The contents of the memory byte are not changed.
 )"})
 
   (note
@@ -7394,7 +7490,19 @@ and a byte store.
 
   (operation
 {R"(
+TSTM (int i)
+{
+  long temp;
+  temp = (long)Read_Byte (GBR + R[0]);
+  temp &= (0x000000FF & (long)i);
 
+  if (temp == 0)
+    T = 1;
+  else
+    T = 0;
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -7404,7 +7512,13 @@ and a byte store.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<br/>
+Exceptions are checked taking a data access by this instruction as a byte load
+and a byte store.
 )"})
 )
 
@@ -7420,7 +7534,7 @@ and a byte store.
 
   (description
 {R"(
-
+XORs the contents of general registers Rn and Rm and stores the result in Rn.
 )"})
 
   (note
@@ -7430,7 +7544,11 @@ and a byte store.
 
   (operation
 {R"(
-
+XOR (long m, long n)
+{
+  R[n] ^= R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -7456,17 +7574,23 @@ and a byte store.
 
   (description
 {R"(
-
+XORs the contents of general register R0 and the zero-extended immediate value
+and stores the result in R0.
 )"})
 
   (note
 {R"(
-
+Since the 8-bit immediate value is zero-extended, the upper 24 bits of R0 are
+not modified.
 )"})
 
   (operation
 {R"(
-
+XORI (int i)
+{
+  R[0] ^= (0x000000FF & (long)i);
+  PC += 2;
+}
 )"})
 
   (example
@@ -7492,7 +7616,8 @@ and a byte store.
 
   (description
 {R"(
-
+XORs the contents of the memory byte indicated by the indirect GBR address with
+the immediate value and writes the result back to the memory byte.
 )"})
 
   (note
@@ -7502,7 +7627,14 @@ and a byte store.
 
   (operation
 {R"(
-
+XORM (int i)
+{
+  int temp;
+  temp = (long)Read_Byte (GBR + R[0]);
+  temp ^= (0x000000FF & (long)i);
+  Write_Byte (GBR + R[0], temp);
+  PC += 2;
+}
 )"})
 
   (example
@@ -7512,7 +7644,14 @@ and a byte store.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Initial page write exception</li>
+<li>Data address error</li>
+<br/>
+Exceptions are checked taking a data access by this instruction as a byte load
+and a byte store.
 )"})
 )
 
