@@ -595,9 +595,10 @@ Last updated: )html" << __DATE__ << " " << __TIME__ << R"html(
 
 </div>
 <br/>
-<a style="float:right" href="mailto:olegendo@gcc.gnu.org?Subject=Renesas%20SuperH%20Instruction%20Set%20Summary">Contact</a>
-<br/>
-<a style="float:right" href="sh_insns.cpp">Page Source</a>
+<div style="float:right">
+<a href="mailto:olegendo@gcc.gnu.org?Subject=Renesas%20SuperH%20Instruction%20Set%20Summary">Contact</a>
+<a href="sh_insns.cpp">Page Source</a>
+</div>
 
 </br></br>
 
