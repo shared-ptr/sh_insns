@@ -9336,7 +9336,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+This instruction clears the MACH and MACL registers.
 )"})
 
   (note
@@ -9346,7 +9346,12 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+CLRMAC ()
+{
+  MACH = 0;
+  MACL = 0;
+  PC += 2;
+}
 )"})
 
   (example
@@ -9372,7 +9377,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+This instruction clears the S bit to 0.
 )"})
 
   (note
@@ -9382,7 +9387,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+CLRS ()
+{
+S = 0;
+PC += 2;
+}
 )"})
 
   (example
@@ -9409,7 +9418,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+This instruction clears the T bit.
 )"})
 
   (note
@@ -9419,7 +9428,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+CLRT ()
+{
+  T = 0;
+  PC += 2;
+}
 )"})
 
   (example
@@ -9445,17 +9458,28 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+This instruction accesses the instruction cache at the effective address
+indicated by the contents of Rn. When the cache is hit, the corresponding cache
+block is invalidated (the V bit is cleared to 0). At this time, write-back is
+not performed. No operation is performed in the case of a cache miss or access
+to a non-cache area.
 )"})
 
   (note
 {R"(
-
+When a program is overwriting RAM to modify its own execution, the corresponding
+block of the instruction cache should be invalidated by the ICBI instruction.
+This prevents execution of the program from the instruction cache, where the
+non-overwritten instructions are stored.
 )"})
 
   (operation
 {R"(
-
+ICBI (int n)
+{
+  invalidate_instruction_cache_block (R[n]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -9465,7 +9489,12 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Instruction TLB multiple-hit exception</li>
+<li>Instruction TLB miss exception</li>
+<li>Instruction TLB protection violation exception</li>
+<li>Instruction address error</li>
+<li>Slot illegal instruction exception</li>
+Exceptions may occur when invalidation is not performed.
 )"})
 )
 
@@ -9480,17 +9509,25 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+The register bank entry indicated by the contents of general register Rm is
+transferred to general register R0. The register bank number and register stored
+in the bank are specified by general register Rm.
+<br/><img src="ldbank.svg" height="400"/>
 )"})
 
   (note
 {R"(
-
+The architecture supports a maximum of 512 banks. However, the number of banks
+differs depending on the product.
 )"})
 
   (operation
 {R"(
-
+LDBANK (int m)
+{
+  R[0] = Read_Bank_Long (R[m]);
+  PC+=2;
+}
 )"})
 
   (example
@@ -9517,17 +9554,32 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+This instruction stores the source operand in the control register SR.
 )"})
 
   (note
 {R"(
-
+This instruction is only usable in privileged mode. Issuing this instruction in
+user mode will cause an illegal instruction exception.
 )"})
 
   (operation
 {R"(
+LDCSR (int m)
+{
+  #if SH1 || SH2 || SH2 || SH3
+  SR = R[m] & 0x0FFF0FFF;
 
+  #elif SH2A
+  SR = R[m] & 0x000063F3;
+
+  #elif SH4 || SH4A
+  SR = R[m] & 0x700083F3;
+
+  #endif
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -9537,7 +9589,66 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
+)"})
+)
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "ldc.l	@Rm+,SR"
+  SH_ANY privileged
+  (abstract "(Rm) -> SR, Rm+4 -> Rm")
+  (code "0100mmmm00000111")
+  (t_bit "LSB")
+
+  (group SH4A "CO" SH4 "CO")
+  (issue SH1 "1" SH2 "1" SH3 "2" SH4A "9" SH2A "5" SH4 "4")
+  (latency SH1 "3" SH2 "3" SH3 "7" SH4A "4" SH2A "4" SH4 "4/4")
+
+  (description
+{R"(
+This instruction stores the source operand in the control register SR.
+)"})
+
+  (note
+{R"(
+This instruction is only usable in privileged mode. Issuing this instruction in
+user mode will cause an illegal instruction exception.
+)"})
+
+  (operation
+{R"(
+LDCMSR (int m)
+{
+  #if SH1 || SH2 || SH2 || SH3
+  SR = Read_Long (R[m]) & 0x0FFF0FFF;
+
+  #elif SH2A
+  SR = Read_Long (R[m]) & 0x000063F3;
+
+  #elif SH4 || SH4A
+  SR = Read_Long (R[m]) & 0x700083F3;
+
+  #endif
+
+  R[m] += 4;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -9552,7 +9663,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Stores a source operand in control register TBR.
 )"})
 
   (note
@@ -9562,7 +9673,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+LDCTBR (int m)
+{
+  TBR = R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -9588,17 +9703,21 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Stores a source operand in control register GBR.
 )"})
 
   (note
 {R"(
-
+This instruction can also be issued in user mode.
 )"})
 
   (operation
 {R"(
-
+LDCGBR (int m)
+{
+  GBR = R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -9609,6 +9728,50 @@ __sexpr (insn_blocks.push_back
   (exceptions
 {R"(
 
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "ldc.l	@Rm+,GBR"
+  SH_ANY
+  (abstract "(Rm) -> GBR, Rm+4 -> Rm")
+  (code "0100mmmm00010111")
+
+  (group SH4A "LS" SH4 "CO")
+  (issue SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "3")
+  (latency SH1 "3" SH2 "3" SH3 "1/5" SH4A "1" SH2A "2" SH4 "3/3")
+
+  (description
+{R"(
+Stores a source operand in control register GBR.
+)"})
+
+  (note
+{R"(
+This instruction can also be issued in user mode.
+)"})
+
+  (operation
+{R"(
+LDCMGBR (int m)
+{
+  GBR = Read_Long (R[m]);
+  R[m] += 4;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -9624,7 +9787,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Stores a source operand in control register VBR.
 )"})
 
   (note
@@ -9634,7 +9797,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+LDCVBR (int m)
+{
+VBR = R[m];
+PC += 2;
+}
 )"})
 
   (example
@@ -9644,7 +9811,54 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
+)"})
+)
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "ldc.l	@Rm+,VBR"
+  SH_ANY privileged
+  (abstract "(Rm) -> VBR, Rm+4 -> Rm")
+  (code "0100mmmm00100111")
+
+  (group SH4A "LS" SH4 "CO")
+  (issue SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "1")
+  (latency SH1 "3" SH2 "3" SH3 "1/5" SH4A "1" SH2A "2" SH4 "1/3")
+
+  (description
+{R"(
+Stores a source operand in control register VBR.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+LDCMVBR (int m)
+{
+  VBR = Read_Long(R[m]);
+  R[m] += 4;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -9657,21 +9871,23 @@ __sexpr (insn_blocks.push_back
   (issue SH_DSP "1")
   (latency SH_DSP "1/3")
 
-  // SH1-DSP: 1 cycle latency
-
   (description
 {R"(
-
+Stores a source operand in control register MOD.
 )"})
 
   (note
 {R"(
-
+On the SH-DSP the latency of this instruction is 1 cycle.
 )"})
 
   (operation
 {R"(
-
+LDCMOD (int m)
+{
+  MOD = R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -9686,6 +9902,47 @@ __sexpr (insn_blocks.push_back
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "ldc.l	@Rm+,MOD"
+  SH_DSP
+  (abstract "(Rm) -> MOD, Rm+4 -> Rm")
+  (code "0100mmmm01010111")
+
+  (issue SH_DSP "1")
+  (latency SH_DSP "1/5")
+
+  (description
+{R"(
+Stores a source operand in control register MOD.
+)"})
+
+  (note
+{R"(
+On the SH-DSP the latency of this instruction is 3 cycles.
+)"})
+
+  (operation
+{R"(
+LDCMMOD (int m)
+{
+  MOD = Read_Long (R[m]);
+  R[m] += 4;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
+)"})
+)
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "ldc	Rm,RE"
   SH_DSP
   (abstract "Rm -> RE")
@@ -9694,21 +9951,23 @@ __sexpr (insn_blocks.push_back
   (issue SH_DSP "1")
   (latency SH_DSP "1/3")
 
-  // SH1-DSP: 1 cycle latency
-
   (description
 {R"(
-
+Stores a source operand in control register RE.
 )"})
 
   (note
 {R"(
-
+On the SH-DSP the latency of this instruction is 1 cycle.
 )"})
 
   (operation
 {R"(
-
+LDCRE (int m)
+{
+  RE = R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -9719,6 +9978,46 @@ __sexpr (insn_blocks.push_back
   (exceptions
 {R"(
 
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "ldc.l	@Rm+,RE"
+  SH_DSP
+  (abstract "(Rm) -> RE, Rm+4 -> Rm")
+  (code "0100mmmm01110111")
+
+  (issue SH_DSP "1")
+  (latency SH_DSP "1/5")
+
+  (description
+{R"(
+Stores a source operand in control register RE.
+)"})
+
+  (note
+{R"(
+On the SH-DSP the latency of this instruction is 3 cycles.
+)"})
+
+  (operation
+{R"(
+LDCMRE (int m)
+{
+  RE = Read_Long (R[m]);
+  R[m] += 4;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
 )"})
 )
 
@@ -9731,21 +10030,23 @@ __sexpr (insn_blocks.push_back
   (issue SH_DSP "1")
   (latency SH_DSP "1/3")
 
-  // SH1-DSP: 1 cycle latency
-
   (description
 {R"(
-
+Stores a source operand in control register RS.
 )"})
 
   (note
 {R"(
-
+On the SH-DSP the latency of this instruction is 1 cycle.
 )"})
 
   (operation
 {R"(
-
+LDCRS (int m)
+{
+RS = R[m];
+PC += 2;
+}
 )"})
 
   (example
@@ -9756,6 +10057,46 @@ __sexpr (insn_blocks.push_back
   (exceptions
 {R"(
 
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "ldc.l	@Rm+,RS"
+  SH_DSP
+  (abstract "(Rm) -> RS, Rm+4 -> Rm")
+  (code "0100mmmm01100111")
+
+  (issue SH_DSP "1")
+  (latency SH_DSP "1/5")
+
+  (description
+{R"(
+Stores a source operand in control register RS.
+)"})
+
+  (note
+{R"(
+On the SH-DSP the latency of this instruction is 3 cycles.
+)"})
+
+  (operation
+{R"(
+LDCMRS (int m)
+{
+  RS = Read_Long (R[m]);
+  R[m] += 4;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
 )"})
 )
 
@@ -9771,18 +10112,22 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Stores a source operand in control register SGR.
 )"})
 
   (note
 {R"(
 Not sure whether it is also available on SH4.
-It is not marked as new instruction for SH4A.
+It is not marked as new instruction for SH4A but also not listed in SH4 manuals.
 )"})
 
   (operation
 {R"(
-
+LDCSGR (int m)
+{
+  SGR = R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -9792,7 +10137,55 @@ It is not marked as new instruction for SH4A.
 
   (exceptions
 {R"(
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
+)"})
+)
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "ldc.l	@Rm+,SGR"
+  SH4A privileged
+  (abstract "(Rm) -> SGR, Rm+4 -> Rm")
+  (code "0100mmmm00110110")
+
+  (group SH4A "CO")
+  (issue SH4A "4")
+  (latency SH4A "4")
+
+  (description
+{R"(
+Stores a source operand in control register SGR.
+)"})
+
+  (note
+{R"(
+Not sure whether it is also available on SH4.
+It is not marked as new instruction for SH4A but also not listed in SH4 manuals.
+)"})
+
+  (operation
+{R"(
+LDCMSGR (int m)
+{
+  SGR = Read_Long (R[m]);
+  R[m] += 4;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -9808,7 +10201,7 @@ It is not marked as new instruction for SH4A.
 
   (description
 {R"(
-
+Stores a source operand in control register SSR.
 )"})
 
   (note
@@ -9818,7 +10211,11 @@ It is not marked as new instruction for SH4A.
 
   (operation
 {R"(
-
+LDCSSR (int m)
+{
+  SSR = R[m],
+  PC += 2;
+}
 )"})
 
   (example
@@ -9828,7 +10225,54 @@ It is not marked as new instruction for SH4A.
 
   (exceptions
 {R"(
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
+)"})
+)
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "ldc.l	@Rm+,SSR"
+  SH3 SH4 SH4A privileged
+  (abstract "(Rm) -> SSR, Rm+4 -> Rm")
+  (code "0100mmmm00110111")
+
+  (group SH4A "LS" SH4 "CO")
+  (issue SH3 "1" SH4A "1" SH4 "1")
+  (latency SH3 "1/5" SH4A "1" SH4 "1/3")
+
+  (description
+{R"(
+Stores a source operand in control register SSR.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+LDCMSSR (int m)
+{
+  SSR = Read_Long (R[m]);
+  R[m] += 4;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -9913,299 +10357,6 @@ It is not marked as new instruction for SH4A.
   (group SH4A "LS" SH4 "CO")
   (issue SH3 "1" SH4A "1" SH4 "1")
   (latency SH3 "1/3" SH4A "1" SH4 "3")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "ldc.l	@Rm+,SR"
-  SH_ANY privileged
-  (abstract "(Rm) -> SR, Rm+4 -> Rm")
-  (code "0100mmmm00000111")
-  (t_bit "LSB")
-
-  (group SH4A "CO" SH4 "CO")
-  (issue SH1 "1" SH2 "1" SH3 "2" SH4A "9" SH2A "5" SH4 "4")
-  (latency SH1 "3" SH2 "3" SH3 "7" SH4A "4" SH2A "4" SH4 "4/4")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "ldc.l	@Rm+,GBR"
-  SH_ANY
-  (abstract "(Rm) -> GBR, Rm+4 -> Rm")
-  (code "0100mmmm00010111")
-
-  (group SH4A "LS" SH4 "CO")
-  (issue SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "3")
-  (latency SH1 "3" SH2 "3" SH3 "1/5" SH4A "1" SH2A "2" SH4 "3/3")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "ldc.l	@Rm+,VBR"
-  SH_ANY privileged
-  (abstract "(Rm) -> VBR, Rm+4 -> Rm")
-  (code "0100mmmm00100111")
-
-  (group SH4A "LS" SH4 "CO")
-  (issue SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "1")
-  (latency SH1 "3" SH2 "3" SH3 "1/5" SH4A "1" SH2A "2" SH4 "1/3")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "ldc.l	@Rm+,MOD"
-  SH_DSP
-  (abstract "(Rm) -> MOD, Rm+4 -> Rm")
-  (code "0100mmmm01010111")
-
-  (issue SH_DSP "1")
-  (latency SH_DSP "1/5")
-
-  // SH1-DSP latency: 3
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "ldc.l	@Rm+,RE"
-  SH_DSP
-  (abstract "(Rm) -> RE, Rm+4 -> Rm")
-  (code "0100mmmm01110111")
-
-  (issue SH_DSP "1")
-  (latency SH_DSP "1/5")
-
-  // SH1-DSP latency: 3
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "ldc.l	@Rm+,RS"
-  SH_DSP
-  (abstract "(Rm) -> RS, Rm+4 -> Rm")
-  (code "0100mmmm01100111")
-
-  (issue SH_DSP "1")
-  (latency SH_DSP "1/5")
-
-  // SH1-DSP latency: 3
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "ldc.l	@Rm+,SGR"
-  SH4A privileged
-  (abstract "(Rm) -> SGR, Rm+4 -> Rm")
-  (code "0100mmmm00110110")
-
-  (group SH4A "CO")
-  (issue SH4A "4")
-  (latency SH4A "4")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-Not sure whether it is also available on SH4.
-It is not marked as new instruction for SH4A.
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "ldc.l	@Rm+,SSR"
-  SH3 SH4 SH4A privileged
-  (abstract "(Rm) -> SSR, Rm+4 -> Rm")
-  (code "0100mmmm00110111")
-
-  (group SH4A "LS" SH4 "CO")
-  (issue SH3 "1" SH4A "1" SH4 "1")
-  (latency SH3 "1/5" SH4A "1" SH4 "1/3")
 
   (description
 {R"(
