@@ -4680,14 +4680,17 @@ ADDC (long m, long n)
 
   (example
 {R"(
-
+clrt           ! r0:r1 (64 bits) + r2:r3 (64 bits) = r0:r1 (64 bits)
+addc  r3,r1    ! Before execution T = 0, r1 = 0x00000001, r3 = 0xFFFFFFFF
+               ! After execution T = 1, r1 = 0x00000000
+addc  r2,r0    ! Before execution T = 1, r0 = 0x00000000, r2 = 0x00000000
+               ! After execution T = 0, r0 = 0x00000001
 )"})
 
   (exceptions
 {R"(
 
 )"})
-
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -4756,11 +4759,11 @@ ADDV (long m, long n)
   (example
 {R"(
 
-ADDV  R0,R1  ! Before execution: R0 = H'00000001, R1 = H'7FFFFFFE, T = 0
-             ! After execution:  R1 = H'7FFFFFFF, T = 0
+addv  r0,r1  ! Before execution: r0 = 0x00000001, r1 = 0x7FFFFFFE, T = 0
+             ! After execution:  r1 = 0x7FFFFFFF, T = 0
 
-ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
-             ! After execution:  R1 = H'80000000, T = 1
+addv  r0,r1  ! Before execution: r0 = 0x00000002, r1 = 0x7FFFFFFE, T = 0
+             ! After execution:  r1 = 0x80000000, T = 1
 )"})
 
   (exceptions
@@ -4782,7 +4785,9 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction compares general register R0 and the sign-extended 8-bit
+immediate data and sets the T bit if the values are equal.  If they are not
+equal the T bit is cleared.  The contents of R0 are not changed.
 )"})
 
   (note
@@ -4792,7 +4797,22 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
+CMPIM (int i)
+{
+  long imm;
 
+  if ((i & 0x80) == 0)
+    imm = (0x000000FF & (long i));
+  else
+    imm = (0xFFFFFF00 | (long i));
+
+  if (R[0] == imm)
+    T = 1;
+  else
+    T = 0;
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -4819,7 +4839,8 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction compares general registers Rn and Rm, and sets the T bit if
+they are equal.  The contents of Rn and Rm are not changed.
 )"})
 
   (note
@@ -4829,7 +4850,15 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
+CMPEQ (int m, int n)
+{
+  if (R[n] == R[m])
+    T = 1;
+  else
+    T = 0;
 
+  PC += 2;
+}
 )"})
 
   (example
@@ -4856,7 +4885,9 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction compares general registers Rn and Rm, and sets the T bit if
+Rn is greater or equal Rm.  The values for the comparison are interpreted as
+unsigned integer values.  The contents of Rn and Rm are not changed.
 )"})
 
   (note
@@ -4866,7 +4897,15 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
+CMPHI (int m, int n)
+{
+  if ((unsigned long)R[n] >= (unsigned long)R[m])
+    T = 1;
+  else
+    T = 0;
 
+  PC += 2;
+}
 )"})
 
   (example
@@ -4893,7 +4932,9 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction compares general registers Rn and Rm, and sets the T bit if
+Rn is greater or equal Rm.  The values for the comparison are interpreted as
+signed integer values.  The contents of Rn and Rm are not changed.
 )"})
 
   (note
@@ -4903,7 +4944,15 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
+CMPGE (int m, int n)
+{
+  if ((long)R[n] >= (long)R[m])
+    T = 1;
+  else
+    T = 0;
 
+  PC += 2;
+}
 )"})
 
   (example
@@ -4930,7 +4979,9 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction compares general registers Rn and Rm, and sets the T bit if
+Rn is greater Rm.  The values for the comparison are interpreted as
+unsigned integer values.  The contents of Rn and Rm are not changed.
 )"})
 
   (note
@@ -4940,7 +4991,15 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
+CMPHI (int m, int n)
+{
+  if ((unsigned long)R[n] > (unsigned long)R[m])
+    T = 1;
+  else
+    T = 0;
 
+  PC += 2;
+}
 )"})
 
   (example
@@ -4967,7 +5026,9 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction compares general registers Rn and Rm, and sets the T bit if
+Rn is greater Rm.  The values for the comparison are interpreted as
+signed integer values.  The contents of Rn and Rm are not changed.
 )"})
 
   (note
@@ -4977,7 +5038,15 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
+CMPGT (int m, int n)
+{
+  if ((long)R[n] > (long)R[m])
+    T = 1;
+  else
+    T = 0;
 
+  PC += 2;
+}
 )"})
 
   (example
@@ -5004,7 +5073,9 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction compares general register Rn and sets the T bit if
+Rn is greater 0.  The value in Rn for the comparison is interpreted as
+signed integer.  The contents of Rn are not changed.
 )"})
 
   (note
@@ -5014,7 +5085,15 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
+CMPPL (int n)
+{
+  if ((long)R[n] > 0)
+    T = 1;
+  else
+    T = 0;
 
+  PC += 2;
+}
 )"})
 
   (example
@@ -5041,7 +5120,9 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction compares general register Rn and sets the T bit if
+Rn is greater or equal 0.  The value in Rn for the comparison is interpreted as
+signed integer.  The contents of Rn are not changed.
 )"})
 
   (note
@@ -5051,7 +5132,15 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
+CMPPZ (int n)
+{
+  if ((long)R[n] >= 0)
+    T = 1;
+  else
+    T = 0;
 
+  PC += 2;
+}
 )"})
 
   (example
@@ -5078,22 +5167,43 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction compares general registers Rn and Rm, and sets the T bit if
+any of the 4 bytes in Rn are equal to the corresponding byte in Rm.
+The contents of Rn and Rm are not changed.
 )"})
 
   (note
 {R"(
-
+This instruction can be used to speed up some string operations such as
+finding the string length of a zero terminated string or string matching.
 )"})
 
   (operation
 {R"(
+CMPSTR (int m, int n)
+{
+  unsigned long temp;
+  long HH, HL, LH, LL;
+  temp = R[n] ^ R[m];
+  HH = (temp & 0xFF000000) >> 24;
+  HL = (temp & 0x00FF0000) >> 16;
+  LH = (temp & 0x0000FF00) >> 8;
+  LL = temp & 0x000000FF;
+  HH = HH && HL && LH && LL;
 
+  if (HH == 0)
+    T = 1;
+  else
+    T = 0;
+
+  PC += 2;
+}
 )"})
 
   (example
 {R"(
-
+cmp/str  r2,r3    ! r2 = "ABCD", r3 = "XYCZ"
+bt       target   ! T = 1, so branch is taken.
 )"})
 
   (exceptions
@@ -5113,17 +5223,39 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+Determines saturation. Signed data is used with this instruction. The saturation
+upper-limit value is stored in general register Rn if the contents of Rn exceed
+the saturation upper-limit value, or the saturation lower-limit value is stored
+in Rn if the contents of Rn are less than the saturation lower-limit value, and
+the CS bit is set to 1.
+The saturation upper-limit value is 0x0000007F (127).
+The saturation lower-limit value is 0xFFFFFF80 (-128).
 )"})
 
   (note
 {R"(
-
+The CS bit value does not change if the contents of general register Rn do not
+exceed the saturation upper-limit value or are not less than the saturation
+lower-limit value.
 )"})
 
   (operation
 {R"(
+CLIPSB (int n)
+{
+  if (R[n] > 0x0000007F)
+  {
+    R[n] = 0x0000007F;
+    CS = 1;
+  }
+  else if (R[n] < 0xFFFFFF80)
+  {
+    R[n] = 0xFFFFFF80;
+    CS = 1;
+  }
 
+  PC += 2;
+}
 )"})
 
   (example
@@ -5148,17 +5280,39 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+Determines saturation. Signed data is used with this instruction. The saturation
+upper-limit value is stored in general register Rn if the contents of Rn exceed
+the saturation upper-limit value, or the saturation lower-limit value is stored
+in Rn if the contents of Rn are less than the saturation lower-limit value, and
+the CS bit is set to 1.
+The saturation upper-limit value is 0x00007FFF (32767).
+The saturation lower-limit value is 0xFFFF8000 (-32768).
 )"})
 
   (note
 {R"(
-
+The CS bit value does not change if the contents of general register Rn do not
+exceed the saturation upper-limit value or are not less than the saturation
+lower-limit value.
 )"})
 
   (operation
 {R"(
+CLIPSW (int n)
+{
+  if (R[n] > 0x00007FFF)
+  {
+    R[n] = 0x00007FFF;
+    CS = 1;
+  }
+  else if (R[n] < 0xFFFF8000)
+  {
+    R[n] = 0xFFFF8000;
+    CS = 1;
+  }
 
+  PC += 2;
+}
 )"})
 
   (example
@@ -5183,17 +5337,30 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+Determines saturation. Unsigned data is used with this instruction. If the
+contents of general register Rn exceed the saturation value, the saturation
+value is stored in Rn and the CS bit is set to 1.
+The saturation value is 0x000000FF (255).
 )"})
 
   (note
 {R"(
-
+The CS bit value does not change if the contents of general register Rn do not
+exceed the saturation upper-limit value.
 )"})
 
   (operation
 {R"(
+CLIPUB (int n)
+{
+  if (R[n] > 0x000000FF)
+  {
+    R[n] = 0x000000FF;
+    CS = 1;
+  }
 
+  PC += 2;
+}
 )"})
 
   (example
@@ -5218,17 +5385,30 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+Determines saturation. Unsigned data is used with this instruction. If the
+contents of general register Rn exceed the saturation value, the saturation
+value is stored in Rn and the CS bit is set to 1.
+The saturation value is 0x0000FFFF (65535).
 )"})
 
   (note
 {R"(
-
+The CS bit value does not change if the contents of general register Rn do not
+exceed the saturation upper-limit value.
 )"})
 
   (operation
 {R"(
+CLIPUW (int n)
+{
+  if (R[n] > 0x0000FFFF)
+  {
+    R[n] = 0x0000FFFF;
+    CS = 1;
+  }
 
+  PC += 2;
+}
 )"})
 
   (example
@@ -5241,44 +5421,6 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
 )"})
 )
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "div1	Rm,Rn"
-  SH_ANY
-  (abstract "1-step division (Rn / Rm)")
-  (code "0011nnnnmmmm0100")
-  (t_bit "Result")
-
-  (group SH4 "EX" SH4A "EX")
-  (issue SH_ANY "1")
-  (latency SH_ANY "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "div0s	Rm,Rn"
@@ -5293,17 +5435,36 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction performs initial settings for signed division. This instruction
+is followed by a DIV1 instruction that executes 1-digit division, for example,
+and repeated division steps are executed to find the quotient. See the
+description of the DIV1 instruction for details.
 )"})
 
   (note
 {R"(
-
+This instruction can also be used to compare the signs of Rm and Rn.  If the
+signs of Rm and Rn are equal, T will be set to 0.  If the signs of Rm and Rn
+are not equal, T will be set to 1.
 )"})
 
   (operation
 {R"(
+DIV0S (int m, int n)
+{
+  if ((R[n] & 0x80000000) == 0)
+    Q = 0;
+  else
+    Q = 1;
 
+  if ((R[m] & 0x80000000) == 0)
+    M = 0;
+  else
+    M = 1;
+
+  T = ! (M == Q);
+  PC += 2;
+}
 )"})
 
   (example
@@ -5330,7 +5491,10 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction performs initial settings for unsigned division. This
+instruction is followed by a DIV1 instruction that executes 1-digit division,
+for example, and repeated division steps are executed to find the quotient.
+See the description of the DIV1 instruction for details.
 )"})
 
   (note
@@ -5340,12 +5504,231 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
-
+DIV0U ()
+{
+  M = Q = T = 0;
+  PC += 2;
+}
 )"})
 
   (example
 {R"(
 
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "div1	Rm,Rn"
+  SH_ANY
+  (abstract "1-step division (Rn / Rm)")
+  (code "0011nnnnmmmm0100")
+  (t_bit "Result")
+
+  (group SH4 "EX" SH4A "EX")
+  (issue SH_ANY "1")
+  (latency SH_ANY "1")
+
+  (description
+{R"(
+This instruction performs 1-digit division (1-step division) of the 32-bit
+contents of general register Rn (dividend) by the contents of Rm (divisor).
+The quotient is obtained by repeated execution of this instruction alone or in
+combination with other instructions. The specified registers and the M, Q, and
+T bits must not be modified during these repeated executions.
+<br/><br/>
+In 1-step division, the dividend is shifted 1 bit to the left, the divisor is
+subtracted from this, and the quotient bit is reflected in the Q bit according
+to whether the result is positive or negative.
+<br/><br/>
+Detection of division by zero or overflow is not provided. Check for division by
+zero and overflow division before executing the division. A remainder operation
+is not provided. Find the remainder by finding the product of the divisor and
+the obtained quotient, and subtracting this value from the dividend:
+<br/>
+<center><code>remainder = dividend - (divisor * quotient)</code></center>
+<br/>
+Initial settings should first be made with the DIV0S or DIV0U instruction. DIV1
+is executed once for each bit of the divisor. If a quotient of more than 17
+bits is required, place an ROTCL instruction before the DIV1 instruction. See
+the examples for details of the division sequence.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+DIV1 (int m, int n)
+{
+  unsigned long tmp0, tmp2;
+  unsigned char old_q, tmp1;
+
+  old_q = Q;
+  Q = (0x80000000 & R[n]) != 0;
+  tmp2 = R[m];
+  R[n] <<= 1;
+  R[n] |= (unsigned long)T;
+
+  if (old_q == 0)
+  {
+    if (M == 0)
+    {
+      tmp0 = R[n];
+      R[n] -= tmp2;
+      tmp1 = R[n] > tmp0;
+
+      if (Q == 0)
+        Q = tmp1;
+      else if (Q == 1)
+        Q = tmp1 == 0;
+    }
+
+    else if (M == 1)
+    {
+      tmp0 = R[n];
+      R[n] += tmp2;
+      tmp1 = R[n] < tmp0;
+
+      if (Q == 0)
+        Q = tmp1 == 0;
+      else if (Q == 1)
+        Q = tmp1;
+    }
+  }
+
+  else if (old_q == 1)
+  {
+    if (M == 0)
+    {
+      tmp0 = R[n];
+      R[n] += tmp2;
+      tmp1 = R[n] < tmp0;
+
+      if (Q == 0)
+        Q = tmp1;
+      else if (Q == 1)
+        Q = tmp1 == 0;
+    }
+
+    else if (M == 1)
+    {
+       tmp0 = R[n];
+       R[n] -= tmp2;
+       tmp1 = R[n] > tmp0;
+
+       if (Q == 0)
+         Q = tmp1 == 0;
+       else if (Q == 1)
+         Q = tmp1;
+    }
+  }
+
+  T = (Q == M);
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+! r1 (32 bits) / r0 (16 bits) = r1 (16 bits)  (unsigned)
+
+shll16  r0        ! Set divisor in upper 16 bits, clear lower 16 bits to 0
+
+tst     r0,r0     ! Check for division by zero
+bt      zero_div
+
+cmp/hs  r0,r1     ! Check for overflow
+bt      over_div
+
+div0u             ! Flag initialization
+
+.rept 16 
+div1    r0,r1     ! Repeat 16 times
+.endr
+
+rotcl   r1 
+extu.w  r1,r1     ! r1 = quotient
+
+- - - - - - - - - - - - - - - - 
+
+! r1:r2 (64 bits) / r0 (32 bits) = r2 (32 bits)  (unsigned)
+
+tst     r0,r0     ! Check for division by zero
+bt      zero_div
+
+cmp/hs  r0,r1     ! Check for overflow
+bt      over_div
+
+div0u             ! Flag initialization
+
+.rept 32
+rotcl   r2        ! Repeat 32 times
+div1    r0,r1
+.endr
+
+rotcl   r2        ! r2 = quotient
+
+- - - - - - - - - - - - - - - - 
+
+! r1 (16 bits) / r0 (16 bits) = r1 (16 bits)  (signed)
+
+shll16  r0        ! Set divisor in upper 16 bits, clear lower 16 bits to 0
+exts.w  r1,r1     ! Dividend sign-extended to 32 bits
+mov     #0,r2
+mov     r1,r3 
+rotcl   r3 
+subc    r2,r1     ! If dividend is negative, subtract 1
+div0s   r0,r1     ! Flag initialization
+
+.rept 16
+div1    r0,r1     ! Repeat 16 times
+.endr
+
+exts.w  r1,r1 
+rotcl   r1        ! r1 = quotient (one's complement notation)
+addc    r2,r1     ! If MSB of quotient is 1, add 1 to convert to two's complement notation
+exts.w  r1,r1     ! r1 = quotient (two's complement notation)
+
+- - - - - - - - - - - - - - - - 
+
+! r2 (32 bits) / r0 (32 bits) = r2 (32 bits)  (signed)
+
+mov     r2,r3 
+rotcl   r3 
+subc    r1,r1     ! Dividend sign-extended to 64 bits (r1:r2)
+mov     #0,r3
+subc    r3,r2     ! If dividend is negative, subtract 1 to convert to one's complement notation
+div0s   r0,r1     ! Flag initialization
+
+.rept 32
+div1    r0,r1     ! Repeat 32 times
+.endr
+
+rotcl   r2        ! r2 = quotient (one's complement notation)
+addc    r3,r2     ! If MSB of quotient is 1, add 1 to convert to two's complement notation
+                  ! r2 = quotient (two's complement notation)
+
+- - - - - - - - - - - - - - - - 
+! r4 (8 bits) / r5 (8 bits) = r0 (8 bits)  (unsigned)
+
+extu.b  r4,r4     ! Optional, not needed if value is known to be zero extended.
+extu.b  r5,r5     ! Optional, not needed if value is known to be zero extended.
+shll8   r5
+div0u
+
+.rept 8
+div1    r5,r4     ! Repeat 8 times
+.endr
+
+rotcl   r4
+extu.b  r4,r0
 )"})
 
   (exceptions
@@ -5365,17 +5748,33 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+Executes division of the 32-bit contents of a general register Rn (dividend) by
+the contents of R0 (divisor). This instruction executes signed division and
+finds the quotient only. A remainder operation is not provided. To obtain the
+remainder, find the product of the divisor and the obtained quotient, and
+subtract this value from the dividend. The sign of the remainder will be the
+same as that of the dividend.
 )"})
 
   (note
 {R"(
-
+An overflow exception will occur if the negative maximum value (0x00000000) is
+divided by -1. If division by zero is performed a division by zero exception
+will occur.
+<br/><br/>
+If an interrupt is generated while this instruction is being executed, execution
+will be halted. The return address will be the start address of this instruction,
+and this instruction will be re-executed.  This avoids increased interrupt
+latency.
 )"})
 
   (operation
 {R"(
-
+DIVS (int n)
+{
+  R[n] = R[n] / R[0];
+  PC += 2;
+}
 )"})
 
   (example
@@ -5385,7 +5784,8 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (exceptions
 {R"(
-
+<li>Overflow exception</li>
+<li>Division by zero exception</li>
 )"})
 )
 
@@ -5400,17 +5800,30 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+Executes division of the 32-bit contents of a general register Rn (dividend) by
+the contents of R0 (divisor). This instruction executes unsigned division and
+finds the quotient only. A remainder operation is not provided. To obtain the
+remainder, find the product of the divisor and the obtained quotient, and
+subtract this value from the dividend.
 )"})
 
   (note
 {R"(
-
+A division by zero exception will occur if division by zero is performed.
+<br/><br/>
+If an interrupt is generated while this instruction is being executed, execution
+will be halted. The return address will be the start address of this instruction,
+and this instruction will be re-executed.  This avoids increased interrupt
+latency.
 )"})
 
   (operation
 {R"(
-
+DIVU (long n)
+{
+  R[n]= (unsigned long)R[n] / (unsigned long)R[0];
+  PC += 2;
+}
 )"})
 
   (example
@@ -5420,7 +5833,7 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (exceptions
 {R"(
-
+<li>Division by zero exception</li>
 )"})
 )
 
@@ -5436,7 +5849,9 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction performs 32-bit multiplication of the contents of general
+register Rn by the contents of Rm, and stores the 64-bit result in the MACH and
+MACL registers. The multiplication is performed as a signed arithmetic operation.
 )"})
 
   (note
@@ -5446,7 +5861,65 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
+DMULS (int m, int n)
+{
+  unsigned long RnL, RnH, RmL, RmH, Res0, Res1, Res2;
+  unsigned long temp0, temp1, temp2, temp3;
+  long tempm, tempn, fnLmL;
 
+  tempn = (long)R[n];
+  tempm = (long)R[m];
+
+  if (tempn < 0)
+    tempn = 0 - tempn;
+
+  if (tempm < 0)
+    tempm = 0 - tempm;
+
+  if ((long)(R[n] ^ R[m]) < 0)
+    fnLmL = -1;
+  else
+    fnLmL = 0;
+
+  temp1 = (unsigned long)tempn;
+  temp2 = (unsigned long)tempm;
+
+  RnL = temp1 & 0x0000FFFF;
+  RnH = (temp1 >> 16) & 0x0000FFFF;
+
+  RmL = temp2 & 0x0000FFFF;
+  RmH = (temp2 >> 16) & 0x0000FFFF;
+
+  temp0 = RmL * RnL;
+  temp1 = RmH * RnL;
+  temp2 = RmL * RnH;
+  temp3 = RmH * RnH;
+
+  Res2 = 0;
+  Res1 = temp1 + temp2;
+  if (Res1 < temp1)
+    Res2 += 0x00010000;
+
+  temp1 = (Res1 << 16) & 0xFFFF0000;
+  Res0 = temp0 + temp1;
+  if (Res0 < temp0)
+    Res2++;
+
+  Res2 = Res2 + ((Res1 >> 16) & 0x0000FFFF) + temp3;
+
+  if (fnLmL < 0)
+  {
+    Res2 = ~Res2;
+    if (Res0 == 0)
+      Res2++;
+    else
+      Res0 = (~Res0) + 1;
+  }
+
+  MACH = Res2;
+  MACL = Res0;
+  PC += 2;
+}
 )"})
 
   (example
@@ -5472,7 +5945,10 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction performs 32-bit multiplication of the contents of general
+register Rn by the contents of Rm, and stores the 64-bit result in the MACH
+and MACL registers. The multiplication is performed as an unsigned arithmetic
+operation.
 )"})
 
   (note
@@ -5482,7 +5958,38 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
+DMULU (int m, int n)
+{
+  unsigned long RnL, RnH, RmL, RmH, Res0, Res1, Res2;
+  unsigned long temp0, temp1, temp2, temp3;
 
+  RnL = R[n] & 0x0000FFFF;
+  RnH = (R[n] >> 16) & 0x0000FFFF;
+
+  RmL = R[m] & 0x0000FFFF;
+  RmH = (R[m] >> 16) & 0x0000FFFF;
+
+  temp0 = RmL * RnL;
+  temp1 = RmH * RnL;
+  temp2 = RmL * RnH;
+  temp3 = RmH * RnH;
+
+  Res2 = 0
+  Res1 = temp1 + temp2;
+  if (Res1 < temp1)
+    Res2 += 0x00010000;
+
+  temp1 = (Res1 << 16) & 0xFFFF0000;
+  Res0 = temp0 + temp1;
+  if (Res0 < temp0)
+    Res2++;
+
+  Res2 = Res2 + ((Res1 >> 16) & 0x0000FFFF) + temp3;
+
+  MACH = Res2;
+  MACL = Res0;
+  PC += 2;
+}
 )"})
 
   (example
@@ -5508,7 +6015,9 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction decrements the contents of general register Rn by 1 and
+compares the result with zero. If the result is zero, the T bit is set to 1.
+If the result is nonzero, the T bit is cleared to 0.
 )"})
 
   (note
@@ -5518,12 +6027,26 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
+DT (int n)
+{
+  R[n]--;
 
+  if (R[n] == 0)
+    T = 1;
+  else T = 0;
+
+  PC += 2;
+}
 )"})
 
   (example
 {R"(
-
+    mov   #4,r4      ! Set loop count
+loop:
+    add   r0,r1
+    dt    r5         ! Decrement r5 value and check for 0.
+    bf    loop       ! if T = 0 branch to loop
+                     ! (in this example, 4 loop iterations are executed)
 )"})
 
   (exceptions
@@ -5544,7 +6067,8 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction sign-extends the contents of general register Rm and stores the
+result in Rn.  The value of Rm bit 7 is transferred to Rn bits 8 to 31.
 )"})
 
   (note
@@ -5554,7 +6078,17 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
+EXTSB (int m, int n)
+{
+  R[n] = R[m];
 
+  if ((R[m] & 0x00000080) == 0)
+    R[n] & = 0x000000FF;
+  else
+    R[n] |= 0xFFFFFF00;
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -5580,7 +6114,8 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction sign-extends the contents of general register Rm and stores the
+result in Rn.  The value of Rm bit 15 is transferred to Rn bits 16 to 31.
 )"})
 
   (note
@@ -5590,7 +6125,17 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
+EXTSW (int m, int n)
+{
+  R[n] = R[m];
 
+  if ((R[m] & 0x00008000) == 0)
+    R[n] & = 0x0000FFFF;
+  else
+    R[n] |= 0xFFFF0000;
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -5616,7 +6161,8 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction zero-extends the contents of general register Rm and stores the
+result in Rn.  0 is transferred to Rn bits 8 to 31.
 )"})
 
   (note
@@ -5652,7 +6198,8 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction zero-extends the contents of general register Rm and stores the
+result in Rn.  0 is transferred to Rn bits 16 to 31.
 )"})
 
   (note
@@ -5662,12 +6209,22 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
-
+EXTUB (int m, int n)
+{
+  R[n] = R[m];
+  R[n] &= 0x000000FF;
+  PC += 2;
+}
 )"})
 
   (example
 {R"(
-
+EXTUW (int m, int n)
+{
+  R[n] = R[m];
+  R[n] &= 0x0000FFFF;
+  PC += 2;
+}
 )"})
 
   (exceptions
@@ -5688,7 +6245,18 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction performs signed multiplication of the 32-bit operands whose
+addresses are the contents of general registers Rm and Rn, adds the 64-bit
+result to the MAC register contents, and stores the result in the MAC register.
+Operands Rm and Rn are each incremented by 4 each time they are read.
+<br/><br/>
+When the S bit is cleared to 0, the 64-bit result is stored in the coupled MACH
+and MACL registers.
+<br/><br/>
+When bit S is set to 1, addition to the MAC register is a saturation operation
+of 48 bits starting from the LSB. For the saturation operation, only the lower
+48 bits of the MACL register are enabled and the result is limited to a range
+of 0xFFFF800000000000 (minimum) and 0x00007FFFFFFFFFFF (maximum).
 )"})
 
   (note
@@ -5698,7 +6266,98 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
+MACL (int m, int n)
+{
+  unsigned long RnL, RnH, RmL, RmH, Res0, Res1, Res2;
+  unsigned long temp0, temp1, temp2, temp3;
+  long tempm, tempn, fnLmL;
 
+  tempn = (long)Read_Long (R[n]);
+  R[n] += 4;
+  tempm = (long)Read_Long (R[m]);
+  R[m] += 4;
+
+  if ((long)(tempn ^ tempm) < 0)
+    fnLmL = -1;
+  else
+    fnLmL = 0;
+
+  if (tempn < 0)
+    tempn = 0 - tempn;
+  if (tempm < 0)
+    tempm = 0 - tempm;
+
+  temp1 = (unsigned long)tempn;
+  temp2 = (unsigned long)tempm;
+
+  RnL = temp1 & 0x0000FFFF;
+  RnH = (temp1 >> 16) & 0x0000FFFF;
+  RmL = temp2 & 0x0000FFFF;
+  RmH = (temp2 >> 16) & 0x0000FFFF;
+  temp0 = RmL * RnL;
+  temp1 = RmH * RnL;
+  temp2 = RmL * RnH;
+  temp3 = RmH * RnH;
+
+  Res2 = 0;
+
+  Res1 = temp1 + temp2;
+  if (Res1 < temp1)
+    Res2 += 0x00010000;
+
+  temp1 = (Res1 << 16) & 0xFFFF0000;
+
+  Res0 = temp0 + temp1;
+  if (Res0 < temp0)
+    Res2++;
+
+  Res2 = Res2 + ((Res1 >> 16) & 0x0000FFFF) + temp3;
+
+  if(fnLmL < 0)
+  {
+    Res2 = ~Res2;
+    if (Res0 == 0)
+      Res2++;
+    else
+      Res0 = (~Res0) + 1;
+  }
+
+  if (S == 1)
+  {
+    Res0 = MACL + Res0;
+    if (MACL > Res0)
+      Res2++;
+
+    Res2 += MACH & 0x0000FFFF;
+
+    if (((long)Res2 < 0) && (Res2 < 0xFFFF8000))
+    {
+      Res2 = 0xFFFF8000;
+      Res0 = 0x00000000;
+    }
+
+    if (((long)Res2 > 0) && (Res2 > 0x00007FFF))
+    {
+      Res2 = 0x00007FFF;
+      Res0 = 0xFFFFFFFF;
+    }
+
+    MACH = (Res2 & 0x0000FFFF) | (MACH & 0xFFFF0000);
+    MACL = Res0;
+  }
+  else
+  {
+    Res0 = MACL + Res0;
+    if (MACL > Res0)
+      Res2 ++;
+
+    Res2 += MACH;
+    MACH = Res2;
+    MACL = Res0;
+  }
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -5708,7 +6367,10 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -5724,17 +6386,104 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction performs signed multiplication of the 16-bit operands whose
+addresses are the contents of general registers Rm and Rn, adds the 32-bit
+result to the MAC register contents, and stores the result in the MAC register.
+Operands Rm and Rn are each incremented by 2 each time they are read.
+<br/><br/>
+If the S bit is 0, a 16 * 16 + 64 -> 64-bit multiply-and-accumulate operation
+is performed, and the 64-bit result is stored in the linked MACH and MACL
+registers.
+<br/><br/>
+If the S bit is 1, a 16 * 16 + 32 -> 32-bit multiply-and-accumulate operation is
+performed, and the addition to the MAC register contents is a saturation
+operation. In a saturation operation, only the MACL register is valid, and the
+result range is limited to 0x80000000 (minimum value) to 0x7FFFFFFF
+(maximum value). If overflow occurs, the LSB of the MACH register is set to 1.
+0x80000000 (minimum value) is stored in the MACL register if the result
+overflows in the negative direction, and 0x7FFFFFFF (maximum value) is stored
+if the result overflows in the positive direction
 )"})
 
   (note
 {R"(
-
+When the S bit is 0, the SH2 and SH-DSP CPU perform a 16 * 16 + 64 -> 64 bit
+multiply and accumulate operation and the SH1 CPU performs a 16 * 16 + 42 ->
+42 bit multiply and accumulate operation.
 )"})
 
   (operation
 {R"(
+MACW (int m, int n)
+{
+  long tempm, tempn, dest, src, ans;
+  unsigned long templ;
 
+  tempn = (long)Read_Word (R[n]);
+  R[n] += 2;
+  tempm = (long)Read_Word (R[m]);
+  R[m] += 2;
+
+  templ = MACL;
+  tempm = ((long)(short)tempn * (long)(short)tempm);
+
+  if ((long)MACL >= 0)
+    dest = 0;
+  else
+    dest = 1;
+
+  if ((long)tempm >= 0)
+  {
+    src = 0;
+    tempn = 0;
+  }
+  else
+  {
+    src = 1;
+    tempn = 0xFFFFFFFF;
+  }
+
+  src += dest;
+  MACL += tempm;
+
+  if ((long)MACL >= 0)
+    ans = 0;
+  else
+    ans = 1;
+
+  ans += dest;
+
+  if (S == 1)
+  {
+    if (ans == 1)
+    {
+      #ifdef SH1
+      if (src == 0 || src == 2)
+        MACH |= 0x00000001;
+      #endif
+
+      if (src == 0)
+        MACL = 0x7FFFFFFF;
+      if (src == 2)
+        MACL = 0x80000000;
+    }
+  }
+  else
+  {
+    MACH += tempn;
+    if (templ > MACL)
+      MACH += 1;
+
+    #ifdef SH1
+    if ((MACH & 0x00000200) == 0)
+      MACH &= 0x000003FF;
+    else
+      MACH |= 0xFFFFFC00;
+    #endif
+  }
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -5744,7 +6493,10 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -5760,7 +6512,9 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction performs 32-bit multiplication of the contents of general
+registers Rn and Rm, and stores the lower 32 bits of the result in the MACL
+register. The contents of MACH are not changed.
 )"})
 
   (note
@@ -5770,7 +6524,11 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
-
+MULL (int m, int n)
+{
+  MACL = R[n] * R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -5795,7 +6553,9 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction performs 32-bit multiplication of the contents of general
+register R0 by Rn, and stores the lower 32 bits of the result in general
+register Rn.
 )"})
 
   (note
@@ -5805,7 +6565,11 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
-
+MULR (int n)
+{
+  R[n] = R[0] * R[n];
+  PC += 2;
+}
 )"})
 
   (example
@@ -5831,7 +6595,10 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction performs 16-bit multiplication of the contents of general
+registers Rn and Rm, and stores the 32-bit result in the MACL register. The
+multiplication is performed as a signed arithmetic operation. The contents of
+MACH are not changed.
 )"})
 
   (note
@@ -5841,7 +6608,11 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
-
+MULS (int m, int n)
+{
+  MACL = ((long)(short)R[n] * (long)(short)R[m]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -5867,7 +6638,10 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction performs 16-bit multiplication of the contents of general
+registers Rn and Rm, and stores the 32-bit result in the MACL register. The
+multiplication is performed as an unsigned arithmetic operation. The contents of
+MACH are not changed.
 )"})
 
   (note
@@ -5877,7 +6651,11 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
-
+MULU (int m, int n)
+{
+  MACL = ((unsigned long)(unsigned short)R[n]* (unsigned long)(unsigned short)R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -5903,7 +6681,9 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction finds the two's complement of the contents of general register
+Rm and stores the result in Rn. That is, it subtracts Rm from 0 and stores the
+result in Rn.
 )"})
 
   (note
@@ -5913,7 +6693,11 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
-
+NEG (int m, int n)
+{
+  R[n] = 0 - R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -5940,22 +6724,58 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction subtracts the contents of general register Rm and the T bit
+from 0 and stores the result in Rn. A borrow resulting from the operation is
+reflected in the T bit. This instruction can be  used for sign inversion of a
+value exceeding 32 bits.
 )"})
 
   (note
 {R"(
-
+This instruction can also be used to efficiently store the reversed T bit value
+in a general register, if the MOVRT instruction is not available.
 )"})
 
   (operation
 {R"(
+NEGC (int m, int n)
+{
+  unsigned long temp;
+  temp = 0 - R[m];
+  R[n] = temp - T;
 
+  if (0 < temp)
+    T = 1;
+  else
+    T = 0;
+
+  if (temp < R[n])
+    T = 1;
+
+  PC += 2;
+}
 )"})
 
   (example
 {R"(
 
+! Sign inversion of r0:r1 (64 bits)
+
+clrt
+negc   r1,r1    ! Before execution: r1 = 0x00000001, T = 0
+                ! After execution: r1 = 0xFFFFFFFF, T = 1
+negc   r0,r0    ! Before execution: r0 = 0x00000000, T = 1
+                ! After execution: r0 = 0xFFFFFFFF, T = 1
+
+- - - - - - - - - - - - - - - - 
+
+! Store reversed T bit in r0
+
+mov    #-1,r1
+negc   r1,r0    ! r0 = 0 - (-1) - T
+                ! r0 = 1 - T
+                ! Notice that T bit will be modified by the negc operation.
+                ! In this case, T will be always set to 1.
 )"})
 
   (exceptions
@@ -5976,7 +6796,9 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction subtracts the contents of general register Rm from the contents
+of general register Rn and stores the result in Rn. For immediate data
+subtraction, ADD #imm,Rn should be used.
 )"})
 
   (note
@@ -5986,7 +6808,11 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
-
+SUB (int m, int n)
+{
+  R[n] -= R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -6013,22 +6839,57 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction subtracts the contents of general register Rm and the T bit
+from the contents of general register Rn, and stores the result in Rn. A borrow
+resulting from the operation is reflected in the T bit. This instruction is used
+for subtractions exceeding 32 bits.
 )"})
 
   (note
 {R"(
-
+This instruction can also be used to store the T bit to all the bits of a
+general register.
 )"})
 
   (operation
 {R"(
+SUBC (int m, int n)
+{
+  unsigned long tmp0, tmp1;
+  tmp1 = R[n] - R[m];
+  tmp0 = R[n];
+  R[n] = tmp1 - T;
 
+  if (tmp0 < tmp1)
+    T = 1;
+  else
+    T = 0;
+
+  if (tmp1 < R[n])
+    T = 1;
+
+  PC += 2;
+}
 )"})
 
   (example
 {R"(
 
+! r0:r1(64 bits) - r2:r3(64 bits) = r0:r1(64 bits)
+
+clrt
+subc   r3,r1    ! Before execution: T = 0, r1 = 0x00000000, r3 = 0x00000001
+                ! After execution: T = 1, r1 = 0xFFFFFFFF
+subc   r2,r0    ! Before execution: T = 1, r0 = 0x00000000, r2 = 0x00000000
+                ! After execution: T = 1, r0 = 0xFFFFFFFF
+
+- - - - - - - - - - - - - - - - 
+
+! Store T bit to all bits of r0
+
+subc   r0,r0    ! r0 = r0 - r0 - T
+                ! r0 = 0 - T
+                ! Notice that the T bit is modified by the subc operation.
 )"})
 
   (exceptions
@@ -6050,7 +6911,9 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (description
 {R"(
-
+This instruction subtracts the contents of general register Rm from the contents
+of general register Rn, and stores the result in Rn. If underflow occurs, the T
+bit is set.
 )"})
 
   (note
@@ -6060,12 +6923,51 @@ ADDV  R0,R1  ! Before execution: R0 = H'00000002, R1 = H'7FFFFFFE, T = 0
 
   (operation
 {R"(
+SUBV (int m, int n)
+{
+  long dest, src, ans;
 
+  if ((long)R[n] >= 0)
+    dest = 0;
+  else
+    dest = 1;
+
+  if ((long)R[m] >= 0)
+    src = 0;
+  else
+    src = 1;
+
+  src += dest;
+  R[n] -= R[m];
+
+  if ((long)R[n] >= 0)
+    ans = 0;
+  else
+    ans = 1;
+
+  ans += dest;
+
+  if (src == 1)
+  {
+    if (ans == 1)
+      T = 1;
+    else
+      T = 0;
+  }
+  else
+    T = 0;
+
+  PC += 2;
+}
 )"})
 
   (example
 {R"(
+subv   r0,r1    ! Before execution: r0 = 0x00000002, r1 = 0x80000001
+                ! After execution: r1 = 0x7FFFFFFF, T = 1
 
+subv   r2,r3    ! Before execution: r2 = 0xFFFFFFFE, r3 = 0x7FFFFFFE
+                ! After execution r3 = 0x80000000, T = 1
 )"})
 
   (exceptions
