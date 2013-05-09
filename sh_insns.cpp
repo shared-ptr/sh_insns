@@ -7663,80 +7663,6 @@ __sexpr (insn_blocks.push_back
 (insns "Shift Instructions"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "rotl	Rn"
-  SH_ANY
-  (abstract "T << Rn << MSB")
-  (code "0100nnnn00000100")
-  (t_bit "MSB")
-
-  (group SH4A "EX" SH4 "EX")
-  (issue SH_ANY "1")
-  (latency SH_ANY "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "rotr	Rn"
-  SH_ANY
-  (abstract "LSB >> Rn >> T")
-  (code "0100nnnn00000101")
-  (t_bit "LSB")
-
-  (group SH4A "EX" SH4 "EX")
-  (issue SH_ANY "1")
-  (latency SH_ANY "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "rotcl	Rn"
   SH_ANY
   (abstract "T << Rn << T")
@@ -7749,7 +7675,10 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+This instruction rotates the contents of general register Rn one bit to the left
+through the T bit, and stores the result in Rn. The bit rotated out of the
+operand is transferred to the T bit.
+<br/><img src="rotcl.svg" height="100"/>
 )"})
 
   (note
@@ -7759,7 +7688,29 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+ROTCL (int n)
+{
+  long temp;
 
+  if ((R[n] & 0x80000000) == 0)
+    temp = 0;
+  else
+    temp = 1;
+
+  R[n] <<= 1;
+
+  if (T == 1)
+    R[n] |= 0x00000001;
+  else
+    R[n] &= 0xFFFFFFFE;
+
+  if (temp == 1)
+    T = 1;
+  else
+    T = 0;
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -7786,7 +7737,10 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+This instruction rotates the contents of general register Rn one bit to the
+right through the T bit, and stores the result in Rn. The bit rotated out of the
+operand is transferred to the T bit.
+<br/><img src="rotcr.svg" height="100"/>
 )"})
 
   (note
@@ -7796,7 +7750,140 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+ROTCR (int n)
+{
+  long temp;
 
+  if ((R[n] & 0x00000001) == 0)
+    temp = 0;
+  else
+    temp = 1;
+
+  R[n] >>= 1;
+
+  if (T == 1)
+    R[n] |= 0x80000000;
+  else
+    R[n] &= 0x7FFFFFFF;
+
+  if (temp == 1)
+    T = 1;
+  else
+    T = 0;
+
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "rotl	Rn"
+  SH_ANY
+  (abstract "T << Rn << MSB")
+  (code "0100nnnn00000100")
+  (t_bit "MSB")
+
+  (group SH4A "EX" SH4 "EX")
+  (issue SH_ANY "1")
+  (latency SH_ANY "1")
+
+  (description
+{R"(
+This instruction rotates the contents of general register Rn one bit to the
+left, and stores the result in Rn. The bit rotated out of the operand is
+transferred to the T bit.
+<br/><img src="rotl.svg" height="100"/>
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+ROTL (int n)
+{
+  if ((R[n] & 0x80000000) == 0)
+    T = 0;
+  else
+    T = 1;
+
+  R[n] <<= 1;
+
+  if (T == 1)
+    R[n] |= 0x00000001;
+  else
+    R[n] &= 0xFFFFFFFE;
+
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "rotr	Rn"
+  SH_ANY
+  (abstract "LSB >> Rn >> T")
+  (code "0100nnnn00000101")
+  (t_bit "LSB")
+
+  (group SH4A "EX" SH4 "EX")
+  (issue SH_ANY "1")
+  (latency SH_ANY "1")
+
+  (description
+{R"(
+This instruction rotates the contents of general register Rn one bit to the
+right, and stores the result in Rn. The bit rotated out of the operand is
+transferred to the T bit.
+<br/><img src="rotr.svg" height="100"/>
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+ROTR (int n)
+{
+  if ((R[n] & 0x00000001) == 0)
+    T = 0;
+  else
+    T = 1;
+
+  R[n] >>= 1;
+
+  if (T == 1)
+    R[n] |= 0x80000000;
+  else
+    R[n] &= 0x7FFFFFFF;
+
+  PC += 2;
+}
 )"})
 
   (example
