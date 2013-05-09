@@ -588,15 +588,15 @@ function on_mouse_click (div_obj)
 
 <div style="font-size:20px;float:left">
 <b>Renesas SH Instruction Set Summary</b>
+<div class="page_head_cont" style="float:left">Last updated: )html"
+
+<< __DATE__ << " " << __TIME__
+
+<< R"html(
+</div>
 </div>
 
-<!--
-If you found a mistake please drop me a message:
-<a href="mailto:olegendo@gcc.gnu.org?Subject=Renesas%20SH%20Instruction%20Set%20Summary">
-olegendo@gcc.gnu.org</a>
--->
-
-<a style="float:right"href="mailto:olegendo@gcc.gnu.org?Subject=Renesas%20SuperH%20Instruction%20Set%20Summary">Contact</a>
+<a style="float:right" href="mailto:olegendo@gcc.gnu.org?Subject=Renesas%20SuperH%20Instruction%20Set%20Summary">Contact</a>
 <br/>
 <a style="float:right" href="sh_insns.cpp">Page Source</a>
 
