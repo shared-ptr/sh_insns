@@ -8524,9 +8524,9 @@ instruction.
 If the branch destination cannot be reached, the branch must be handled by using
 BF in combination with a BRA or JMP instruction, for example.
 <br/><br/>
-On some SH4 HW a branch with a displacement value of zero does not cause the
-pipeline I-stage to be stalled even if the branch is taken.  This can be
-utilized for efficient conditional operations.
+On some SH4 implementations a branch with a displacement value of zero does not
+cause the pipeline I-stage to be stalled even if the branch is taken.  This can
+be utilized for efficient conditional operations.
 )"})
 
   (operation
@@ -8655,9 +8655,9 @@ instruction.
 If the branch destination cannot be reached, the branch must be handled by using
 BT in combination with a BRA or JMP instruction, for example.
 <br/><br/>
-On some SH4 HW a branch with a displacement value of zero does not cause the
-pipeline I-stage to be stalled even if the branch is taken.  This can be
-utilized for efficient conditional operations.
+On some SH4 implementations a branch with a displacement value of zero does not
+cause the pipeline I-stage to be stalled even if the branch is taken.  This can
+be utilized for efficient conditional operations.
 )"})
 
   (operation
