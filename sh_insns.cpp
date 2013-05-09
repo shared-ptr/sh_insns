@@ -7909,7 +7909,19 @@ ROTR (int n)
 
   (description
 {R"(
-
+This instruction arithmetically shifts the contents of general register Rn.
+General register Rm specifies the shift direction and the number of bits to be
+shifted.
+<br/><br/>
+Rn register contents are shifted to the left if the Rm register value is
+positive, and to the right if negative. In a shift to the right, the MSB is
+added at the upper end.
+<br/><br/>
+The number of bits to be shifted is specified by the lower 5 bits (bits 4 to 0)
+of the Rm register. If the value is negative (MSB = 1), the Rm register is
+represented as a two's complement. The left shift range is 0 to 31, and the
+right shift range, 1 to 32.
+<br/><img src="shad.svg" height="220"/>
 )"})
 
   (note
@@ -7919,7 +7931,24 @@ ROTR (int n)
 
   (operation
 {R"(
+SHAD (int m, int n)
+{
+  int sgn = R[m] & 0x80000000;
 
+  if (sgn == 0)
+    R[n] <<= (R[m] & 0x1F);
+  else if ((R[m] & 0x1F) == 0)
+  {
+    if ((R[n] & 0x80000000) == 0)
+      R[n] = 0;
+    else
+      R[n] = 0xFFFFFFFF;
+  }
+  else
+    R[n] = (long)R[n] >> ((~R[m] & 0x1F) + 1);
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -7946,7 +7975,10 @@ ROTR (int n)
 
   (description
 {R"(
-
+This instruction arithmetically shifts the contents of general register Rn one
+bit to the left, and stores the result in Rn. The bit shifted out of the operand
+is transferred to the T bit.
+<br/><img src="shal.svg" height="100"/>
 )"})
 
   (note
@@ -7956,7 +7988,16 @@ ROTR (int n)
 
   (operation
 {R"(
+SHAL (int n)
+{
+  if ((R[n] & 0x80000000) == 0)
+    T = 0;
+  else
+    T = 1;
 
+  R[n] <<= 1;
+  PC += 2;
+}
 )"})
 
   (example
@@ -7983,7 +8024,10 @@ ROTR (int n)
 
   (description
 {R"(
-
+This instruction arithmetically shifts the contents of general register Rn one
+bit to the right, and stores the result in Rn. The bit shifted out of the
+operand is transferred to the T bit.
+<br/><img src="shar.svg" height="100"/>
 )"})
 
   (note
@@ -7993,7 +8037,29 @@ ROTR (int n)
 
   (operation
 {R"(
+SHAR (int n)
+{
+  long temp;
 
+  if ((R[n] & 0x00000001) == 0)
+    T = 0;
+  else
+    T = 1;
+
+  if ((R[n] & 0x80000000) == 0)
+    temp = 0;
+  else
+    temp = 1;
+
+  R[n] >>= 1;
+
+  if (temp == 1)
+    R[n] |= 0x80000000;
+  else
+    R[n] &= 0x7FFFFFFF;
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -8019,7 +8085,18 @@ ROTR (int n)
 
   (description
 {R"(
-
+This instruction logically shifts the contents of general register Rn. General
+register Rm specifies the shift direction and the number of bits to be shifted.
+<br/><br/>
+Rn register contents are shifted to the left if the Rm register value is
+positive, and to the right if negative. In a shift to the right, 0s are added
+at the upper end.
+<br/><br/>
+The number of bits to be shifted is specified by the lower 5 bits (bits 4 to 0)
+of the Rm register. If the value is negative (MSB = 1), the Rm register is
+represented as a two's complement. The left shift range is 0 to 31, and the
+right shift range, 1 to 32.
+<br/><img src="shld.svg" height="220"/>
 )"})
 
   (note
@@ -8029,7 +8106,19 @@ ROTR (int n)
 
   (operation
 {R"(
+SHLD (int m, int n)
+{
+  int sgn = R[m] & 0x80000000;
 
+  if (sgn == 0)
+    R[n] <<= (R[m] & 0x1F);
+  else if ((R[m] & 0x1F) == 0)
+    R[n] = 0;
+  else
+    R[n] = (unsigned)R[n] >> ((~R[m] & 0x1F) + 1);
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -8050,14 +8139,64 @@ ROTR (int n)
   (code "0100nnnn00000000")
   (t_bit "MSB")
 
-  // this is the same as shal
   (group SH4A "EX" SH4 "EX")
   (issue SH_ANY "1")
   (latency SH_ANY "1")
 
   (description
 {R"(
+This instruction logically shifts the contents of general register Rn one bit
+to the left, and stores the result in Rn. The bit shifted out of the operand is
+transferred to the T bit.
+<br/><img src="shll.svg" height="100"/>
+)"})
 
+  (note
+{R"(
+Effectively, the operation performed is the same as the SHAL instruction.
+)"})
+
+  (operation
+{R"(
+SHLL (int n)
+{
+  if ((R[n] & 0x80000000) == 0)
+    T = 0;
+  else
+    T = 1;
+
+  R[n] <<= 1;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "shll2	Rn"
+  SH_ANY
+  (abstract "Rn << 2 -> Rn")
+  (code "0100nnnn00001000")
+
+  (group SH4A "EX" SH4 "EX")
+  (issue SH_ANY "1")
+  (latency SH_ANY "1")
+
+  (description
+{R"(
+This instruction logically shifts the contents of general register Rn 2 bits to
+the left, and stores the result in Rn. The bits shifted out of the operand are
+discarded.
+<br/><img src="shll2.svg" height="120"/>
 )"})
 
   (note
@@ -8067,7 +8206,97 @@ ROTR (int n)
 
   (operation
 {R"(
+SHLL2 (int n)
+{
+  R[n] <<= 2;
+  PC += 2;
+}
+)"})
 
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "shll8	Rn"
+  SH_ANY
+  (abstract "Rn << 8 -> Rn")
+  (code "0100nnnn00011000")
+
+  (group SH4A "EX" SH4 "EX")
+  (issue SH_ANY "1")
+  (latency SH_ANY "1")
+
+  (description
+{R"(
+This instruction logically shifts the contents of general register Rn 8 bits to
+the left, and stores the result in Rn. The bits shifted out of the operand are
+discarded.
+<br/><img src="shll8.svg" height="120"/>
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+SHLL8 (int n)
+{
+  R[n] <<= 8;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "shll16	Rn"
+  SH_ANY
+  (abstract "Rn << 16 -> Rn")
+  (code "0100nnnn00101000")
+
+  (group SH4A "EX" SH4 "EX")
+  (issue SH_ANY "1")
+  (latency SH_ANY "1")
+
+  (description
+{R"(
+This instruction logically shifts the contents of general register Rn 16 bits to
+the left, and stores the result in Rn. The bits shifted out of the operand are
+discarded.
+<br/><img src="shll16.svg" height="120"/>
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+SHLL16 (int n)
+{
+  R[n] <<= 16;
+  PC += 2;
+}
 )"})
 
   (example
@@ -8094,7 +8323,10 @@ ROTR (int n)
 
   (description
 {R"(
-
+This instruction logically shifts the contents of general register Rn one bit
+to the right, and stores the result in Rn. The bit shifted out of the operand
+is transferred to the T bit.
+<br/><img src="shlr.svg" height="100"/>
 )"})
 
   (note
@@ -8104,43 +8336,17 @@ ROTR (int n)
 
   (operation
 {R"(
+SHLR (int n)
+{
+  if ((R[n] & 0x00000001) == 0)
+    T = 0;
+  else
+    T = 1;
 
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "shll2	Rn"
-  SH_ANY
-  (abstract "Rn << 2 -> Rn")
-  (code "0100nnnn00001000")
-
-  (group SH4A "EX" SH4 "EX")
-  (issue SH_ANY "1")
-  (latency SH_ANY "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
+  R[n] >>= 1;
+  R[n] &= 0x7FFFFFFF;
+  PC += 2;
+}
 )"})
 
   (example
@@ -8166,7 +8372,10 @@ ROTR (int n)
 
   (description
 {R"(
-
+This instruction logically shifts the contents of general register Rn 2 bits to
+the right, and stores the result in Rn. The bits shifted out of the operand
+are discarded.
+<br/><img src="shlr2.svg" height="120"/>
 )"})
 
   (note
@@ -8176,43 +8385,12 @@ ROTR (int n)
 
   (operation
 {R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "shll8	Rn"
-  SH_ANY
-  (abstract "Rn << 8 -> Rn")
-  (code "0100nnnn00011000")
-
-  (group SH4A "EX" SH4 "EX")
-  (issue SH_ANY "1")
-  (latency SH_ANY "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
+SHLR2 (int n)
+{
+  R[n] >>= 2;
+  R[n] &= 0x3FFFFFFF;
+  PC += 2;
+}
 )"})
 
   (example
@@ -8238,7 +8416,10 @@ ROTR (int n)
 
   (description
 {R"(
-
+This instruction logically shifts the contents of general register Rn 8 bits to
+the right, and stores the result in Rn. The bits shifted out of the operand
+are discarded.
+<br/><img src="shlr8.svg" height="120"/>
 )"})
 
   (note
@@ -8248,43 +8429,12 @@ ROTR (int n)
 
   (operation
 {R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "shll16	Rn"
-  SH_ANY
-  (abstract "Rn << 16 -> Rn")
-  (code "0100nnnn00101000")
-
-  (group SH4A "EX" SH4 "EX")
-  (issue SH_ANY "1")
-  (latency SH_ANY "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
+SHLR8 (int n)
+{
+  R[n] >>= 8;
+  R[n] &= 0x00FFFFFF;
+  PC += 2;
+}
 )"})
 
   (example
@@ -8310,7 +8460,10 @@ ROTR (int n)
 
   (description
 {R"(
-
+This instruction logically shifts the contents of general register Rn 16 bits to
+the right, and stores the result in Rn. The bits shifted out of the operand
+are discarded.
+<br/><img src="shlr16.svg" height="120"/>
 )"})
 
   (note
@@ -8320,7 +8473,12 @@ ROTR (int n)
 
   (operation
 {R"(
-
+SHLR16 (int n)
+{
+  R[n] >>= 16;
+  R[n] &= 0x0000FFFF;
+  PC += 2;
+}
 )"})
 
   (example
