@@ -686,8 +686,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-This instruction stores immediate data, sign-extended to longword, in general
-register Rn.
+Stores immediate data, sign-extended to longword, in general register Rn.
 )"})
 
   (note
@@ -731,8 +730,8 @@ MOVI (int i, int n)
 
   (description
 {R"(
-This instruction stores immediate data, sign-extended to longword, in general
-register Rn.  The data is stored from memory address (PC + 4 + displacement * 2).
+Stores immediate data, sign-extended to longword, in general register Rn.
+The data is stored from memory address (PC + 4 + displacement * 2).
 The 8-bit displacement is multiplied by two after zero-extension, and so the
 relative distance from the table is in the range up to PC + 4 + 510 bytes. The
 PC value is the address of this instruction.
@@ -786,8 +785,8 @@ MOVWI (int d, int n)
 
   (description
 {R"(
-This instruction stores immediate data, sign-extended to longword, in general
-register Rn.  the data is stored from memory address (PC + 4 + displacement * 4).
+Stores immediate data, sign-extended to longword, in general register Rn.
+The data is stored from memory address (PC + 4 + displacement * 4).
 The 8-bit displacement is multiplied by four after zero-extension, and so the
 relative distance from the operand is in the range up to PC + 4 + 1020 bytes.
 The PC value is the address of this instruction. A value with the lower 2 bits
@@ -838,7 +837,7 @@ MOVLI (int d, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 )"})
 
   (note
@@ -878,7 +877,7 @@ MOV (int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 )"})
 
   (note
@@ -922,7 +921,7 @@ MOVBS (int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 )"})
 
   (note
@@ -966,7 +965,7 @@ MOVWS (int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 )"})
 
   (note
@@ -1010,7 +1009,7 @@ MOVLS (int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The loaded data is sign-extended to 32 bit before being stored in the
 destination register.
 )"})
@@ -1060,7 +1059,7 @@ MOVBL (int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The loaded data is sign-extended to 32 bit before being stored in the
 destination register.
 )"})
@@ -1110,7 +1109,7 @@ MOVWL (int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 )"})
 
   (note
@@ -1153,7 +1152,7 @@ MOVLL (int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 )"})
 
   (note
@@ -1198,7 +1197,7 @@ MOVBM (int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 )"})
 
   (note
@@ -1243,7 +1242,7 @@ MOVWM (int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 )"})
 
   (note
@@ -1288,7 +1287,7 @@ MOVLM (int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The loaded data is sign-extended to 32 bit before being stored in the
 destination register.
 )"})
@@ -1341,7 +1340,7 @@ MOVBP (int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The loaded data is sign-extended to 32 bit before being stored in the
 destination register.
 )"})
@@ -1394,7 +1393,7 @@ MOVWP (int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 )"})
 
   (note
@@ -1442,7 +1441,7 @@ MOVLP (int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The 4-bit displacement is only zero-extended, so a range up to +15 bytes
 can be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can
 be used instead.
@@ -1491,7 +1490,7 @@ MOVBS4 (int d, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The 4-bit displacement is multiplied by two after zero-extension, enabling a
 range up to +30 bytes to be specified.  If a memory operand cannot be reached,
 the @(R0,Rn) mode can be used instead.
@@ -1540,7 +1539,7 @@ MOVWS4 (int d, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The 4-bit displacement is multiplied by four after zero-extension, enabling a
 range up to +60 bytes to be specified.  If a memory operand cannot be reached,
 the @(R0,Rn) mode can be used instead.
@@ -1589,7 +1588,7 @@ MOVLS4 (int m, int d, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The 4-bit displacement is only zero-extended, so a range up to +15 bytes
 can be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can
 be used instead.
@@ -1645,7 +1644,7 @@ MOVBL4 (int m, int d)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The 4-bit displacement is multiplied by two after zero-extension, enabling a
 range up to +30 bytes to be specified.  If a memory operand cannot be reached,
 the @(R0,Rn) mode can be used instead.
@@ -1701,7 +1700,7 @@ MOVWL4 (int m, int d)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The 4-bit displacement is multiplied by four after zero-extension, enabling a
 range up to +60 bytes to be specified.  If a memory operand cannot be reached,
 the @(R0,Rn) mode can be used instead.
@@ -1749,7 +1748,7 @@ MOVLL4 (int m, int d, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 )"})
 
   (note
@@ -1793,7 +1792,7 @@ MOVBS0 (int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 )"})
 
   (note
@@ -1837,7 +1836,7 @@ MOVWS0 (int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 )"})
 
   (note
@@ -1881,7 +1880,7 @@ MOVLS0 (int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The loaded data is sign-extended to 32 bit before being stored in the
 destination register.
 )"})
@@ -1931,7 +1930,7 @@ MOVBL0 (int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The loaded data is sign-extended to 32 bit before being stored in the
 destination register.
 )"})
@@ -1982,7 +1981,7 @@ MOVWL0 (int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 )"})
 
   (note
@@ -2026,7 +2025,7 @@ MOVLL0 (int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The 8-bit displacement is only zero-extended, so a range up to +255 bytes can be
 specified.
 )"})
@@ -2074,7 +2073,7 @@ MOVBSG (int d)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The 8-bit displacement is multiplied by two after zero-extension, enabling a
 range up to +510 bytes to be specified.
 )"})
@@ -2122,7 +2121,7 @@ MOVWSG (int d)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The 8-bit displacement is multiplied by four after zero-extension, enabling a
 range up to +1020 bytes to be specified.
 )"})
@@ -2170,7 +2169,7 @@ MOVLSG (int d)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The 8-bit displacement is only zero-extended, so a range up to +255 bytes can be
 specified.
 The loaded data is sign-extended to 32 bit before being stored in the
@@ -2225,7 +2224,7 @@ MOVBLG (int d)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The 8-bit displacement is multiplied by two after zero-extension, enabling a
 range up to +510 bytes to be specified.
 The loaded data is sign-extended to 32 bit before being stored in the
@@ -2280,7 +2279,7 @@ MOVWLG (int d)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The 8-bit displacement is multiplied by four after zero-extension, enabling a
 range up to +1020 bytes to be specified.
 )"})
@@ -2326,7 +2325,7 @@ MOVLLG (int d)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 )"})
 
   (note
@@ -2366,7 +2365,7 @@ MOVRSBP (int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 )"})
 
   (note
@@ -2406,7 +2405,7 @@ MOVRSWP (int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 )"})
 
   (note
@@ -2446,7 +2445,7 @@ MOVRSLP (int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The loaded data is sign-extended to 32 bit before being stored in the
 destination register.
 )"})
@@ -2494,7 +2493,7 @@ MOVRSBM (int m)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 The loaded data is sign-extended to 32 bit before being stored in the
 destination register.
 )"})
@@ -2542,7 +2541,7 @@ MOVRSWM (int m)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.
+Transfers the source operand to the destination.
 )"})
 
   (note
@@ -2582,7 +2581,7 @@ MOVRSLM (int m)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.  This
+Transfers the source operand to the destination.  This
 instruction is ideal for data access in a structure or the stack.
 )"})
 
@@ -2624,7 +2623,7 @@ MOVBS12 (int d, int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.  This
+Transfers the source operand to the destination.  This
 instruction is ideal for data access in a structure or the stack.
 )"})
 
@@ -2667,7 +2666,7 @@ MOVWS12 (int d, int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.  This
+Transfers the source operand to the destination.  This
 instruction is ideal for data access in a structure or the stack.
 )"})
 
@@ -2709,7 +2708,7 @@ MOVLS12 (int d, int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.  This
+Transfers the source operand to the destination.  This
 instruction is ideal for data access in a structure or the stack.
 The loaded data is sign-extended to 32 bit before being stored in the
 destination register.
@@ -2760,7 +2759,7 @@ MOVBL12 (int d, int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.  This
+Transfers the source operand to the destination.  This
 instruction is ideal for data access in a structure or the stack.
 The loaded data is sign-extended to 32 bit before being stored in the
 destination register.
@@ -2810,7 +2809,7 @@ MOVWL12 (int d, int m, int n)
 
   (description
 {R"(
-This instruction transfers the source operand to the destination.  This
+Transfers the source operand to the destination.  This
 instruction is ideal for data access in a structure or the stack.
 )"})
 
@@ -2853,7 +2852,7 @@ MOVLL12 (int d, int m, int n)
 
   (description
 {R"(
-This instruction stores the effective address of the source operand into general
+Stores the effective address of the source operand into general
 register R0.  The 8-bit displacement is zero-extended and quadrupled.
 Consequently, the relative interval from the operand is PC + 1020 bytes.  The PC
 is the address four bytes after this instruction, but the lowest two bits of the
@@ -3107,7 +3106,7 @@ MOVLINK (int m)
 
   (description
 {R"(
-This instruction loads the longword of data from the effective address indicated
+Loads the longword of data from the effective address indicated
 by the contents of Rm in memory to R0. The address is not restricted to longword
 boundaries address (4n).  This instruction allows loading from
 non-longword-boundary addresses (4n + 1, 4n + 2, and 4n + 3). Data address error
@@ -3155,7 +3154,7 @@ MOVUAL (int m)
 
   (description
 {R"(
-This instruction loads the longword of data from the effective address indicated
+Loads the longword of data from the effective address indicated
 by the contents of Rm in memory to R0. The address is not restricted to longword
 boundaries address (4n).  This instruction allows loading from
 non-longword-boundary addresses (4n + 1, 4n + 2, and 4n + 3). Data address error
@@ -3489,7 +3488,7 @@ MOVRT (int n)
 
   (description
 {R"(
-This instruction stores the T bit in general register Rn.
+Stores the T bit in general register Rn.
 The value of Rn is 1 when T = 1 and 0 when T = 0.
 )"})
 
@@ -3667,8 +3666,8 @@ NOTT ()
 
   (description
 {R"(
-This instruction swaps the upper and lower parts of the contents of general
-register Rm, and stores the result in Rn.
+Swaps the upper and lower parts of the contents of general register Rm and
+stores the result in Rn.
 The 8 bits from bit 15 to bit 8 of Rm are swapped with the 8 bits from bit 7 to
 bit 0. The upper 16 bits of Rm are transferred directly to the upper 16 bits of
 Rn.
@@ -3715,8 +3714,8 @@ SWAPB (int m, int n)
 
   (description
 {R"(
-This instruction swaps the upper and lower parts of the contents of general
-register Rm, and stores the result in Rn.
+Swaps the upper and lower parts of the contents of general register Rm and
+stores the result in Rn.
 The 16 bits from bit 31 to bit 16 of Rm are swapped with the 16 bits from bit
 15 to bit 0.
 )"})
@@ -3761,8 +3760,8 @@ SWAPW (int m, int n)
 
   (description
 {R"(
-This instruction extracts the middle 32 bits from the 64-bit contents of linked
-general registers Rm and Rn, and stores the result in Rn.
+Extracts the middle 32 bits from the 64-bit contents of linked general registers
+Rm and Rn, and stores the result in Rn.
 <br/><img src="xtrct.svg" height="110"/>
 )"})
 
@@ -4785,9 +4784,9 @@ addv  r0,r1  ! Before execution: r0 = 0x00000002, r1 = 0x7FFFFFFE, T = 0
 
   (description
 {R"(
-This instruction compares general register R0 and the sign-extended 8-bit
-immediate data and sets the T bit if the values are equal.  If they are not
-equal the T bit is cleared.  The contents of R0 are not changed.
+Compares general register R0 and the sign-extended 8-bit immediate data and sets
+the T bit if the values are equal.  If they are not equal the T bit is cleared.
+The contents of R0 are not changed.
 )"})
 
   (note
@@ -4839,8 +4838,8 @@ CMPIM (int i)
 
   (description
 {R"(
-This instruction compares general registers Rn and Rm, and sets the T bit if
-they are equal.  The contents of Rn and Rm are not changed.
+Compares general registers Rn and Rm, and sets the T bit if they are equal.
+The contents of Rn and Rm are not changed.
 )"})
 
   (note
@@ -4885,9 +4884,9 @@ CMPEQ (int m, int n)
 
   (description
 {R"(
-This instruction compares general registers Rn and Rm, and sets the T bit if
-Rn is greater or equal Rm.  The values for the comparison are interpreted as
-unsigned integer values.  The contents of Rn and Rm are not changed.
+Compares general registers Rn and Rm, and sets the T bit if Rn is greater or
+equal Rm.  The values for the comparison are interpreted as unsigned integer
+values.  The contents of Rn and Rm are not changed.
 )"})
 
   (note
@@ -4932,9 +4931,9 @@ CMPHI (int m, int n)
 
   (description
 {R"(
-This instruction compares general registers Rn and Rm, and sets the T bit if
-Rn is greater or equal Rm.  The values for the comparison are interpreted as
-signed integer values.  The contents of Rn and Rm are not changed.
+Compares general registers Rn and Rm, and sets the T bit if Rn is greater or
+equal Rm.  The values for the comparison are interpreted as signed integer
+values.  The contents of Rn and Rm are not changed.
 )"})
 
   (note
@@ -4979,9 +4978,9 @@ CMPGE (int m, int n)
 
   (description
 {R"(
-This instruction compares general registers Rn and Rm, and sets the T bit if
-Rn is greater Rm.  The values for the comparison are interpreted as
-unsigned integer values.  The contents of Rn and Rm are not changed.
+Compares general registers Rn and Rm, and sets the T bit if Rn is greater Rm.
+The values for the comparison are interpreted as unsigned integer values.
+The contents of Rn and Rm are not changed.
 )"})
 
   (note
@@ -5026,9 +5025,9 @@ CMPHI (int m, int n)
 
   (description
 {R"(
-This instruction compares general registers Rn and Rm, and sets the T bit if
-Rn is greater Rm.  The values for the comparison are interpreted as
-signed integer values.  The contents of Rn and Rm are not changed.
+Compares general registers Rn and Rm, and sets the T bit if Rn is greater Rm.
+The values for the comparison are interpreted as signed integer values.
+The contents of Rn and Rm are not changed.
 )"})
 
   (note
@@ -5073,9 +5072,9 @@ CMPGT (int m, int n)
 
   (description
 {R"(
-This instruction compares general register Rn and sets the T bit if
-Rn is greater 0.  The value in Rn for the comparison is interpreted as
-signed integer.  The contents of Rn are not changed.
+Compares general register Rn and sets the T bit if Rn is greater 0.  The value
+in Rn for the comparison is interpreted as signed integer.  The contents of Rn
+are not changed.
 )"})
 
   (note
@@ -5120,9 +5119,9 @@ CMPPL (int n)
 
   (description
 {R"(
-This instruction compares general register Rn and sets the T bit if
-Rn is greater or equal 0.  The value in Rn for the comparison is interpreted as
-signed integer.  The contents of Rn are not changed.
+Compares general register Rn and sets the T bit if Rn is greater or equal 0.
+The value in Rn for the comparison is interpreted as signed integer.  The
+contents of Rn are not changed.
 )"})
 
   (note
@@ -5167,9 +5166,9 @@ CMPPZ (int n)
 
   (description
 {R"(
-This instruction compares general registers Rn and Rm, and sets the T bit if
-any of the 4 bytes in Rn are equal to the corresponding byte in Rm.
-The contents of Rn and Rm are not changed.
+Compares general registers Rn and Rm, and sets the T bit if any of the 4 bytes
+in Rn are equal to the corresponding byte in Rm. The contents of Rn and Rm are
+not changed.
 )"})
 
   (note
@@ -5435,10 +5434,10 @@ CLIPUW (int n)
 
   (description
 {R"(
-This instruction performs initial settings for signed division. This instruction
-is followed by a DIV1 instruction that executes 1-digit division, for example,
-and repeated division steps are executed to find the quotient. See the
-description of the DIV1 instruction for details.
+Performs initial settings for signed division. This instruction is followed by
+a DIV1 instruction that executes 1-digit division, for example, and repeated
+division steps are executed to find the quotient. See the description of the
+DIV1 instruction for details.
 )"})
 
   (note
@@ -5491,10 +5490,10 @@ DIV0S (int m, int n)
 
   (description
 {R"(
-This instruction performs initial settings for unsigned division. This
-instruction is followed by a DIV1 instruction that executes 1-digit division,
-for example, and repeated division steps are executed to find the quotient.
-See the description of the DIV1 instruction for details.
+Performs initial settings for unsigned division. This instruction is followed by
+a DIV1 instruction that executes 1-digit division, for example, and repeated
+division steps are executed to find the quotient. See the description of the
+DIV1 instruction for details.
 )"})
 
   (note
@@ -5535,8 +5534,8 @@ DIV0U ()
 
   (description
 {R"(
-This instruction performs 1-digit division (1-step division) of the 32-bit
-contents of general register Rn (dividend) by the contents of Rm (divisor).
+Performs 1-digit division (1-step division) of the 32-bit contents of general
+register Rn (dividend) by the contents of Rm (divisor).
 The quotient is obtained by repeated execution of this instruction alone or in
 combination with other instructions. The specified registers and the M, Q, and
 T bits must not be modified during these repeated executions.
@@ -5849,9 +5848,9 @@ DIVU (long n)
 
   (description
 {R"(
-This instruction performs 32-bit multiplication of the contents of general
-register Rn by the contents of Rm, and stores the 64-bit result in the MACH and
-MACL registers. The multiplication is performed as a signed arithmetic operation.
+Performs 32-bit multiplication of the contents of general register Rn by the
+contents of Rm, and stores the 64-bit result in the MACH and MACL registers.
+The multiplication is performed as a signed arithmetic operation.
 )"})
 
   (note
@@ -5945,10 +5944,9 @@ DMULS (int m, int n)
 
   (description
 {R"(
-This instruction performs 32-bit multiplication of the contents of general
-register Rn by the contents of Rm, and stores the 64-bit result in the MACH
-and MACL registers. The multiplication is performed as an unsigned arithmetic
-operation.
+Performs 32-bit multiplication of the contents of general register Rn by the
+contents of Rm, and stores the 64-bit result in the MACH and MACL registers.
+The multiplication is performed as an unsigned arithmetic operation.
 )"})
 
   (note
@@ -6015,8 +6013,8 @@ DMULU (int m, int n)
 
   (description
 {R"(
-This instruction decrements the contents of general register Rn by 1 and
-compares the result with zero. If the result is zero, the T bit is set to 1.
+Decrements the contents of general register Rn by 1 and compares the result
+with zero. If the result is zero, the T bit is set to 1.
 If the result is nonzero, the T bit is cleared to 0.
 )"})
 
@@ -6067,8 +6065,8 @@ loop:
 
   (description
 {R"(
-This instruction sign-extends the contents of general register Rm and stores the
-result in Rn.  The value of Rm bit 7 is transferred to Rn bits 8 to 31.
+Sign-extends the contents of general register Rm and stores the result in Rn.
+The value of Rm bit 7 is transferred to Rn bits 8 to 31.
 )"})
 
   (note
@@ -6114,8 +6112,8 @@ EXTSB (int m, int n)
 
   (description
 {R"(
-This instruction sign-extends the contents of general register Rm and stores the
-result in Rn.  The value of Rm bit 15 is transferred to Rn bits 16 to 31.
+Sign-extends the contents of general register Rm and stores the result in Rn.
+The value of Rm bit 15 is transferred to Rn bits 16 to 31.
 )"})
 
   (note
@@ -6161,8 +6159,8 @@ EXTSW (int m, int n)
 
   (description
 {R"(
-This instruction zero-extends the contents of general register Rm and stores the
-result in Rn.  0 is transferred to Rn bits 8 to 31.
+Zero-extends the contents of general register Rm and stores the result in Rn.
+0 is transferred to Rn bits 8 to 31.
 )"})
 
   (note
@@ -6198,8 +6196,8 @@ result in Rn.  0 is transferred to Rn bits 8 to 31.
 
   (description
 {R"(
-This instruction zero-extends the contents of general register Rm and stores the
-result in Rn.  0 is transferred to Rn bits 16 to 31.
+Zero-extends the contents of general register Rm and stores the result in Rn.
+0 is transferred to Rn bits 16 to 31.
 )"})
 
   (note
@@ -6245,9 +6243,9 @@ EXTUW (int m, int n)
 
   (description
 {R"(
-This instruction performs signed multiplication of the 32-bit operands whose
-addresses are the contents of general registers Rm and Rn, adds the 64-bit
-result to the MAC register contents, and stores the result in the MAC register.
+Performs signed multiplication of the 32-bit operands whose addresses are the
+contents of general registers Rm and Rn, adds the 64-bit result to the MAC
+register contents, and stores the result in the MAC register.
 Operands Rm and Rn are each incremented by 4 each time they are read.
 <br/><br/>
 When the S bit is cleared to 0, the 64-bit result is stored in the coupled MACH
@@ -6386,9 +6384,9 @@ MACL (int m, int n)
 
   (description
 {R"(
-This instruction performs signed multiplication of the 16-bit operands whose
-addresses are the contents of general registers Rm and Rn, adds the 32-bit
-result to the MAC register contents, and stores the result in the MAC register.
+Performs signed multiplication of the 16-bit operands whose addresses are the
+contents of general registers Rm and Rn, adds the 32-bit result to the MAC
+register contents, and stores the result in the MAC register.
 Operands Rm and Rn are each incremented by 2 each time they are read.
 <br/><br/>
 If the S bit is 0, a 16 * 16 + 64 -> 64-bit multiply-and-accumulate operation
@@ -6512,9 +6510,9 @@ MACW (int m, int n)
 
   (description
 {R"(
-This instruction performs 32-bit multiplication of the contents of general
-registers Rn and Rm, and stores the lower 32 bits of the result in the MACL
-register. The contents of MACH are not changed.
+Performs 32-bit multiplication of the contents of general registers Rn and Rm,
+and stores the lower 32 bits of the result in the MACL register. The contents
+of MACH are not changed.
 )"})
 
   (note
@@ -6553,9 +6551,8 @@ MULL (int m, int n)
 
   (description
 {R"(
-This instruction performs 32-bit multiplication of the contents of general
-register R0 by Rn, and stores the lower 32 bits of the result in general
-register Rn.
+Performs 32-bit multiplication of the contents of general register R0 by Rn,
+and stores the lower 32 bits of the result in general register Rn.
 )"})
 
   (note
@@ -6595,10 +6592,10 @@ MULR (int n)
 
   (description
 {R"(
-This instruction performs 16-bit multiplication of the contents of general
-registers Rn and Rm, and stores the 32-bit result in the MACL register. The
-multiplication is performed as a signed arithmetic operation. The contents of
-MACH are not changed.
+Performs 16-bit multiplication of the contents of general registers Rn and Rm,
+and stores the 32-bit result in the MACL register. The multiplication is
+performed as a signed arithmetic operation. The contents of MACH are not
+changed.
 )"})
 
   (note
@@ -6638,10 +6635,10 @@ MULS (int m, int n)
 
   (description
 {R"(
-This instruction performs 16-bit multiplication of the contents of general
-registers Rn and Rm, and stores the 32-bit result in the MACL register. The
-multiplication is performed as an unsigned arithmetic operation. The contents of
-MACH are not changed.
+Performs 16-bit multiplication of the contents of general registers Rn and Rm,
+and stores the 32-bit result in the MACL register. The multiplication is
+performed as an unsigned arithmetic operation. The contents of MACH are not
+changed.
 )"})
 
   (note
@@ -6681,9 +6678,8 @@ MULU (int m, int n)
 
   (description
 {R"(
-This instruction finds the two's complement of the contents of general register
-Rm and stores the result in Rn. That is, it subtracts Rm from 0 and stores the
-result in Rn.
+Finds the two's complement of the contents of general register Rm and stores
+the result in Rn. That is, it subtracts Rm from 0 and stores the result in Rn.
 )"})
 
   (note
@@ -6724,10 +6720,10 @@ NEG (int m, int n)
 
   (description
 {R"(
-This instruction subtracts the contents of general register Rm and the T bit
-from 0 and stores the result in Rn. A borrow resulting from the operation is
-reflected in the T bit. This instruction can be  used for sign inversion of a
-value exceeding 32 bits.
+Subtracts the contents of general register Rm and the T bit from 0 and stores
+the result in Rn. A borrow resulting from the operation is reflected in the
+T bit. This instruction can be  used for sign inversion of a value exceeding
+32 bits.
 )"})
 
   (note
@@ -6796,9 +6792,9 @@ negc   r1,r0    ! r0 = 0 - (-1) - T
 
   (description
 {R"(
-This instruction subtracts the contents of general register Rm from the contents
-of general register Rn and stores the result in Rn. For immediate data
-subtraction, ADD #imm,Rn should be used.
+Subtracts the contents of general register Rm from the contents of general
+register Rn and stores the result in Rn. For immediate data subtraction,
+ADD #imm,Rn should be used.
 )"})
 
   (note
@@ -6839,10 +6835,10 @@ SUB (int m, int n)
 
   (description
 {R"(
-This instruction subtracts the contents of general register Rm and the T bit
-from the contents of general register Rn, and stores the result in Rn. A borrow
-resulting from the operation is reflected in the T bit. This instruction is used
-for subtractions exceeding 32 bits.
+Subtracts the contents of general register Rm and the T bit from the contents of
+general register Rn, and stores the result in Rn. A borrow resulting from the
+operation is reflected in the T bit. This instruction is used for subtractions
+exceeding 32 bits.
 )"})
 
   (note
@@ -6911,9 +6907,8 @@ subc   r0,r0    ! r0 = r0 - r0 - T
 
   (description
 {R"(
-This instruction subtracts the contents of general register Rm from the contents
-of general register Rn, and stores the result in Rn. If underflow occurs, the T
-bit is set.
+Subtracts the contents of general register Rm from the contents of general
+register Rn, and stores the result in Rn. If underflow occurs, the T bit is set.
 )"})
 
   (note
@@ -7128,9 +7123,8 @@ and a byte store.
 
   (description
 {R"(
-This instruction finds the one's complement of the contents of general register
-Rm and stores the result in Rn. That is, it inverts the Rm bits and stores the
-result in Rn.
+Finds the one's complement of the contents of general register Rm and stores
+the result in Rn. That is, it inverts the Rm bits and stores the result in Rn.
 )"})
 
   (note
@@ -7675,9 +7669,9 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-This instruction rotates the contents of general register Rn one bit to the left
-through the T bit, and stores the result in Rn. The bit rotated out of the
-operand is transferred to the T bit.
+Rotates the contents of general register Rn one bit to the left through the
+T bit, and stores the result in Rn. The bit rotated out of the operand is
+transferred to the T bit.
 <br/><img src="rotcl.svg" height="100"/>
 )"})
 
@@ -7737,9 +7731,9 @@ ROTCL (int n)
 
   (description
 {R"(
-This instruction rotates the contents of general register Rn one bit to the
-right through the T bit, and stores the result in Rn. The bit rotated out of the
-operand is transferred to the T bit.
+Rotates the contents of general register Rn one bit to the right through the
+T bit, and stores the result in Rn. The bit rotated out of the operand is
+transferred to the T bit.
 <br/><img src="rotcr.svg" height="100"/>
 )"})
 
@@ -7800,9 +7794,8 @@ ROTCR (int n)
 
   (description
 {R"(
-This instruction rotates the contents of general register Rn one bit to the
-left, and stores the result in Rn. The bit rotated out of the operand is
-transferred to the T bit.
+Rotates the contents of general register Rn one bit to the left, and stores the
+result in Rn. The bit rotated out of the operand is transferred to the T bit.
 <br/><img src="rotl.svg" height="100"/>
 )"})
 
@@ -7855,9 +7848,8 @@ ROTL (int n)
 
   (description
 {R"(
-This instruction rotates the contents of general register Rn one bit to the
-right, and stores the result in Rn. The bit rotated out of the operand is
-transferred to the T bit.
+Rotates the contents of general register Rn one bit to the right, and stores the
+result in Rn. The bit rotated out of the operand is transferred to the T bit.
 <br/><img src="rotr.svg" height="100"/>
 )"})
 
@@ -7909,9 +7901,8 @@ ROTR (int n)
 
   (description
 {R"(
-This instruction arithmetically shifts the contents of general register Rn.
-General register Rm specifies the shift direction and the number of bits to be
-shifted.
+Arithmetically shifts the contents of general register Rn. General register Rm
+specifies the shift direction and the number of bits to be shifted.
 <br/><br/>
 Rn register contents are shifted to the left if the Rm register value is
 positive, and to the right if negative. In a shift to the right, the MSB is
@@ -7975,9 +7966,9 @@ SHAD (int m, int n)
 
   (description
 {R"(
-This instruction arithmetically shifts the contents of general register Rn one
-bit to the left, and stores the result in Rn. The bit shifted out of the operand
-is transferred to the T bit.
+Arithmetically shifts the contents of general register Rn one bit to the left
+and stores the result in Rn. The bit shifted out of the operand is transferred
+to the T bit.
 <br/><img src="shal.svg" height="100"/>
 )"})
 
@@ -8024,9 +8015,9 @@ SHAL (int n)
 
   (description
 {R"(
-This instruction arithmetically shifts the contents of general register Rn one
-bit to the right, and stores the result in Rn. The bit shifted out of the
-operand is transferred to the T bit.
+Arithmetically shifts the contents of general register Rn one bit to the right
+and stores the result in Rn. The bit shifted out of the operand is transferred
+to the T bit.
 <br/><img src="shar.svg" height="100"/>
 )"})
 
@@ -8085,8 +8076,8 @@ SHAR (int n)
 
   (description
 {R"(
-This instruction logically shifts the contents of general register Rn. General
-register Rm specifies the shift direction and the number of bits to be shifted.
+Logically shifts the contents of general register Rn. General register Rm
+specifies the shift direction and the number of bits to be shifted.
 <br/><br/>
 Rn register contents are shifted to the left if the Rm register value is
 positive, and to the right if negative. In a shift to the right, 0s are added
@@ -8145,9 +8136,9 @@ SHLD (int m, int n)
 
   (description
 {R"(
-This instruction logically shifts the contents of general register Rn one bit
-to the left, and stores the result in Rn. The bit shifted out of the operand is
-transferred to the T bit.
+Logically shifts the contents of general register Rn one bit to the left and
+stores the result in Rn. The bit shifted out of the operand is transferred to
+the T bit.
 <br/><img src="shll.svg" height="100"/>
 )"})
 
@@ -8193,9 +8184,8 @@ SHLL (int n)
 
   (description
 {R"(
-This instruction logically shifts the contents of general register Rn 2 bits to
-the left, and stores the result in Rn. The bits shifted out of the operand are
-discarded.
+Logically shifts the contents of general register Rn 2 bits to the left and
+stores the result in Rn. The bits shifted out of the operand are discarded.
 <br/><img src="shll2.svg" height="120"/>
 )"})
 
@@ -8236,9 +8226,8 @@ SHLL2 (int n)
 
   (description
 {R"(
-This instruction logically shifts the contents of general register Rn 8 bits to
-the left, and stores the result in Rn. The bits shifted out of the operand are
-discarded.
+Logically shifts the contents of general register Rn 8 bits to the left and
+stores the result in Rn. The bits shifted out of the operand are discarded.
 <br/><img src="shll8.svg" height="120"/>
 )"})
 
@@ -8279,9 +8268,8 @@ SHLL8 (int n)
 
   (description
 {R"(
-This instruction logically shifts the contents of general register Rn 16 bits to
-the left, and stores the result in Rn. The bits shifted out of the operand are
-discarded.
+Logically shifts the contents of general register Rn 16 bits to the left and
+stores the result in Rn. The bits shifted out of the operand are discarded.
 <br/><img src="shll16.svg" height="120"/>
 )"})
 
@@ -8323,9 +8311,9 @@ SHLL16 (int n)
 
   (description
 {R"(
-This instruction logically shifts the contents of general register Rn one bit
-to the right, and stores the result in Rn. The bit shifted out of the operand
-is transferred to the T bit.
+Logically shifts the contents of general register Rn one bit to the right and
+stores the result in Rn. The bit shifted out of the operand is transferred to
+the T bit.
 <br/><img src="shlr.svg" height="100"/>
 )"})
 
@@ -8372,9 +8360,8 @@ SHLR (int n)
 
   (description
 {R"(
-This instruction logically shifts the contents of general register Rn 2 bits to
-the right, and stores the result in Rn. The bits shifted out of the operand
-are discarded.
+Logically shifts the contents of general register Rn 2 bits to the right, and
+stores the result in Rn. The bits shifted out of the operand are discarded.
 <br/><img src="shlr2.svg" height="120"/>
 )"})
 
@@ -8416,9 +8403,8 @@ SHLR2 (int n)
 
   (description
 {R"(
-This instruction logically shifts the contents of general register Rn 8 bits to
-the right, and stores the result in Rn. The bits shifted out of the operand
-are discarded.
+Logically shifts the contents of general register Rn 8 bits to the right, and
+stores the result in Rn. The bits shifted out of the operand are discarded.
 <br/><img src="shlr8.svg" height="120"/>
 )"})
 
@@ -8460,9 +8446,8 @@ SHLR8 (int n)
 
   (description
 {R"(
-This instruction logically shifts the contents of general register Rn 16 bits to
-the right, and stores the result in Rn. The bits shifted out of the operand
-are discarded.
+Logically shifts the contents of general register Rn 16 bits to the right and
+stores the result in Rn. The bits shifted out of the operand are discarded.
 <br/><img src="shlr16.svg" height="120"/>
 )"})
 
@@ -8879,8 +8864,8 @@ BRAF (int m)
 
   (description
 {R"(
-This instruction branches to address (PC + 4 + displacement * 2), and stores
-address (PC + 4) in PR. The PC source value is the BSR instruction address.
+Branches to address (PC + 4 + displacement * 2), and stores address (PC + 4) in
+PR. The PC source value is the BSR instruction address.
 As the 12-bit displacement is multiplied by two after sign-extension, the branch
 destination can be located in the range from -4096 to +4094 bytes from the BSR
 instruction. If the branch destination cannot be reached, this branch can be
@@ -8941,10 +8926,9 @@ BSR (int d)
 
   (description
 {R"(
-This instruction branches to address (PC + 4 + Rm), and stores address (PC + 4)
-in PR. The PC source value is the BSRF instruction address. The branch
-destination address is the result of adding the 32-bit contents of general
-register Rm to PC + 4.
+Branches to address (PC + 4 + Rm), and stores address (PC + 4) in PR. The PC
+source value is the BSRF instruction address. The branch destination address is
+the result of adding the 32-bit contents of general register Rm to PC + 4.
 )"})
 
   (note
@@ -9043,11 +9027,10 @@ JMP (int m)
 
   (description
 {R"(
-This instruction makes a delayed branch to the subroutine procedure at the
-specified address after execution of the following instruction. Return address
-(PC + 4) is saved in PR, and a branch is made to the address indicated by
-general register Rm. JSR is used in combination with RTS for subroutine
-procedure calls.
+Makes a delayed branch to the subroutine procedure at the specified address
+after execution of the following instruction. Return address (PC + 4) is saved
+in PR, and a branch is made to the address indicated by general register Rm.
+JSR is used in combination with RTS for subroutine procedure calls.
 )"})
 
   (note
@@ -9189,10 +9172,10 @@ JSRNM (long d)
 
   (description
 {R"(
-This instruction returns from a subroutine procedure by restoring the PC from
-PR. Processing continues from the address indicated by the restored PC value.
-This instruction can be used to return from a subroutine procedure called by a
-BSR or JSR instruction to the source of the call.
+Returns from a subroutine procedure by restoring the PC from PR. Processing
+continues from the address indicated by the restored PC value. This instruction
+can be used to return from a subroutine procedure called by a BSR or JSR
+instruction to the source of the call.
 )"})
 
   (note
@@ -9336,7 +9319,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-This instruction clears the MACH and MACL registers.
+Clears the MACH and MACL registers.
 )"})
 
   (note
@@ -9377,7 +9360,7 @@ CLRMAC ()
 
   (description
 {R"(
-This instruction clears the S bit to 0.
+Clears the S bit to 0.
 )"})
 
   (note
@@ -9418,7 +9401,7 @@ PC += 2;
 
   (description
 {R"(
-This instruction clears the T bit.
+Clears the T bit.
 )"})
 
   (note
@@ -9458,11 +9441,11 @@ CLRT ()
 
   (description
 {R"(
-This instruction accesses the instruction cache at the effective address
-indicated by the contents of Rn. When the cache is hit, the corresponding cache
-block is invalidated (the V bit is cleared to 0). At this time, write-back is
-not performed. No operation is performed in the case of a cache miss or access
-to a non-cache area.
+Accesses the instruction cache at the effective address indicated by the
+contents of Rn. When the cache is hit, the corresponding cache block is
+invalidated (the V bit is cleared to 0). At this time, write-back is not
+performed. No operation is performed in the case of a cache miss or access to
+a non-cache area.
 )"})
 
   (note
@@ -9554,7 +9537,7 @@ LDBANK (int m)
 
   (description
 {R"(
-This instruction stores the source operand in the control register SR.
+Stores the source operand in the control register SR.
 )"})
 
   (note
@@ -9607,7 +9590,7 @@ LDCSR (int m)
 
   (description
 {R"(
-This instruction stores the source operand in the control register SR.
+Stores the source operand in the control register SR.
 )"})
 
   (note
@@ -11449,9 +11432,9 @@ LDSMY1 (int m)
 
   (description
 {R"(
-This instruction loads the contents of the PTEH/PTEL registers into the TLB
-(translation lookaside buffer) specified by MMUCR.URC (random counter field in
-the MMC control register).
+Loads the contents of the PTEH/PTEL registers into the TLB (translation
+lookaside buffer) specified by MMUCR.URC (random counter field in the MMC
+control register).
 <br/><br/>
 LDTLB is a privileged instruction, and can only be used in privileged mode. Use of this
 instruction in user mode will cause an illegal instruction exception.
@@ -11582,8 +11565,8 @@ MOVCAL (int n)
 
   (note
 {R"(
-This instruction simply increments the program counter (PC), advancing the
-processing flow to execution of the next instruction.
+Increments the program counter (PC), advancing the processing flow to execution
+of the next instruction.
 )"})
 
   (operation
@@ -11954,7 +11937,6 @@ by the RTE instruction. The SR and MD values defined prior to RTE execution are
 used to fetch the instruction in the RTE delay slot.
 <br/><br/>
 On SH1, SH2 and SH2A the PC and SR values are from the stack (R15).
-
 )"})
 
   (note
@@ -12139,7 +12121,7 @@ end:
 
   (description
 {R"(
-This instruction sets the S bit to 1.
+Sets the S bit to 1.
 )"})
 
   (note
@@ -12180,7 +12162,7 @@ SETS ()
 
   (description
 {R"(
-This instruction sets the T bit to 1.
+Sets the T bit to 1.
 )"})
 
   (note
@@ -12220,7 +12202,7 @@ SETT ()
 
   (description
 {R"(
-This instruction places the CPU in the power-down state.
+Places the CPU in the power-down state.
 <br/><br/>
 In power-down mode, the CPU retains its internal state, but immediately stops
 executing instructions and waits for an interrupt request. When it receives an
@@ -12228,7 +12210,6 @@ interrupt request, the CPU exits the power-down state.
 <br/><br/>
 SLEEP is a privileged instruction, and can only be used in privileged mode. Use
 of this instruction in user mode will cause an illegal instruction exception.
-
 )"})
 
   (note
