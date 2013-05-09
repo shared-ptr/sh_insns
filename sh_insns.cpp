@@ -365,7 +365,7 @@ div.col_head_2, div.col_cont_2
 /* Abstract column.  */
 div.col_head_3, div.col_cont_3
 {
-  width: 300px;
+  width: 320px;
   float: left;
   padding-right: 30px;
 }
@@ -2990,7 +2990,7 @@ MOVI20S (int i, int n)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "movco.l	R0,@Rn"
   SH4A
-  (abstract "LDST -> T\nif (T == 1) R0 -> Rn\n0 -> LDST")
+  (abstract "LDST -> T\nIf (T == 1): R0 -> Rn\n0 -> LDST")
   (code "0000nnnn01110011")
   (t_bit "LDST")
 
@@ -3046,7 +3046,7 @@ MOVCO (int n)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "movli.l	@Rm,R0"
   SH4A
-  (abstract "1 -> LDST\n(Rm) -> R0\nWhen interrupt/exception occured 0 -> LDST")
+  (abstract "1 -> LDST\n(Rm) -> R0\nWhen interrupt/exception occured: 0 -> LDST")
   (code "0000mmmm01100011")
 
   (group SH4A "CO")
@@ -6004,7 +6004,7 @@ DMULU (int m, int n)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dt	Rn"
   SH2 SH2A SH3 SH4 SH4A
-  (abstract "Rn-1 -> Rn\nIf Rn = 0: 1 -> T, else: 0 -> T")
+  (abstract "Rn-1 -> Rn\nIf Rn = 0: 1 -> T\nElse: 0 -> T")
   (code "0100nnnn00010000")
 
   (group SH4A "EX" SH4 "EX")
@@ -7288,7 +7288,7 @@ and a byte store.
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "tas.b	@Rn"
   SH_ANY
-  (abstract "If (Rn) = 0: 1 -> T, else: 0 -> T\n1 -> MSB of (Rn)")
+  (abstract "If (Rn) = 0: 1 -> T\nElse: 0 -> T\n1 -> MSB of (Rn)")
   (code "0100nnnn00011011")
   (t_bit "Result")
 
@@ -7364,7 +7364,7 @@ and a byte store.
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "tst	Rm,Rn"
   SH_ANY
-  (abstract "If Rn & Rm = 0: 1 -> T, else: 0 -> T")
+  (abstract "If Rn & Rm = 0: 1 -> T\nElse: 0 -> T")
   (code "0010nnnnmmmm1000")
   (t_bit "Result")
 
@@ -7411,7 +7411,7 @@ TST (int m, int n)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "tst	#imm,R0"
   SH_ANY
-  (abstract "If R0 & (zero extend)imm = 0: 1 -> T, else 0 -> T")
+  (abstract "If R0 & (zero extend)imm = 0: 1 -> T\nElse: 0 -> T")
   (code "11001000iiiiiiii")
   (t_bit "Result")
 
@@ -7461,7 +7461,7 @@ TSTI (int i)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "tst.b	#imm,@(R0,GBR)"
   SH_ANY
-  (abstract "If (R0 + GBR) & (zero extend)imm = 0: 1 -> T, else 0 -> T")
+  (abstract "If (R0 + GBR) & (zero extend)imm = 0: 1 -> T\nElse 0: -> T")
   (code "11001100iiiiiiii")
   (t_bit "Result")
 
@@ -8487,7 +8487,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "bf	label"
   SH_ANY
-  (abstract "If T = 0: disp*2 + PC + 4 -> PC, else: nop")
+  (abstract "If T = 0: disp*2 + PC + 4 -> PC\nElse: nop")
   (code "10001011dddddddd")
 
   (group SH4A "BR" SH4 "BR")
@@ -8545,7 +8545,7 @@ BF (int d)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "bf/s	label"
   SH2 SH2A SH3 SH4 SH4A
-  (abstract "Delayed branch, if T = 0: disp*2 + PC + 4 -> PC, else: nop")
+  (abstract "If T = 0: disp*2 + PC + 4 -> PC\nElse: nop\n(Delayed branch)")
   (code "10001111dddddddd")
 
   (group SH4A "BR" SH4 "BR")
@@ -8618,7 +8618,7 @@ BFS (int d)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "bt	label"
   SH_ANY
-  (abstract "If T = 1: disp*2 + PC + 4 -> PC, else: nop")
+  (abstract "If T = 1: disp*2 + PC + 4 -> PC\nElse: nop")
   (code "10001001dddddddd")
 
   (group SH4A "BR" SH4 "BR")
@@ -8676,7 +8676,7 @@ BT (int d)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "bt/s	label"
   SH2 SH2A SH3 SH4 SH4A
-  (abstract "Delayed branch, if T = 1: disp*2 + PC + 4 -> PC, else: nop")
+  (abstract "If T = 1: disp*2 + PC + 4 -> PC\nElse: nop\n(Delayed branch)")
   (code "10001101dddddddd")
 
   (group SH4A "BR" SH4 "BR")
@@ -8744,7 +8744,7 @@ BTS (int d)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "bra	label"
   SH_ANY
-  (abstract "Delayed branch, disp*2 + PC + 4 -> PC")
+  (abstract "disp*2 + PC + 4 -> PC\n(Delayed branch)")
   (code "1010dddddddddddd")
 
   (group SH4A "BR" SH4 "BR")
@@ -8805,7 +8805,7 @@ BRA (int d)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "braf	Rm"
   SH2 SH2A SH3 SH4 SH4A
-  (abstract "Delayed branch, Rm + PC + 4 -> PC")
+  (abstract "Rm + PC + 4 -> PC\n(Delayed branch)")
   (code "0000mmmm00100011")
 
   (group SH4A "BR" SH4 "CO")
@@ -8855,7 +8855,7 @@ BRAF (int m)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "bsr	label"
   SH_ANY
-  (abstract "Delayed branch, PC + 4 -> PR, disp*2 + PC + 4 -> PC")
+  (abstract "PC + 4 -> PR, disp*2 + PC + 4 -> PC\n(Delayed branch)")
   (code "1011dddddddddddd")
 
   (group SH4A "BR" SH4 "BR")
@@ -8917,7 +8917,7 @@ BSR (int d)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "bsrf	Rm"
   SH2 SH2A SH3 SH4 SH4A
-  (abstract "Delayed branch, PC + 4 -> PR, Rm + PC + 4 -> PC")
+  (abstract "PC + 4 -> PR, Rm + PC + 4 -> PC\n(Delayed branch)")
   (code "0000mmmm00000011")
 
   (group SH4A "BR" SH4 "CO")
@@ -8969,7 +8969,7 @@ BSRF (int m)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "jmp	@Rm"
   SH_ANY
-  (abstract "Delayed branch, Rm -> PC")
+  (abstract "Rm -> PC\n(Delayed branch)")
   (code "0100mmmm00101011")
 
   (group SH4A "BR" SH4 "CO")
@@ -9018,7 +9018,7 @@ JMP (int m)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "jsr	@Rm"
   SH_ANY
-  (abstract "Delayed branch, PC + 4 -> PR, Rm -> PC")
+  (abstract "PC + 4 -> PR, Rm -> PC\n(Delayed branch)")
   (code "0100mmmm00001011")
 
   (group SH4A "BR" SH4 "CO")
@@ -9163,7 +9163,7 @@ JSRNM (long d)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "rts"
   SH_ANY
-  (abstract "Delayed branch, PR -> PC")
+  (abstract "PR -> PC\nDelayed branch")
   (code "0000000000001011")
 
   (group SH4A "BR" SH4 "CO")
@@ -15373,7 +15373,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "fcmp/eq	FRm,FRn"
   SH2E SH3E SH4 SH4A SH2A
-  (abstract "If FRn = FRm: 1 -> T, else: 0 -> T")
+  (abstract "If FRn = FRm: 1 -> T\nElse: 0 -> T")
   (code "1111nnnnmmmm0100")
   (t_bit "Result")
 
@@ -15410,7 +15410,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "fcmp/gt	FRm,FRn"
   SH2E SH3E SH4 SH4A SH2A
-  (abstract "If FRn > FRm: 1 -> T, else: 0 -> T")
+  (abstract "If FRn > FRm: 1 -> T\nElse: 0 -> T")
   (code "1111nnnnmmmm0101")
   (t_bit "Result")
 
@@ -15960,7 +15960,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "fcmp/eq	DRm,DRn"
   SH4 SH4A SH2A
-  (abstract "If DRn = DRm: 1 -> T, else: 0 -> T")
+  (abstract "If DRn = DRm: 1 -> T\nElse: 0 -> T")
   (code "1111nnn0mmm00100")
 
   (group SH4A "FE" SH4 "CO")
@@ -15996,7 +15996,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "fcmp/gt	DRm,DRn"
   SH4 SH4A SH2A
-  (abstract "If DRn > DRm: 1 -> T, else: 0 -> T")
+  (abstract "If DRn > DRm: 1 -> T\nElse: 0 -> T")
   (code "1111nnn0mmm00101")
 
   (group SH4A "FE" SH4 "CO")
@@ -17932,7 +17932,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct padd	Sx,Sy,Dz"
   SH_DSP
-  (abstract "If DC = 1: Sx + Sy -> Dz, else: nop")
+  (abstract "If DC = 1: Sx + Sy -> Dz\nElse: nop")
   (code "111110********** 10110010xxyyzzzz")
 
   (issue SH_DSP "1")
@@ -17967,7 +17967,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf padd	Sx,Sy,Dz"
   SH_DSP
-  (abstract "If DC = 0: Sx + Sy -> Dz, else: nop")
+  (abstract "If DC = 0: Sx + Sy -> Dz\nElse: nop")
   (code "111110********** 10110011xxyyzzzz")
 
   (issue SH_DSP "1")
@@ -18110,7 +18110,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct pclr	Dz"
   SH_DSP
-  (abstract "If DC = 1: 0x00000000 -> Dz, else: nop")
+  (abstract "If DC = 1: 0x00000000 -> Dz\nElse: nop")
   (code "111110********** 100011100000zzzz")
 
   (issue SH_DSP "1")
@@ -18145,7 +18145,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf pclr	Dz"
   SH_DSP
-  (abstract "If DC = 0: 0x00000000 -> Dz, else: nop")
+  (abstract "If DC = 0: 0x00000000 -> Dz\nElse: nop")
   (code "111110********** 100011110000zzzz")
 
   (issue SH_DSP "1")
@@ -18288,7 +18288,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct pcopy	Sx,Dz"
   SH_DSP
-  (abstract "If DC = 1: Sx -> Dz, else: nop")
+  (abstract "If DC = 1: Sx -> Dz\nElse: nop")
   (code "111110********** 11011010xx00zzzz")
 
   (issue SH_DSP "1")
@@ -18323,7 +18323,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct pcopy	Sy,Dz"
   SH_DSP
-  (abstract "If DC = 1: Sy -> Dz, else: nop")
+  (abstract "If DC = 1: Sy -> Dz\nElse: nop")
   (code "111110********** 1111101000yyzzzz")
 
   (issue SH_DSP "1")
@@ -18358,7 +18358,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf pcopy	Sx,Dz"
   SH_DSP
-  (abstract "If DC = 0: Sx -> Dz, else: nop")
+  (abstract "If DC = 0: Sx -> Dz\nElse: nop")
   (code "111110********** 11011011xx00zzzz")
 
   (issue SH_DSP "1")
@@ -18393,7 +18393,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf pcopy	Sy,Dz"
   SH_DSP
-  (abstract "If DC = 0: Sy -> Dz, else: nop")
+  (abstract "If DC = 0: Sy -> Dz\nElse: nop")
   (code "111110********** 1111101100yyzzzz")
 
   (issue SH_DSP "1")
@@ -18500,7 +18500,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct pneg	Sx,Dz"
   SH_DSP
-  (abstract "If DC = 1: 0 - Sx -> Dz, else: nop")
+  (abstract "If DC = 1: 0 - Sx -> Dz\nElse: nop")
   (code "111110********** 11001010xx00zzzz")
 
   (issue SH_DSP "1")
@@ -18535,7 +18535,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct pneg	Sy,Dz"
   SH_DSP
-  (abstract "If DC = 1: 0 - Sy -> Dz, else: nop")
+  (abstract "If DC = 1: 0 - Sy -> Dz\nElse: nop")
   (code "111110********** 1110101000yyzzzz")
 
   (issue SH_DSP "1")
@@ -18570,7 +18570,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf pneg	Sx,Dz"
   SH_DSP
-  (abstract "If DC = 0: 0 - Sx -> Dz, else: nop")
+  (abstract "If DC = 0: 0 - Sx -> Dz\nElse: nop")
   (code "111110********** 11001011xx00zzzz")
 
   (issue SH_DSP "1")
@@ -18605,7 +18605,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf pneg	Sy,Dz"
   SH_DSP
-  (abstract "If DC = 0: 0 - Sy -> Dz, else: nop")
+  (abstract "If DC = 0: 0 - Sy -> Dz\nElse: nop")
   (code "111110********** 1110101100yyzzzz")
 
   (issue SH_DSP "1")
@@ -18676,7 +18676,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct psub	Sx,Sy,Dz"
   SH_DSP
-  (abstract "If DC = 1: Sx - Sy -> Dz, else: nop")
+  (abstract "If DC = 1: Sx - Sy -> Dz\nElse: nop")
   (code "111110********** 10100010xxyyzzzz")
 
   (issue SH_DSP "1")
@@ -18711,7 +18711,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf psub 	Sx,Sy,Dz"
   SH_DSP
-  (abstract "If DC = 0: Sx - Sy -> Dz, else: nop")
+  (abstract "If DC = 0: Sx - Sy -> Dz\nElse: nop")
   (code "111110********** 10100011xxyyzzzz")
 
   (issue SH_DSP "1")
@@ -20259,7 +20259,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct plds	Dz,MACH"
   SH_DSP
-  (abstract "If DC = 1: Dz -> MACH, else: nop")
+  (abstract "If DC = 1: Dz -> MACH\nElse: nop")
   (code "111110********** 111011100000zzzz")
 
   (issue SH_DSP "1")
@@ -20294,7 +20294,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct plds	Dz,MACL"
   SH_DSP
-  (abstract "If DC = 1: Dz -> MACL, else: nop")
+  (abstract "If DC = 1: Dz -> MACL\nElse: nop")
   (code "111110********** 111111100000zzzz")
 
   (issue SH_DSP "1")
@@ -20329,7 +20329,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf plds	Dz,MACH"
   SH_DSP
-  (abstract "If DC = 0: Dz -> MACH, else: nop")
+  (abstract "If DC = 0: Dz -> MACH\nElse: nop")
   (code "111110********** 111011110000zzzz")
 
   (issue SH_DSP "1")
@@ -20364,7 +20364,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf plds	Dz,MACL"
   SH_DSP
-  (abstract "If DC = 0: Dz -> MACL, else: nop")
+  (abstract "If DC = 0: Dz -> MACL\nElse: nop")
   (code "111110********** 111111110000zzzz")
 
   (issue SH_DSP "1")
@@ -20469,7 +20469,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct psts	MACH,Dz"
   SH_DSP
-  (abstract "If DC = 1: MACH -> Dz, else: nop")
+  (abstract "If DC = 1: MACH -> Dz\nElse: nop")
   (code "111110********** 110011100000zzzz")
 
   (issue SH_DSP "1")
@@ -20504,7 +20504,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dct psts	MACL,Dz"
   SH_DSP
-  (abstract "If DC = 1: MACL -> Dz, else: nop")
+  (abstract "If DC = 1: MACL -> Dz\nElse: nop")
   (code "111110********** 110111100000zzzz")
 
   (issue SH_DSP "1")
@@ -20539,7 +20539,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf psts	MACH,Dz"
   SH_DSP
-  (abstract "If DC = 0: MACH -> Dz, else: nop")
+  (abstract "If DC = 0: MACH -> Dz\nElse: nop")
   (code "111110********** 110011110000zzzz")
 
   (issue SH_DSP "1")
@@ -20574,7 +20574,7 @@ __sexpr (insn_blocks.push_back
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "dcf psts	MACL,Dz"
   SH_DSP
-  (abstract "If DC = 0: MACL -> Dz, else: nop")
+  (abstract "If DC = 0: MACL -> Dz\nElse: nop")
   (code "111110********** 110111110000zzzz")
 
   (issue SH_DSP "1")
