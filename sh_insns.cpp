@@ -14133,7 +14133,7 @@ TRAPA (int i)
   R[15] -= 4;
   Write_Long (R[15], SR);
   R[15] -= 4;
-  Write_Long (R[15], PC);
+  Write_Long (R[15], PC + 2);
   PC = Read_Long (VBR + (imm << 2));
 
   #elif SH3 || SH4 || SH4A
