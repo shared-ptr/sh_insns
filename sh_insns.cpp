@@ -12296,16 +12296,109 @@ STBANK (int n)
 
   (description
 {R"(
-
+Stores control register SR in the destination.
 )"})
 
   (note
 {R"(
-
+This instruction is only usable in privileged mode. Issuing this instruction in
+user mode will cause an illegal instruction exception. 
 )"})
 
   (operation
 {R"(
+STCSR (int n)
+{
+  R[n] = SR;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "stc.l	SR,@-Rn"
+  SH_ANY privileged
+  (abstract "Rn-4 -> Rn, SR -> (Rn)")
+  (code "0100nnnn00000011")
+
+  (group SH4A "CO" SH4 "CO")
+  (issue SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "2")
+  (latency SH1 "2" SH2 "2" SH3 "1/2" SH4A "1" SH2A "2" SH4 "2/2")
+
+  (description
+{R"(
+Stores control register SR in the destination.
+)"})
+
+  (note
+{R"(
+This instruction is only usable in privileged mode. Issuing this instruction in
+user mode will cause an illegal instruction exception. 
+)"})
+
+  (operation
+{R"(
+STCMSR (int n)
+{
+  R[n] -= 4;
+  Write_Long (R[n],SR);
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Initial page write exception</li>
+<li>Data address error</li>
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "stc	TBR,Rn"
+  SH2A
+  (abstract "TBR -> Rn")
+  (code "0000nnnn01001010")
+
+  (issue SH2A "1")
+  (latency SH2A "1")
+
+  (description
+{R"(
+Stores control register TBR in the destination.
+)"})
+
+  (note
+{R"(
+)"})
+
+  (operation
+{R"(
+STCTBR (int n)
+{
+  R[n] = TBR;
+  PC += 2;
+}
 
 )"})
 
@@ -12332,17 +12425,21 @@ STBANK (int n)
 
   (description
 {R"(
-
+Stores control register GBR in the destination.
 )"})
 
   (note
 {R"(
-
+This instruction can also be issued in user mode. 
 )"})
 
   (operation
 {R"(
-
+STCGBR (int n)
+{
+  R[n] = GBR;
+  PC += 2;
+}
 )"})
 
   (example
@@ -12353,6 +12450,51 @@ STBANK (int n)
   (exceptions
 {R"(
 
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "stc.l	GBR,@-Rn"
+  SH_ANY
+  (abstract "Rn-4 -> Rn, GBR -> (Rn)")
+  (code "0100nnnn00010011")
+
+  (group SH4A "LS" SH4 "CO")
+  (issue SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "2")
+  (latency SH1 "2" SH2 "2" SH3 "1/2" SH4A "1" SH2A "1" SH4 "2/2")
+
+  (description
+{R"(
+Stores control register GBR in the destination.
+)"})
+
+  (note
+{R"(
+This instruction can also be issued in user mode. 
+)"})
+
+  (operation
+{R"(
+STCMGBR (int n)
+{
+  R[n] –= 4;
+  Write_Long (R[n],GBR);
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Initial page write exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -12393,363 +12535,6 @@ STBANK (int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "stc	MOD,Rn"
-  SH_DSP
-  (abstract "MOD -> Rn")
-  (code "0000nnnn01010010")
-
-  (issue SH_DSP "1")
-  (latency SH_DSP "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "stc	RE,Rn"
-  SH_DSP
-  (abstract "RE -> Rn")
-  (code "0000nnnn01110010")
-
-  (issue SH_DSP "1")
-  (latency SH_DSP "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "stc	RS,Rn"
-  SH_DSP
-  (abstract "RS -> Rn")
-  (code "0000nnnn01100010")
-
-  (issue SH_DSP "1")
-  (latency SH_DSP "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "stc	SSR,Rn"
-  SH3 SH4 SH4A privileged
-  (abstract "SSR -> Rn")
-  (code "0000nnnn00110010")
-
-  (group SH4A "LS" SH4 "CO")
-  (issue SH3 "1" SH4A "1" SH4 "2")
-  (latency SH3 "1" SH4A "1" SH4 "2")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "stc	SPC,Rn"
-  SH3 SH4 SH4A privileged
-  (abstract "SPC -> Rn")
-  (code "0000nnnn01000010")
-
-  (group SH4A "LS" SH4 "CO")
-  (issue SH3 "1" SH4A "1" SH4 "2")
-  (latency SH3 "1" SH4A "1" SH4 "2")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "stc	SGR,Rn"
-  SH4 SH4A privileged
-  (abstract "SGR -> Rn")
-  (code "0000nnnn00111010")
-
-  (group SH4A "LS" SH4 "CO")
-  (issue SH4A "1" SH4 "3")
-  (latency SH4A "1" SH4 "3")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "stc	DBR,Rn"
-  SH4 SH4A privileged
-  (abstract "DBR -> Rn")
-  (code "0000nnnn11111010")
-
-  (group SH4A "LS" SH4 "CO")
-  (issue SH4A "1" SH4 "2")
-  (latency SH4A "1" SH4 "2")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "stc	Rm_BANK,Rn"
-  SH3 SH4 SH4A privileged
-  (abstract "Rm_BANK -> Rn (m = 0-7)")
-  (code "0000nnnn1mmm0010")
-
-  (group SH4A "LS" SH4 "CO")
-  (issue SH3 "1" SH4A "1" SH4 "2")
-  (latency SH3 "1" SH4A "1" SH4 "2")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "stc.l	SR,@-Rn"
-  SH_ANY privileged
-  (abstract "Rn-4 -> Rn, SR -> (Rn)")
-  (code "0100nnnn00000011")
-
-  (group SH4A "CO" SH4 "CO")
-  (issue SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "2")
-  (latency SH1 "2" SH2 "2" SH3 "1/2" SH4A "1" SH2A "2" SH4 "2/2")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "stc.l	GBR,@-Rn"
-  SH_ANY
-  (abstract "Rn-4 -> Rn, GBR -> (Rn)")
-  (code "0100nnnn00010011")
-
-  (group SH4A "LS" SH4 "CO")
-  (issue SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "2")
-  (latency SH1 "2" SH2 "2" SH3 "1/2" SH4A "1" SH2A "1" SH4 "2/2")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "stc.l	VBR,@-Rn"
   SH_ANY privileged
   (abstract "Rn-4 -> Rn, VBR -> (Rn)")
@@ -12758,6 +12543,41 @@ STBANK (int n)
   (group SH4A "LS" SH4 "CO")
   (issue SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "2")
   (latency SH1 "2" SH2 "2" SH3 "1/2" SH4A "1" SH2A "1" SH4 "2/2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "stc	MOD,Rn"
+  SH_DSP
+  (abstract "MOD -> Rn")
+  (code "0000nnnn01010010")
+
+  (issue SH_DSP "1")
+  (latency SH_DSP "1")
 
   (description
 {R"(
@@ -12823,6 +12643,41 @@ STBANK (int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "stc	RE,Rn"
+  SH_DSP
+  (abstract "RE -> Rn")
+  (code "0000nnnn01110010")
+
+  (issue SH_DSP "1")
+  (latency SH_DSP "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "stc.l	RE,@-Rn"
   SH_DSP
   (abstract "Rn-4 -> Rn, RE -> (Rn)")
@@ -12832,6 +12687,41 @@ STBANK (int n)
   (latency SH_DSP "1/2")
 
   // SH1-DSP latency: 2
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "stc	RS,Rn"
+  SH_DSP
+  (abstract "RS -> Rn")
+  (code "0000nnnn01100010")
+
+  (issue SH_DSP "1")
+  (latency SH_DSP "1")
 
   (description
 {R"(
@@ -12897,50 +12787,14 @@ STBANK (int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "stc.l	SSR,@-Rn"
-  SH3 SH4 SH4A privileged
-  (abstract "Rn-4 -> Rn, SSR -> (Rn)")
-  (code "0100nnnn00110011")
+(insn "stc	SGR,Rn"
+  SH4 SH4A privileged
+  (abstract "SGR -> Rn")
+  (code "0000nnnn00111010")
 
   (group SH4A "LS" SH4 "CO")
-  (issue SH3 "1" SH4A "1" SH4 "2")
-  (latency SH3 "1/2" SH4A "1" SH4 "2")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "stc.l	SPC,@-Rn"
-  SH3 SH4 SH4A privileged
-  (abstract "Rn-4 -> Rn, SPC -> (Rn)")
-  (code "0100nnnn01000011")
-
-  (group SH4A "LS" SH4 "CO")
-  (issue SH4A "1" SH4 "2")
-  (latency SH4A "1" SH4 "2/2")
+  (issue SH4A "1" SH4 "3")
+  (latency SH4A "1" SH4 "3")
 
   (description
 {R"(
@@ -13005,6 +12859,186 @@ STBANK (int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "stc	SSR,Rn"
+  SH3 SH4 SH4A privileged
+  (abstract "SSR -> Rn")
+  (code "0000nnnn00110010")
+
+  (group SH4A "LS" SH4 "CO")
+  (issue SH3 "1" SH4A "1" SH4 "2")
+  (latency SH3 "1" SH4A "1" SH4 "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "stc.l	SSR,@-Rn"
+  SH3 SH4 SH4A privileged
+  (abstract "Rn-4 -> Rn, SSR -> (Rn)")
+  (code "0100nnnn00110011")
+
+  (group SH4A "LS" SH4 "CO")
+  (issue SH3 "1" SH4A "1" SH4 "2")
+  (latency SH3 "1/2" SH4A "1" SH4 "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "stc	SPC,Rn"
+  SH3 SH4 SH4A privileged
+  (abstract "SPC -> Rn")
+  (code "0000nnnn01000010")
+
+  (group SH4A "LS" SH4 "CO")
+  (issue SH3 "1" SH4A "1" SH4 "2")
+  (latency SH3 "1" SH4A "1" SH4 "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "stc.l	SPC,@-Rn"
+  SH3 SH4 SH4A privileged
+  (abstract "Rn-4 -> Rn, SPC -> (Rn)")
+  (code "0100nnnn01000011")
+
+  (group SH4A "LS" SH4 "CO")
+  (issue SH4A "1" SH4 "2")
+  (latency SH4A "1" SH4 "2/2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "stc	DBR,Rn"
+  SH4 SH4A privileged
+  (abstract "DBR -> Rn")
+  (code "0000nnnn11111010")
+
+  (group SH4A "LS" SH4 "CO")
+  (issue SH4A "1" SH4 "2")
+  (latency SH4A "1" SH4 "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "stc.l	DBR,@-Rn"
   SH4 SH4A privileged
   (abstract "Rn-4 -> Rn, DBR -> (Rn)")
@@ -13013,6 +13047,42 @@ STBANK (int n)
   (group SH4A "LS" SH4 "CO")
   (issue SH4A "1" SH4 "2")
   (latency SH4A "1" SH4 "2/2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "stc	Rm_BANK,Rn"
+  SH3 SH4 SH4A privileged
+  (abstract "Rm_BANK -> Rn (m = 0-7)")
+  (code "0000nnnn1mmm0010")
+
+  (group SH4A "LS" SH4 "CO")
+  (issue SH3 "1" SH4A "1" SH4 "2")
+  (latency SH3 "1" SH4A "1" SH4 "2")
 
   (description
 {R"(
@@ -13113,288 +13183,6 @@ STBANK (int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "sts	MACL,Rn"
-  SH_ANY
-  (abstract "MACL -> Rn")
-  (code "0000nnnn00011010")
-
-  (group SH4A "LS" SH4 "CO")
-  (issue SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "1")
-  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "3")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "sts	PR,Rn"
-  SH_ANY
-  (abstract "PR -> Rn")
-  (code "0000nnnn00101010")
-
-  (group SH4A "LS" SH4 "CO")
-  (issue SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "2")
-  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "2")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "sts	DSR,Rn"
-  SH_DSP
-  (abstract "DSR -> Rn")
-  (code "0000nnnn01101010")
-
-  (issue SH_DSP "1")
-  (latency SH_DSP "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "sts	A0,Rn"
-  SH_DSP
-  (abstract "A0 -> Rn")
-  (code "0000nnnn01111010")
-
-  (issue SH_DSP "1")
-  (latency SH_DSP "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "sts	X0,Rn"
-  SH_DSP
-  (abstract "X0 -> Rn")
-  (code "0000nnnn10001010")
-
-  (issue SH_DSP "1")
-  (latency SH_DSP "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "sts	X1,Rn"
-  SH_DSP
-  (abstract "X1 -> Rn")
-  (code "0000nnnn10011010")
-
-  (issue SH_DSP "1")
-  (latency SH_DSP "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "sts	Y0,Rn"
-  SH_DSP
-  (abstract "Y0 -> Rn")
-  (code "0000nnnn10101010")
-
-  (issue SH_DSP "1")
-  (latency SH_DSP "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "sts	Y1,Rn"
-  SH_DSP
-  (abstract "Y1 -> Rn")
-  (code "0000nnnn10111010")
-
-  (issue SH_DSP "1")
-  (latency SH_DSP "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "sts.l	MACH,@-Rn"
   SH_ANY
   (abstract "Rn-4 -> Rn, MACH -> (Rn)")
@@ -13403,6 +13191,42 @@ STBANK (int n)
   (group SH4A "LS" SH4 "CO")
   (issue SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "1")
   (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "1/1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "sts	MACL,Rn"
+  SH_ANY
+  (abstract "MACL -> Rn")
+  (code "0000nnnn00011010")
+
+  (group SH4A "LS" SH4 "CO")
+  (issue SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "1")
+  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "2" SH4 "3")
 
   (description
 {R"(
@@ -13467,6 +13291,42 @@ STBANK (int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "sts	PR,Rn"
+  SH_ANY
+  (abstract "PR -> Rn")
+  (code "0000nnnn00101010")
+
+  (group SH4A "LS" SH4 "CO")
+  (issue SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "2")
+  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "2")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "sts.l	PR,@-Rn"
   SH_ANY
   (abstract "Rn-4 -> Rn, PR -> (Rn)")
@@ -13503,10 +13363,81 @@ STBANK (int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "sts	DSR,Rn"
+  SH_DSP
+  (abstract "DSR -> Rn")
+  (code "0000nnnn01101010")
+
+  (issue SH_DSP "1")
+  (latency SH_DSP "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "sts.l	DSR,@-Rn"
   SH_DSP
   (abstract "Rn-4 -> Rn, DSR -> (Rn)")
   (code "0100nnnn01100010")
+
+  (issue SH_DSP "1")
+  (latency SH_DSP "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "sts	A0,Rn"
+  SH_DSP
+  (abstract "A0 -> Rn")
+  (code "0000nnnn01111010")
 
   (issue SH_DSP "1")
   (latency SH_DSP "1")
@@ -13573,10 +13504,80 @@ STBANK (int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "sts	X0,Rn"
+  SH_DSP
+  (abstract "X0 -> Rn")
+  (code "0000nnnn10001010")
+
+  (issue SH_DSP "1")
+  (latency SH_DSP "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "sts.l	X0,@-Rn"
   SH_DSP
   (abstract "Rn-4 -> Rn, X0 -> (Rn)")
   (code "0100nnnn10000010")
+
+  (issue SH_DSP "1")
+  (latency SH_DSP "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "sts	X1,Rn"
+  SH_DSP
+  (abstract "X1 -> Rn")
+  (code "0000nnnn10011010")
 
   (issue SH_DSP "1")
   (latency SH_DSP "1")
@@ -13643,10 +13644,80 @@ STBANK (int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "sts	Y0,Rn"
+  SH_DSP
+  (abstract "Y0 -> Rn")
+  (code "0000nnnn10101010")
+
+  (issue SH_DSP "1")
+  (latency SH_DSP "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "sts.l	Y0,@-Rn"
   SH_DSP
   (abstract "Rn-4 -> Rn, Y0 -> (Rn)")
   (code "0100nnnn10100010")
+
+  (issue SH_DSP "1")
+  (latency SH_DSP "1")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "sts	Y1,Rn"
+  SH_DSP
+  (abstract "Y1 -> Rn")
+  (code "0000nnnn10111010")
 
   (issue SH_DSP "1")
   (latency SH_DSP "1")
