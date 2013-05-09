@@ -6457,7 +6457,7 @@ MACW (int m, int n)
   {
     if (ans == 1)
     {
-      #ifdef SH1
+      #if SH1
       if (src == 0 || src == 2)
         MACH |= 0x00000001;
       #endif
@@ -6474,7 +6474,7 @@ MACW (int m, int n)
     if (templ > MACL)
       MACH += 1;
 
-    #ifdef SH1
+    #if SH1
     if ((MACH & 0x00000200) == 0)
       MACH &= 0x000003FF;
     else
@@ -9799,8 +9799,8 @@ Stores a source operand in control register VBR.
 {R"(
 LDCVBR (int m)
 {
-VBR = R[m];
-PC += 2;
+  VBR = R[m];
+  PC += 2;
 }
 )"})
 
@@ -10044,8 +10044,8 @@ On the SH-DSP the latency of this instruction is 1 cycle.
 {R"(
 LDCRS (int m)
 {
-RS = R[m];
-PC += 2;
+  RS = R[m];
+  PC += 2;
 }
 )"})
 
@@ -10118,7 +10118,8 @@ Stores a source operand in control register SGR.
   (note
 {R"(
 Not sure whether it is also available on SH4.
-It is not marked as new instruction for SH4A but also not listed in SH4 manuals.
+It is not marked as new instruction for SH4A but is also not listed in SH4
+manuals.
 )"})
 
   (operation
@@ -10160,7 +10161,8 @@ Stores a source operand in control register SGR.
   (note
 {R"(
 Not sure whether it is also available on SH4.
-It is not marked as new instruction for SH4A but also not listed in SH4 manuals.
+It is not marked as new instruction for SH4A but is also not listed in SH4
+manuals.
 )"})
 
   (operation
@@ -10288,7 +10290,7 @@ LDCMSSR (int m)
 
   (description
 {R"(
-
+Stores a source operand in control register SPC.
 )"})
 
   (note
@@ -10298,7 +10300,11 @@ LDCMSSR (int m)
 
   (operation
 {R"(
-
+LDCSPC (int m)
+{
+  SPC = R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -10308,79 +10314,8 @@ LDCMSSR (int m)
 
   (exceptions
 {R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "ldc	Rm,DBR"
-  SH4 SH4A privileged
-  (abstract "Rm -> DBR")
-  (code "0100mmmm11110110")
-
-  (group SH4A "CO" SH4 "CO")
-  (issue SH4A "4" SH4 "1")
-  (latency SH4A "4" SH4 "3")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "ldc	Rm,Rn_BANK"
-  SH3 SH4 SH4A privileged
-  (abstract "Rm -> Rn_BANK (n = 0-7)")
-  (code "0100mmmm1nnn1110")
-
-  (group SH4A "LS" SH4 "CO")
-  (issue SH3 "1" SH4A "1" SH4 "1")
-  (latency SH3 "1/3" SH4A "1" SH4 "3")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -10396,7 +10331,7 @@ LDCMSSR (int m)
 
   (description
 {R"(
-
+Stores a source operand in control register SPC.
 )"})
 
   (note
@@ -10406,7 +10341,12 @@ LDCMSSR (int m)
 
   (operation
 {R"(
-
+LDCMSPC (int m)
+{
+  SPC = Read_Long (R[m]);
+  R[m] += 4;
+  PC += 2;
+}
 )"})
 
   (example
@@ -10416,7 +10356,53 @@ LDCMSSR (int m)
 
   (exceptions
 {R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
+)"})
+)
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "ldc	Rm,DBR"
+  SH4 SH4A privileged
+  (abstract "Rm -> DBR")
+  (code "0100mmmm11110110")
+
+  (group SH4A "CO" SH4 "CO")
+  (issue SH4A "4" SH4 "1")
+  (latency SH4A "4" SH4 "3")
+
+  (description
+{R"(
+Stores a source operand in control register DBR.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+LDCDBR (int m)
+{
+  DBR = R[m];
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -10432,7 +10418,7 @@ LDCMSSR (int m)
 
   (description
 {R"(
-
+Stores a source operand in control register DBR.
 )"})
 
   (note
@@ -10442,7 +10428,12 @@ LDCMSSR (int m)
 
   (operation
 {R"(
-
+LDCMDBR (int m)
+{
+  DBR = Read_Long (R[m]);
+  R[m] += 4;
+  PC += 2;
+}
 )"})
 
   (example
@@ -10452,7 +10443,55 @@ LDCMSSR (int m)
 
   (exceptions
 {R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
+)"})
+)
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "ldc	Rm,Rn_BANK"
+  SH3 SH4 SH4A privileged
+  (abstract "Rm -> Rn_BANK (n = 0-7)")
+  (code "0100mmmm1nnn1110")
+
+  (group SH4A "LS" SH4 "CO")
+  (issue SH3 "1" SH4A "1" SH4 "1")
+  (latency SH3 "1/3" SH4A "1" SH4 "3")
+
+  (description
+{R"(
+Stores a source operand in banked general register.
+Rn_BANK0 is accessed when the RB bit in the SR register is 1, and Rn_BANK1 is
+accessed when this bit is 0.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+LDCRn_BANK (int m)
+{
+  Rn_BANK = R[m];
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -10468,7 +10507,9 @@ LDCMSSR (int m)
 
   (description
 {R"(
-
+Stores a source operand in banked general register.
+Rn_BANK0 is accessed when the RB bit in the SR register is 1, and Rn_BANK1 is
+accessed when this bit is 0.
 )"})
 
   (note
@@ -10478,7 +10519,12 @@ LDCMSSR (int m)
 
   (operation
 {R"(
-
+LDCMRn_BANK (int m)
+{
+  Rn_BANK = Read_Long (R[m]);
+  R[m] += 4;
+  PC += 2;
+}
 )"})
 
   (example
@@ -10488,7 +10534,12 @@ LDCMSSR (int m)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -10501,26 +10552,57 @@ LDCMSSR (int m)
   (issue SH_DSP "1")
   (latency SH_DSP "3")
 
-  // SH1-DSP latency: 1
-
   (description
 {R"(
-
+Stores the effective address of the source operand in the repeat end register
+RE. The effective address is an address specified by PC + displacement. The PC
+is the address four bytes after this instruction. The 8-bit displacement is
+sign-extended and doubled. Consequently, the relative interval from the branch
+destination is -256 to +254 bytes.
 )"})
 
   (note
 {R"(
-
+The effective address value designated for the RE reregister is different from
+the actual repeat end address. Refer to RS and RE Design Rules, for more
+information.
+<br/><br/>
+When this instruction is arranged immediately after the delayed
+branch instruction, PC becomes the "first address +2" of the branch destination.
+<br/><br/>
+On the SH-DSP the latency of this instruction is 1 cycle.
 )"})
 
   (operation
 {R"(
+LDRE (int d)
+{
+  long disp;
 
+  if ((d & 0x80) == 0)
+    disp = (0x000000FF & (long)d);
+  else
+    disp = (0xFFFFFF00 | (long)d);
+
+  RE = PC + (disp << 1);
+  PC += 2;
+}
 )"})
 
   (example
 {R"(
-
+    ldrs   start     ! Set repeat start address to RS
+    ldre   end       ! Set repeat end address to RE
+    setrc  #32       ! Repeat 32 times from <instruction A> to <instruction B>
+    ...
+start:
+    <instruction A>
+    ...
+    ...
+    ...
+end:
+    <instruction B>
+    ...
 )"})
 
   (exceptions
@@ -10538,26 +10620,57 @@ LDCMSSR (int m)
   (issue SH_DSP "1")
   (latency SH_DSP "3")
 
-  // SH1-DSP latency: 1
-
   (description
 {R"(
-
+Stores the effective address of the source operand in the repeat start register
+RS. The effective address is an address specified by PC + displacement. The PC
+is the address four bytes after this instruction. The 8-bit displacement is
+sign-extended and doubled. Consequently, the relative interval from the branch
+destination is -256 to +254 bytes.
 )"})
 
   (note
 {R"(
-
+When the instructions of the repeat (loop) program are below 3, the effective
+address value designated for the RS register is different from the actual repeat
+start address. Refer to "RS and RE setting rule", for more information. If this
+<br/><br/>
+instruction is arranged immediately after the delayed branch instruction, the PC
+becomes "the first address +2" of the branch destination.
+<br/><br/>
+On the SH-DSP the latency of this instruction is 1 cycle.
 )"})
 
   (operation
 {R"(
+LDRS (int d)
+{
+  long disp;
 
+  if ((d & 0x80) == 0)
+    disp = (0x000000FF & (long)d);
+  else
+    disp = (0xFFFFFF00 | (long)d);
+
+  RS = PC + (disp << 1);
+  PC += 2;
+}
 )"})
 
   (example
 {R"(
-
+    ldrs   start     ! Set repeat start address to RS
+    ldre   end       ! Set repeat end address to RE
+    setrc  #32       ! Repeat 32 times from <instruction A> to <instruction B>
+    ...
+start:
+    <instruction A>
+    ...
+    ...
+    ...
+end:
+    <instruction B>
+    ...
 )"})
 
   (exceptions
@@ -10578,299 +10691,29 @@ LDCMSSR (int m)
 
   (description
 {R"(
-
+Stores the source operand into the system register MACH.
 )"})
 
   (note
 {R"(
-
+On SH1, only the lower 10 bits are stored in MACH.
 )"})
 
   (operation
 {R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "lds	Rm,MACL"
-  SH_ANY
-  (abstract "Rm -> MACL")
-  (code "0100mmmm00011010")
-
-  (group SH4A "LS" SH4 "CO")
-  (issue SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "1")
-  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "3")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "lds	Rm,PR"
-  SH_ANY
-  (abstract "Rm -> PR")
-  (code "0100mmmm00101010")
-
-  (group SH4A "LS" SH4 "CO")
-  (issue SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "2")
-  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "3")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "lds	Rm,DSR"
-  SH_DSP
-  (abstract "Rm -> DSR")
-  (code "0100mmmm01101010")
-
-  (issue SH_DSP "1")
-  (latency SH_DSP "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "lds	Rm,A0"
-  SH_DSP
-  (abstract "Rm -> A0")
-  (code "0100mmmm01110110")
-
-  (issue SH_DSP "1")
-  (latency SH_DSP "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "lds	Rm,X0"
-  SH_DSP
-  (abstract "Rm -> X0")
-  (code "0100mmmm10001010")
-
-  (issue SH_DSP "1")
-  (latency SH_DSP "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "lds	Rm,X1"
-  SH_DSP
-  (abstract "Rm -> X1")
-  (code "0100mmmm10011010")
-
-  (issue SH_DSP "1")
-  (latency SH_DSP "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "lds	Rm,Y0"
-  SH_DSP
-  (abstract "Rm -> Y0")
-  (code "0100mmmm10101010")
-
-  (issue SH_DSP "1")
-  (latency SH_DSP "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "lds	Rm,Y1"
-  SH_DSP
-  (abstract "Rm -> Y1")
-  (code "0100mmmm10111010")
-
-  (issue SH_DSP "1")
-  (latency SH_DSP "1")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
+LDSMACH (int m)
+{
+  MACH = R[m];
+
+  #if SH1
+  if ((MACH & 0x00000200) == 0)
+    MACH &= 0x000003FF; 
+  else
+    MACH |= 0xFFFFFC00;
+  #endif
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -10896,7 +10739,7 @@ LDCMSSR (int m)
 
   (description
 {R"(
-
+Stores the source operand into the system register MACH.
 )"})
 
   (note
@@ -10906,7 +10749,63 @@ LDCMSSR (int m)
 
   (operation
 {R"(
+LDSMMACH (int m)
+{
+  MACH = Read_Long (R[m]);
 
+  #if SH1
+  if ((MACH & 0x00000200) == 0)
+    MACH &= 0x000003FF; 
+  else
+    MACH |= 0xFFFFFC00;
+  #endif
+
+  R[m] += 4;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "lds	Rm,MACL"
+  SH_ANY
+  (abstract "Rm -> MACL")
+  (code "0100mmmm00011010")
+
+  (group SH4A "LS" SH4 "CO")
+  (issue SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "1")
+  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "3")
+
+  (description
+{R"(
+Stores the source operand into the system register MACL.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+LDSMACL (int m)
+{
+  MACL = R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -10932,7 +10831,7 @@ LDCMSSR (int m)
 
   (description
 {R"(
-
+Stores the source operand into the system register MACL.
 )"})
 
   (note
@@ -10942,7 +10841,55 @@ LDCMSSR (int m)
 
   (operation
 {R"(
+LDSMMACL (int m)
+{
+  MACL = Read_Long (R[m]);
+  R[m] += 4;
+  PC += 2;
+}
+)"})
 
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "lds	Rm,PR"
+  SH_ANY
+  (abstract "Rm -> PR")
+  (code "0100mmmm00101010")
+
+  (group SH4A "LS" SH4 "CO")
+  (issue SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "2")
+  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "3")
+
+  (description
+{R"(
+Stores the source operand into the system register PR.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+LDSPR (int m)
+{
+  PR = R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -10968,7 +10915,7 @@ LDCMSSR (int m)
 
   (description
 {R"(
-
+Stores the source operand into the system register PR.
 )"})
 
   (note
@@ -10978,7 +10925,54 @@ LDCMSSR (int m)
 
   (operation
 {R"(
+LDSMPR (int m)
+{
+  PR = Read_Long (R[m]);
+  R[m] += 4;
+  PC += 2;
+}
+)"})
 
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "lds	Rm,DSR"
+  SH_DSP
+  (abstract "Rm -> DSR")
+  (code "0100mmmm01101010")
+
+  (issue SH_DSP "1")
+  (latency SH_DSP "1")
+
+  (description
+{R"(
+Stores the source operand into the DSP register DSR.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+LDSDSR (int m)
+{
+  DSR = R[m] & 0x0000000F;
+  PC += 2;
+}
 )"})
 
   (example
@@ -11001,11 +10995,50 @@ LDCMSSR (int m)
   (issue SH_DSP "1")
   (latency SH_DSP "1/5")
 
-  // SH1-DSP latency: 1
+  (description
+{R"(
+Stores the source operand into the DSP register DSR.
+)"})
+
+  (note
+{R"(
+On the SH-DSP the latency of this instruction is 1 cycle.
+)"})
+
+  (operation
+{R"(
+LDSMDSR (int m)
+{
+  DSR = Read_Long (R[m]) & 0x0000000F;
+  R[m] += 4;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "lds	Rm,A0"
+  SH_DSP
+  (abstract "Rm -> A0")
+  (code "0100mmmm01110110")
+
+  (issue SH_DSP "1")
+  (latency SH_DSP "1")
 
   (description
 {R"(
-
+Stores the source operand into the DSP register A0.  The MSB of the data is
+copied into A0G.
 )"})
 
   (note
@@ -11015,7 +11048,17 @@ LDCMSSR (int m)
 
   (operation
 {R"(
+LDSA0 (int m)
+{
+  A0 = R[m];
 
+  if ((A0 & 0x80000000) == 0)
+    A0G = 0x00;
+  else
+    A0G = 0xFF;
+
+  PC+=2;
+}
 )"})
 
   (example
@@ -11040,7 +11083,8 @@ LDCMSSR (int m)
 
   (description
 {R"(
-
+Stores the source operand into the DSP register A0.  The MSB of the data is
+copied into A0G.
 )"})
 
   (note
@@ -11050,7 +11094,57 @@ LDCMSSR (int m)
 
   (operation
 {R"(
+LDSMA0 (int m)
+{
+  A0 = Read_Long (R[m]);
 
+  if ((A0 & 0x80000000) == 0)
+    A0G = 0x00;
+  else
+    A0G = 0xFF;
+
+  R[m] += 4;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "lds	Rm,X0"
+  SH_DSP
+  (abstract "Rm -> X0")
+  (code "0100mmmm10001010")
+
+  (issue SH_DSP "1")
+  (latency SH_DSP "1")
+
+  (description
+{R"(
+Stores the source operand into the DSP register X0.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+LDSX0 (int m)
+{
+  X0 = R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -11075,7 +11169,7 @@ LDCMSSR (int m)
 
   (description
 {R"(
-
+Stores the source operand into the DSP register X0.
 )"})
 
   (note
@@ -11085,7 +11179,51 @@ LDCMSSR (int m)
 
   (operation
 {R"(
+LDSMX0 (int m)
+{
+  X0 = Read_Long (R[m]);
+  R[m] += 4;
+  PC += 2;
+}
+)"})
 
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "lds	Rm,X1"
+  SH_DSP
+  (abstract "Rm -> X1")
+  (code "0100mmmm10011010")
+
+  (issue SH_DSP "1")
+  (latency SH_DSP "1")
+
+  (description
+{R"(
+Stores the source operand into the DSP register X1.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+LDSX1 (int m)
+{
+  X1 = R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -11110,7 +11248,7 @@ LDCMSSR (int m)
 
   (description
 {R"(
-
+Stores the source operand into the DSP register X1.
 )"})
 
   (note
@@ -11120,7 +11258,52 @@ LDCMSSR (int m)
 
   (operation
 {R"(
+LDSMX1 (int m)
+{
+  X1 = Read_Long (R[m]);
+  R[m] += 4;
+  PC += 2;
+}
+)"})
 
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
+)"})
+)
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "lds	Rm,Y0"
+  SH_DSP
+  (abstract "Rm -> Y0")
+  (code "0100mmmm10101010")
+
+  (issue SH_DSP "1")
+  (latency SH_DSP "1")
+
+  (description
+{R"(
+Stores the source operand into the DSP register Y0.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+LDSY0 (int m)
+{
+  Y0 = R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -11145,7 +11328,7 @@ LDCMSSR (int m)
 
   (description
 {R"(
-
+Stores the source operand into the DSP register Y0.
 )"})
 
   (note
@@ -11155,7 +11338,52 @@ LDCMSSR (int m)
 
   (operation
 {R"(
+LDSMY0 (int m)
+{
+  Y0 = Read_Long (R[m]);
+  R[m] += 4;
+  PC += 2;
+}
+)"})
 
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
+)"})
+)
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "lds	Rm,Y1"
+  SH_DSP
+  (abstract "Rm -> Y1")
+  (code "0100mmmm10111010")
+
+  (issue SH_DSP "1")
+  (latency SH_DSP "1")
+
+  (description
+{R"(
+Stores the source operand into the DSP register Y1.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+LDSY1 (int m)
+{
+  Y1 = R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -11180,7 +11408,7 @@ LDCMSSR (int m)
 
   (description
 {R"(
-
+Stores the source operand into the DSP register Y1.
 )"})
 
   (note
@@ -11190,7 +11418,12 @@ LDCMSSR (int m)
 
   (operation
 {R"(
-
+LDSMY1 (int m)
+{
+  Y1 = Read_Long (R[m]);
+  R[m] += 4;
+  PC += 2;
+}
 )"})
 
   (example
@@ -11200,7 +11433,7 @@ LDCMSSR (int m)
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -11216,16 +11449,53 @@ LDCMSSR (int m)
 
   (description
 {R"(
-
+This instruction loads the contents of the PTEH/PTEL registers into the TLB
+(translation lookaside buffer) specified by MMUCR.URC (random counter field in
+the MMC control register).
+<br/><br/>
+LDTLB is a privileged instruction, and can only be used in privileged mode. Use of this
+instruction in user mode will cause an illegal instruction exception.
 )"})
 
   (note
 {R"(
-
+As this instruction loads the contents of the PTEH/PTEL registers into a TLB, it
+should be used either with the MMU disabled, or in the P1 or P2 virtual space
+with the MMU enabled (see the MMU section of the applicable hardware manual for
+details).
+<br/><br/>
+After this instruction is issued, there must be at least one instruction between
+the LDTLB instruction and issuance of an instruction relating to address to the
+P0, U0, and P3 areas (i.e. BRAF, BSRF, JMP, JSR, RTS, or RTE).
+<br/><br/>
+If the instruction is issued in an exception handler, it should be at least two
+instructions prior to an RTE instruction that terminates the handler.
 )"})
 
   (operation
 {R"(
+LDTLB ()
+{
+  #if SH3
+  TLB_tag = PTEH;
+  TLB_data = PTEL;
+
+  #elif SH4
+  TLB[MMUCR.URC].ASID = PTEH & 0x000000FF;
+  TLB[MMUCR.URC].VPN = (PTEH & 0xFFFFFC00) >> 10;
+  TLB[MMUCR.URC].PPN = (PTEH & 0x1FFFFC00) >> 10;
+  TLB[MMUCR.URC].SZ = (PTEL & 0x00000080) >> 6 | (PTEL & 0x00000010) >> 4;
+  TLB[MMUCR.URC].SH = (PTEH & 0x00000002) >> 1;
+  TLB[MMUCR.URC].PR = (PTEH & 0x00000060) >> 5;
+  TLB[MMUCR.URC].WT = (PTEH & 0x00000001);
+  TLB[MMUCR.URC].C = (PTEH & 0x00000008) >> 3;
+  TLB[MMUCR.URC].D = (PTEH & 0x00000004) >> 2;
+  TLB[MMUCR.URC].V = (PTEH & 0x00000100) >> 8;
+
+  #endif
+
+  PC += 2;
+}
 
 )"})
 
@@ -11236,7 +11506,8 @@ LDCMSSR (int m)
 
   (exceptions
 {R"(
-
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -11252,7 +11523,14 @@ LDCMSSR (int m)
 
   (description
 {R"(
-
+Stores the contents of general register R0 in the memory location indicated by
+effective address Rn. This instruction differs from other store instructions as
+follows.
+<br/><br/>
+If write-back is selected for the accessed memory, and a cache miss occurs, the
+cache block will be allocated but an R0 data write will be performed to that
+cache block without performing a block read. Other cache block contents are
+undefined.
 )"})
 
   (note
@@ -11262,7 +11540,14 @@ LDCMSSR (int m)
 
   (operation
 {R"(
+MOVCAL (int n)
+{
+  if (is_write_back_memory (R[n]) && look_up_in_operand_cache (R[n]) == MISS)
+    allocate_operand_cache_block (R[n]);
 
+  Write_Long (R[n], R[0]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -11272,7 +11557,11 @@ LDCMSSR (int m)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Initial page write exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -11293,12 +11582,16 @@ LDCMSSR (int m)
 
   (note
 {R"(
-
+This instruction simply increments the program counter (PC), advancing the
+processing flow to execution of the next instruction.
 )"})
 
   (operation
 {R"(
-
+NOP ()
+{
+  PC += 2;
+}
 )"})
 
   (example
@@ -11324,7 +11617,11 @@ LDCMSSR (int m)
 
   (description
 {R"(
-
+Accesses data using the contents indicated by effective address Rn. In the case
+of a hit in the cache, the corresponding cache block is invalidated (the V bit
+is cleared to 0). If there is unwritten information (U bit = 1), write-back is
+not performed even if write-back mode is selected. No operation is performed in
+the case of a cache miss or an access to a non-cache area.
 )"})
 
   (note
@@ -11334,7 +11631,11 @@ LDCMSSR (int m)
 
   (operation
 {R"(
-
+OCBI (int n)
+{
+  invalidate_operand_cache_block (R[n]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -11344,7 +11645,12 @@ LDCMSSR (int m)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Initial page write exception</li>
+<li>Data address error</li>
+Note that the above exceptions are generated even if OCBI does not operate.
 )"})
 )
 
@@ -11360,7 +11666,12 @@ LDCMSSR (int m)
 
   (description
 {R"(
-
+Accesses data using the contents indicated by effective address Rn. If the cache
+is hit and there is unwritten information (U bit = 1), the corresponding cache
+block is written back to external memory and that block is invalidated (the V
+bit is cleared to 0). If there is no unwritten information (U bit = 0), the
+block is simply invalidated. No operation is performed in the case of a cache
+miss or an access to a non-cache area.
 )"})
 
   (note
@@ -11370,7 +11681,14 @@ LDCMSSR (int m)
 
   (operation
 {R"(
+OCBP (int n)
+{
+  if (is_dirty_block (R[n]))
+    write_back(R[n])
 
+  invalidate_operand_cache_block (R[n]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -11380,7 +11698,11 @@ LDCMSSR (int m)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+Note that the above exceptions are generated even if OCBP does not operate.
 )"})
 )
 
@@ -11396,7 +11718,12 @@ LDCMSSR (int m)
 
   (description
 {R"(
-
+Accesses data using the contents indicated by effective address Rn. If the cache
+is hit and there is unwritten information (U bit = 1), the corresponding cache
+block is written back to external memory and that block is cleaned (the U bit
+is cleared to 0). In other cases (i.e. in the case of a cache miss or an access
+to a non-cache area, or if the block is already clean), no operation is
+performed.
 )"})
 
   (note
@@ -11406,7 +11733,13 @@ LDCMSSR (int m)
 
   (operation
 {R"(
+OCBWB (int n)
+{
+  if (is_dirty_block (R[n]))
+    write_back(R[n]);
 
+  PC += 2;
+}
 )"})
 
   (example
@@ -11416,7 +11749,11 @@ LDCMSSR (int m)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+Note that the above exceptions are generated even if OCBWB does not operate.
 )"})
 )
 
@@ -11432,22 +11769,35 @@ LDCMSSR (int m)
 
   (description
 {R"(
+SH4 and SH4A
+<br/>
+Reads a 32-byte data block starting at a 32-byte boundary into the operand
+cache. The lower 5 bits of the address specified by Rn are masked to zero.
+<br>
+This instruction is also used to trigger a Store Queue write-back operation if
+the specified address points to the Store Queue area.  For more information
+refer to Store Queues in the manual.
+<br/><br/>
 
+SH3 and SH2A
+<br/>
+Reads a 16-byte data block into the cache.  The address specified by Rn should
+be on 32-bit boundary.  No address related error is detected in this
+instruction. In case of an error, the instruction operates as NOP.
 )"})
 
   (note
 {R"(
-<u>SH2A, SH3*</u><br/>
-The cache line size is 16 bytes. <br/><br/>
-
-<u>SH4*</u><br/>
-The cache line size is 32 bytes.
-
+On products with no cache, this instruction is handled as a NOP instruction.
 )"})
 
   (operation
 {R"(
-
+PREF (int n)
+{
+  prefetch_operand_cache_block (R[n]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -11457,7 +11807,7 @@ The cache line size is 32 bytes.
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
 )"})
 
 )
@@ -11474,17 +11824,32 @@ The cache line size is 32 bytes.
 
   (description
 {R"(
-
+Reads a 32-byte block of data starting at a 32-byte boundary within the
+instruction cache. The lower 5 bits of the address specified by Rn are masked
+by zeroes.
+<br/><br/>
+This instruction does not generate data address error and MMU exceptions. In the
+event of an error, the PREFI instruction is treated as an NOP (no operation)
+instruction.
+<br/><br/>
+When the address to be prefetched is missing from UTLB or is protected, the
+PREFI instruction is treated as an NOP instruction and a TLB exception does not
+occur.
 )"})
 
   (note
 {R"(
-
+This instruction can be used before the SLEEP command is issued to prefetch
+instructions for execution on return from the SLEEP state.
 )"})
 
   (operation
 {R"(
-
+PREFI (int n)
+{
+  prefetch_instruction_cache_block (R[n]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -11494,7 +11859,7 @@ The cache line size is 32 bytes.
 
   (exceptions
 {R"(
-
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -11509,17 +11874,51 @@ The cache line size is 32 bytes.
 
   (description
 {R"(
-
+Restores the last register saved to a register bank.
 )"})
 
   (note
 {R"(
-
+The issue cycle count is 19 when a bank overflow has occured and the registers
+are restored from the stack.
 )"})
 
   (operation
 {R"(
+RESBANK ()
+{
+  int m;  // Number of register bank to which a save was last performed.
 
+  if (BO == 0)
+  {
+    PR = Register_Bank[m].PR_BANK;
+    GBR = Register_Bank[m].GBR_BANK;
+    MACL = Register_Bank[m].MACL_BANK;
+    MACH = Register_Bank[m].MACH_BANK;
+
+    for (int i = 0; i <= 14; i++)
+      R[i] = Register_Bank[m].R_BANK[i];
+  }
+  else
+  {
+    for (int i = 0; i <= 14; i++)
+    {
+      R[i] = Read_Long (R[15]);
+      R[15] += 4;
+    }
+
+    PR = Read_Long (R[15]);
+    R[15] += 4;
+    GBR=Read_Long (R[15]);
+    R[15] += 4;
+    MACH = Read_Long (R[15]);
+    R[15] += 4;
+    MACL = Read_Long (R[15]);
+    R[15] += 4;
+  }
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -11545,17 +11944,57 @@ The cache line size is 32 bytes.
 
   (description
 {R"(
+Returns from an exception or interrupt handling routine by restoring the PC and
+SR values.  Program execution continues from the address specified
+by the restored PC value.
+<br/><br/>
+On SH3 and SH4 the PC and SR values are restored from SPC and SSR.  The SR value
+accessed by the instruction in the RTE delay slot is the value restored from SSR
+by the RTE instruction. The SR and MD values defined prior to RTE execution are
+used to fetch the instruction in the RTE delay slot.
+<br/><br/>
+On SH1, SH2 and SH2A the PC and SR values are from the stack (R15).
 
 )"})
 
   (note
 {R"(
-
+As this is a delayed branch instruction, the instruction following the RTE
+instruction is executed before the branch destination instruction.
+<br/><br/>
+Interrupts are not accepted between this instruction and the following
+instruction. An exception must not be generated by the instruction in this
+instruction's delay slot. If the following instruction is a branch instruction,
+it is identified as a slot illegal instruction.
+<br/><br/>
+If this instruction is located in the delay slot immediately following a delayed
+branch instruction, it is identified as a slot illegal instruction.
+<br/><br/>
+On SH3 and SH4 the SR value accessed by the instruction in the RTE delay slot is
+the value restored from SSR by the RTE instruction. The SR and MD values defined
+prior to RTE execution are used to fetch the instruction in the RTE delay slot.
 )"})
 
   (operation
 {R"(
+RTE ()
+{
+  unsigned long temp = PC;
 
+  #if SH1 || SH2 || SH2A
+  PC = Read_Long (R[15]);
+  R[15]+=4;
+  SR = Read_Long (R[15]) & 0x000063F3;
+  R[15]+=4;
+
+  #elif SH3 || SH4 || SH4A
+  SR = SSR;
+  PC = SPC;
+
+  #endif
+
+  Delay_Slot (temp + 2);
+}
 )"})
 
   (example
@@ -11565,7 +12004,8 @@ The cache line size is 32 bytes.
 
   (exceptions
 {R"(
-
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -11578,26 +12018,48 @@ The cache line size is 32 bytes.
   (issue SH_DSP "1")
   (latency SH_DSP "3")
 
-  // SH1-DSP latency: 1
-
   (description
 {R"(
-
+Sets the repeat count to the SR register's RC counter. The bottom 12 bits of the
+general register Rn are used as the repeat count. 
+Set repeat control flags to RF1, RF0 bits of the SR register. Use of the SETRC
+instruction is subject to any limitations. Refer to the DSP Repeat (Loop)
+Control section of the manual for more information.
+<br/><img src="setrc.svg" height="140"/>
 )"})
 
   (note
 {R"(
-
+On the SH-DSP the latency of this instruction is 1 cycle.
 )"})
 
   (operation
 {R"(
-
+SETRC (int m)
+{
+  long temp = (R[m] & 0x00000FFF) << 16;
+  SR &= 0x00000FF3;
+  SR |= temp;
+  RF1 = Repeat_Control_Flag1;
+  RF0 = Repeat_Control_Flag0;
+  PC += 2;
+}
 )"})
 
   (example
 {R"(
-
+    ldrs   start     ! Set repeat start address to RS
+    ldre   end       ! Set repeat end address to RE
+    setrc  r14       ! Repeat n times from <instruction A> to <instruction B>
+    ...
+start:
+    <instruction A>
+    ...
+    ...
+    ...
+end:
+    <instruction B>
+    ...
 )"})
 
   (exceptions
@@ -11615,26 +12077,48 @@ The cache line size is 32 bytes.
   (issue SH_DSP "1")
   (latency SH_DSP "3")
 
-  // SH1-DSP latency: 1
-
   (description
 {R"(
-
+Sets the repeat count to the SR register's RC counter. The 8-bit immediate value
+is zero-extended and used as the repeat count. 
+Set repeat control flags to RF1, RF0 bits of the SR register. Use of the SETRC
+instruction is subject to any limitations. Refer to the DSP Repeat (Loop)
+Control section of the manual for more information.
+<br/><img src="setrci.svg" height="140"/>
 )"})
 
   (note
 {R"(
-
+On the SH-DSP the latency of this instruction is 1 cycle.
 )"})
 
   (operation
 {R"(
-
+SETRCI (int i)
+{
+  long temp = ((long)i & 0x000000FF) << 16;
+  SR &= 0x00000FFF;
+  SR |= temp;
+  RF1 = Repeat_Control_Flag1;
+  RF0 = Repeat_Control_Flag0;
+  PC += 2;
+}
 )"})
 
   (example
 {R"(
-
+    ldrs   start     ! Set repeat start address to RS
+    ldre   end       ! Set repeat end address to RE
+    setrc  #32       ! Repeat 32 times from <instruction A> to <instruction B>
+    ...
+start:
+    <instruction A>
+    ...
+    ...
+    ...
+end:
+    <instruction B>
+    ...
 )"})
 
   (exceptions
@@ -11655,7 +12139,7 @@ The cache line size is 32 bytes.
 
   (description
 {R"(
-
+This instruction sets the S bit to 1.
 )"})
 
   (note
@@ -11665,7 +12149,11 @@ The cache line size is 32 bytes.
 
   (operation
 {R"(
-
+SETS ()
+{
+  S = 1;
+  PC += 2;
+}
 )"})
 
   (example
@@ -11692,7 +12180,7 @@ The cache line size is 32 bytes.
 
   (description
 {R"(
-
+This instruction sets the T bit to 1.
 )"})
 
   (note
@@ -11702,7 +12190,11 @@ The cache line size is 32 bytes.
 
   (operation
 {R"(
-
+SETT ()
+{
+  T = 1;
+  PC += 2;
+}
 )"})
 
   (example
@@ -11728,17 +12220,32 @@ The cache line size is 32 bytes.
 
   (description
 {R"(
+This instruction places the CPU in the power-down state.
+<br/><br/>
+In power-down mode, the CPU retains its internal state, but immediately stops
+executing instructions and waits for an interrupt request. When it receives an
+interrupt request, the CPU exits the power-down state.
+<br/><br/>
+SLEEP is a privileged instruction, and can only be used in privileged mode. Use
+of this instruction in user mode will cause an illegal instruction exception.
 
 )"})
 
   (note
 {R"(
-
+SLEEP performance depends on the standby control register (STBCR). See
+Power-Down Modes in the target product's hardware manual, for details.
+<br/><br/>
+The number of cycles given is for the transition to sleep mode. "ud" means
+the number of cycles is undefined.
 )"})
 
   (operation
 {R"(
-
+SLEEP ()
+{
+  Sleep_standby();
+}
 )"})
 
   (example
@@ -11748,7 +12255,8 @@ The cache line size is 32 bytes.
 
   (exceptions
 {R"(
-
+<li>General illegal instruction exception</li>
+<li>Slot illegal instruction exception</li>
 )"})
 )
 
@@ -11763,17 +12271,25 @@ The cache line size is 32 bytes.
 
   (description
 {R"(
-
+R0 is transferred to the register bank entry indicated by the contents of
+general register Rn. The register bank number and register stored in the bank
+are specified by general register Rn.
+<br/><img src="stbank.svg" height="400"/>
 )"})
 
   (note
 {R"(
-
+The architecture supports a maximum of 512 banks. However, the number of banks
+differs depending on the product.
 )"})
 
   (operation
 {R"(
-
+STBANK (int n)
+{
+  Write_Bank_Long (R[n], R[0])
+  PC += 2;
+}
 )"})
 
   (example
