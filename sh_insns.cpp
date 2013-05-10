@@ -14221,7 +14221,7 @@ void FMOV (int m, int n)
 
   (description
 {R"(
-
+Transfers contents of memory at address indicated by Rm to FRn.
 )"})
 
   (note
@@ -14231,7 +14231,11 @@ void FMOV (int m, int n)
 
   (operation
 {R"(
-
+void FMOV_LOAD (int m, int n)
+{
+  Read_Long (R[m], FR[n]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -14241,7 +14245,10 @@ void FMOV (int m, int n)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -14257,7 +14264,8 @@ void FMOV (int m, int n)
 
   (description
 {R"(
-
+Transfers contents of memory at address indicated by Rm to FRn, and adds 4 to
+Rm.
 )"})
 
   (note
@@ -14267,7 +14275,12 @@ void FMOV (int m, int n)
 
   (operation
 {R"(
-
+void FMOV_RESTORE (int m, int n)
+{
+  Read_Long (R[m], FR[n]);
+  R[m] += 4;
+  PC += 2;
+}
 )"})
 
   (example
@@ -14277,7 +14290,10 @@ void FMOV (int m, int n)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -14293,7 +14309,7 @@ void FMOV (int m, int n)
 
   (description
 {R"(
-
+Transfers contents of memory at address indicated by (R0 + Rm) to FRn.
 )"})
 
   (note
@@ -14303,7 +14319,11 @@ void FMOV (int m, int n)
 
   (operation
 {R"(
-
+void FMOV_INDEX_LOAD (int m, int n)
+{
+  Read_Long (R[0] + R[m], FR[n]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -14313,7 +14333,10 @@ void FMOV (int m, int n)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -14328,7 +14351,7 @@ void FMOV (int m, int n)
 
   (description
 {R"(
-
+Transfers memory contents at the address indicated by (disp + Rn) to FRn.
 )"})
 
   (note
@@ -14338,7 +14361,12 @@ void FMOV (int m, int n)
 
   (operation
 {R"(
-
+void FMOV_INDEX_DISP12_LOAD (int m, int n)
+{
+  long disp = (0x00000FFF & (long)d);
+  FR[n] = Read_Long (R[m] + (disp << 2));
+  PC += 4;
+}
 )"})
 
   (example
@@ -14348,7 +14376,7 @@ void FMOV (int m, int n)
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -14364,7 +14392,7 @@ void FMOV (int m, int n)
 
   (description
 {R"(
-
+Transfers FRm contents to memory at address indicated by Rn.
 )"})
 
   (note
@@ -14374,7 +14402,11 @@ void FMOV (int m, int n)
 
   (operation
 {R"(
-
+void FMOV_STORE (int m, int n)
+{
+  Write_Long (FR[m], R[n]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -14384,7 +14416,11 @@ void FMOV (int m, int n)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -14400,7 +14436,8 @@ void FMOV (int m, int n)
 
   (description
 {R"(
-
+Subtracts 4 from Rn, and transfers FRm contents to memory at address indicated
+by resulting Rn value.
 )"})
 
   (note
@@ -14410,7 +14447,12 @@ void FMOV (int m, int n)
 
   (operation
 {R"(
-
+void FMOV_SAVE (int m, int n)
+{
+  Write_Long (FR[m], R[n] - 4);
+  R[n] -= 4;
+  PC += 2;
+}
 )"})
 
   (example
@@ -14420,7 +14462,11 @@ void FMOV (int m, int n)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -14436,7 +14482,7 @@ void FMOV (int m, int n)
 
   (description
 {R"(
-
+Transfers FRm contents to memory at address indicated by (R0 + Rn).
 )"})
 
   (note
@@ -14446,7 +14492,11 @@ void FMOV (int m, int n)
 
   (operation
 {R"(
-
+void FMOV_INDEX_STORE (int m, int n)
+{
+  Write_Long (FR[m], R[0] + R[n]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -14456,7 +14506,11 @@ void FMOV (int m, int n)
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -14471,7 +14525,7 @@ void FMOV (int m, int n)
 
   (description
 {R"(
-
+Transfers FRm contents to memory at the address indicated by (disp + Rn).
 )"})
 
   (note
@@ -14481,7 +14535,12 @@ void FMOV (int m, int n)
 
   (operation
 {R"(
-
+void FMOV_INDEX_DISP12_STORE (int m, int n)
+{
+  long disp = (0x00000FFF & (long)d);
+  Write_Long (R[n] + (disp << 2), FR[m]);
+  PC += 4;
+}
 )"})
 
   (example
@@ -14491,7 +14550,7 @@ void FMOV (int m, int n)
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
