@@ -934,9 +934,8 @@ illegal instruction.
 {R"(
 void MOVWI (int d, int n)
 {
-  unsigned int disp;
-  disp = (unsigned int)(0x000000FF & d);
-  R[n] = (int)Read_Word (PC + 4 + (disp << 1));
+  unsigned int disp = (0x000000FF & d);
+  R[n] = Read_16 (PC + 4 + (disp << 1));
   if ((R[n] & 0x8000) == 0)
     R[n] &= 0x0000FFFF;
   else
@@ -990,9 +989,8 @@ illegal instruction.
 {R"(
 void MOVLI (int d, int n)
 {
-  unsigned int disp;
-  disp = (unsigned int)(0x000000FF & (int)d);
-  R[n] = Read_Long ((PC & 0xFFFFFFFC) + 4 + (disp << 2));
+  unsigned int disp = (0x000000FF & d);
+  R[n] = Read_32 ((PC & 0xFFFFFFFC) + 4 + (disp << 2));
   PC += 2;
 }
 )"})
@@ -1037,7 +1035,7 @@ destination register.
 {R"(
 void MOVBL (int m, int n)
 {
-  R[n] = (long)Read_Byte(R[m]);
+  R[n] = Read_8 (R[m]);
   if ((R[n] & 0x80) == 0)
     R[n] &= 0x000000FF;
   else
@@ -1087,7 +1085,7 @@ destination register.
 {R"(
 void MOVWL (int m, int n)
 {
-  R[n] = (long)Read_Word (R[m]);
+  R[n] = Read_16 (R[m]);
   if ((R[n] & 0x8000) == 0)
     R[n] &= 0x0000FFFF;
   else
@@ -1135,7 +1133,7 @@ Transfers the source operand to the destination.
 {R"(
 void MOVLL (int m, int n)
 {
-  R[n] = Read_Long (R[m]);
+  R[n] = Read_32 (R[m]);
   PC += 2;
 }
 )"})
@@ -1312,7 +1310,7 @@ destination register.
 {R"(
 void MOVBP (int m, int n)
 {
-  R[n] = (long)Read_Byte (R[m]);
+  R[n] = Read_8 (R[m]);
   if ((R[n] & 0x80) == 0)
     R[n] &= 0x000000FF;
   else
@@ -1365,7 +1363,7 @@ destination register.
 {R"(
 void MOVWP (int m, int n)
 {
-  R[n] = (long)Read_Word (R[m]);
+  R[n] = Read_16 (R[m]);
   if ((R[n] & 0x8000) == 0)
     R[n] &= 0x0000FFFF;
   else
@@ -1416,7 +1414,7 @@ Transfers the source operand to the destination.
 {R"(
 void MOVLP (int m, int n)
 {
-  R[n] = Read_Long (R[m]);
+  R[n] = Read_32 (R[m]);
 
   if (n != m)
     R[m] += 4;
@@ -1601,7 +1599,7 @@ destination register.
 void MOVRSBM (int m)
 {
   R[m] -= 1;
-  R[0] = (long)Read_Word (R[m]);
+  R[0] = Read_16 (R[m]);
 
   if ((R[0] & 0x80) == 0)
     R[0] &= 0x000000FF;
@@ -1649,7 +1647,7 @@ destination register.
 void MOVRSWM (int m)
 {
   R[m]-= 2;
-  R[0] = (long)Read_Word (R[m]);
+  R[0] = Read_16 (R[m]);
 
   if ((R[0] & 0x8000) == 0)
     R[0] &= 0x0000FFFF;
@@ -1695,7 +1693,7 @@ Transfers the source operand to the destination.
 void MOVRSLM (int m)
 {
   R[m] -= 4;
-  R[0] = Read_Long (R[m]);
+  R[0] = Read_32 (R[m]);
   PC += 2;
 }
 )"})
@@ -1862,7 +1860,7 @@ void MOVBL4 (int m, int d)
 {
   long disp;
   disp = (0x0000000F & (long)d);
-  R[0] = Read_Byte (R[m] + disp);
+  R[0] = Read_8 (R[m] + disp);
 
   if ((R[0] & 0x80) == 0)
     R[0] &= 0x000000FF;
@@ -1915,7 +1913,7 @@ void MOVBL12 (int d, int m, int n)
 {
   long disp;
   disp = (0x00000FFF & (long)d);
-  R[n] = Read_Byte (R[m] + disp);
+  R[n] = Read_8 (R[m] + disp);
 
   if ((R[n] & 0x80) == 0)
     R[n] &= 0x000000FF;
@@ -1966,7 +1964,7 @@ void MOVBUL12 (int d, int m, int n)
 {
   long disp;
   disp = (0x00000FFF & (long)d);
-  R[n] = Read_Byte (R[m] + disp);
+  R[n] = Read_8 (R[m] + disp);
   R[n] &= 0x000000FF;
   PC += 4;
 }
@@ -2014,7 +2012,7 @@ void MOVWL4 (int m, int d)
 {
   long disp;
   disp = (0x0000000F & (long)d);
-  R[0] = Read_Word (R[m] + (disp << 1));
+  R[0] = Read_16 (R[m] + (disp << 1));
 
   if ((R[0] & 0x8000) == 0)
     R[0] &= 0x0000FFFF;
@@ -2067,7 +2065,7 @@ void MOVWL12 (int d, int m, int n)
 {
   long disp;
   disp = (0x00000FFF & (long)d);
-  R[n] = Read_Word (R[m] + (disp << 1));
+  R[n] = Read_16 (R[m] + (disp << 1));
 
   if ((R[n] & 0x8000) == 0)
     R[n] &= 0x0000FFFF;
@@ -2115,9 +2113,8 @@ destination register.
 {R"(
 void MOVWUL12 (int d, int m, int n)
 {
-  long disp;
-  disp = (0x00000FFF & (long)d);
-  R[n] = Read_Word (R[m] + (disp << 1));
+  long disp = (0x00000FFF & (long)d);
+  R[n] = Read_16 (R[m] + (disp << 1));
   R[n] &= 0x0000FFFF;
   PC += 4;
 }
@@ -2163,7 +2160,7 @@ void MOVLL4 (int m, int d, int n)
 {
   long disp;
   disp = (0x0000000F & (long)d);
-  R[n] = Read_Long (R[m] + (disp << 2));
+  R[n] = Read_32 (R[m] + (disp << 2));
   PC += 2;
 }
 )"})
@@ -2208,7 +2205,7 @@ void MOVLL12 (int d, int m, int n)
 {
   long disp;
   disp = (0x00000FFF & (long)d);
-  R[n] = Read_Long (R[m] + (disp << 2));
+  R[n] = Read_32 (R[m] + (disp << 2));
   PC += 4;
 }
 )"})
@@ -2524,7 +2521,7 @@ destination register.
 {R"(
 void MOVBL0 (int m, int n)
 {
-  R[n] = (long)Read_Byte (R[m] + R[0]);
+  R[n] = Read_8 (R[m] + R[0]);
 
   if ((R[n] & 0x80) == 0)
     R[n] &= 0x000000FF;
@@ -2574,7 +2571,7 @@ destination register.
 {R"(
 void MOVWL0 (int m, int n)
 {
-  R[n] = (long)Read_Word (R[m] + R[0]);
+  R[n] = Read_16 (R[m] + R[0]);
 
   if ((R[n] & 0x8000) == 0)
     R[n] &= 0x0000FFFF;
@@ -2623,7 +2620,7 @@ Transfers the source operand to the destination.
 {R"(
 void MOVLL0 (int m, int n)
 {
-  R[n] = Read_Long (R[m] + R[0]);
+  R[n] = Read_32 (R[m] + R[0]);
   PC += 2;
 }
 
@@ -2805,7 +2802,7 @@ void MOVBLG (int d)
 {
   unsigned int disp;
   disp = (unsigned int)(0x000000FF & d);
-  R[0] = (int)Read_Byte (GBR + disp);
+  R[0] = Read_8 (GBR + disp);
 
   if ((R[0] & 0x80) == 0)
     R[0] &= 0x000000FF;
@@ -2860,7 +2857,7 @@ void MOVWLG (int d)
 {
   unsigned int disp;
   disp = (unsigned int)(0x000000FF & d);
-  R[0] = (int)Read_Word (GBR + (disp << 1));
+  R[0] = Read_16 (GBR + (disp << 1));
 
   if ((R[0] & 0x8000) == 0)
     R[0] &= 0x0000FFFF;
@@ -2911,9 +2908,8 @@ range up to +1020 bytes to be specified.
 {R"(
 void MOVLLG (int d)
 {
-  unsigned int disp;
-  disp = (unsigned int)(0x000000FF & d);
-  R[0] = Read_Long (GBR + (disp << 2));
+  unsigned int disp = (0x000000FF & d);
+  R[0] = Read_32 (GBR + (disp << 2));
   PC += 2;
 }
 )"})
@@ -3164,7 +3160,7 @@ to 0, the MOVCO instruction clears the T bit and does not proceed with storage.
 void MOVLINK (int m)
 {
   LDST = 1;
-  R[0] = Read_Long (R[m]);
+  R[0] = Read_32 (R[m]);
   PC += 2
 }
 )"})
@@ -3383,9 +3379,9 @@ void MOVLPML (int n)
   for (i = 0; i <= n; i++)
   {
     if (i == 15)
-      PR = Read_Long (R[15]);
+      PR = Read_32 (R[15]);
     else
-      R[i] = Read_Long (R[15]);
+      R[i] = Read_32 (R[15]);
 
     R[15] += 4;
   }
@@ -3500,11 +3496,11 @@ void MOVLPMU (int n)
   int i;
   for (i = n; i <= 14; i++)
   {
-    R[i] = Read_Long (R[15]);
+    R[i] = Read_32 (R[15]);
     R[15] += 4;
   }
 
-  PR = Read_Long (R[15]);
+  PR = Read_32 (R[15]);
   R[15] += 4;
   PC += 2;
 }
@@ -3829,7 +3825,7 @@ void BANDM (int d, int i, int n)
   long disp, imm, temp, assignbit;
   disp = (0x00000FFF & (long)d);
   imm = (0x00000007 & (long)i);
-  temp = (long)Read_Byte (R[n] + disp);
+  temp = Read_8 (R[n] + disp);
   assignbit =(0x00000001 << imm) & temp;
 
   if ((T == 0) || (assignbit == 0))
@@ -3884,7 +3880,7 @@ void BANDNOTM (int d, int i, int n)
   long disp, imm, temp, assignbit;
   disp = (0x00000FFF & (long)d);
   imm = (0x00000007 & (long)i);
-  temp = (long)Read_Byte (R[n] + disp);
+  temp = Read_8 (R[n] + disp);
   assignbit =(0x00000001 << imm) & temp;
 
   if ((T == 1) && (assignbit == 0))
@@ -3938,7 +3934,7 @@ void BCLRM (int d, int i, int n)
   long disp, imm, temp;
   disp = (0x00000FFF & (long)d);
   imm = (0x00000007 & (long)i);
-  temp = (long)Read_Byte (R[n] + disp);
+  temp = Read_8 (R[n] + disp);
   temp &= (~(0x00000001 < <imm));
   Write_Byte (R[n] + disp, temp);
   PC+=4;
@@ -4031,7 +4027,7 @@ void BLDM (int d, int i, int n)
   long disp, imm, temp, assignbit;
   disp = (0x00000FFF & (long)d);
   imm = (0x00000007 & (long)i);
-  temp = (long)Read_Byte (R[n] + disp);
+  temp = Read_8 (R[n] + disp);
   assignbit = (0x00000001 << imm) & temp;
 
   if (assignbit == 0)
@@ -4136,7 +4132,7 @@ void BLDNOTM (int d, int i, int n)
   long disp, imm, temp, assignbit;
   disp = (0x00000FFF & (long)d);
   imm = (0x00000007 & (long)i);
-  temp = (long)Read_Byte (R[n] + disp);
+  temp = Read_8 (R[n] + disp);
   assignbit = (0x00000001 << imm) & temp;
 
   if (assignbit == 0)
@@ -4190,7 +4186,7 @@ void BORM (int d, int i, int n)
   long disp, imm, temp, assignbit;
   disp = (0x00000FFF & (long)d);
   imm = (0x00000007 & (long)i);
-  temp = (long)Read_Byte (R[n] + disp);
+  temp = Read_8 (R[n] + disp);
   assignbit = (0x00000001 << imm) & temp;
 
   if ((T == 0) && (assignbit == 0))
@@ -4245,7 +4241,7 @@ void BORNOTM (int d, int i, int n)
   long disp, imm, temp, assignbit;
   disp = (0x00000FFF & (long)d);
   imm = (0x00000007 & (long)i);
-  temp = (long)Read_Byte (R[n] + disp);
+  temp = Read_8 (R[n] + disp);
   assignbit = (0x00000001 << imm) & temp;
 
   if ((T == 1) || (assignbit == 0))
@@ -4299,7 +4295,7 @@ void BSETM (int d, int i, int n)
   long disp, imm, temp;
   disp = (0x00000FFF & (long)d);
   imm = (0x00000007 & (long)i);
-  temp = (long)Read_Byte (R[n] + disp);
+  temp = Read_8 (R[n] + disp);
   temp |= (0x00000001 << imm);
   Write_Byte (R[n] + disp, temp);
   PC += 4;
@@ -4393,7 +4389,7 @@ void BSTM (int d, int i, int n)
   long disp, imm, temp;
   disp = (0x00000FFF & (long)d);
   imm = (0x00000007 & (long)i);
-  temp = (long) Read_Byte (R[n] + disp);
+  temp = Read_8 (R[n] + disp);
 
   if (T == 0)
     temp &= (~(0x00000001 << imm));
@@ -4499,7 +4495,7 @@ void BXORM (int d, int i, int n)
   long disp, imm, temp, assignbit;
   disp = (0x00000FFF & (long)d);
   imm = (0x00000007 & (long)i);
-  temp = (long)Read_Byte (R[n] + disp);
+  temp = Read_8 (R[n] + disp);
   assignbit = (0x00000001 << imm) & temp;
 
   if (assignbit == 0)
@@ -6268,9 +6264,9 @@ void MACL (int m, int n)
   unsigned long temp0, temp1, temp2, temp3;
   long tempm, tempn, fnLmL;
 
-  tempn = (long)Read_Long (R[n]);
+  tempn = Read_32 (R[n]);
   R[n] += 4;
-  tempm = (long)Read_Long (R[m]);
+  tempm = Read_32 (R[m]);
   R[m] += 4;
 
   if ((long)(tempn ^ tempm) < 0)
@@ -6415,9 +6411,9 @@ void MACW (int m, int n)
   long tempm, tempn, dest, src, ans;
   unsigned long templ;
 
-  tempn = (long)Read_Word (R[n]);
+  tempn = Read_16 (R[n]);
   R[n] += 2;
-  tempm = (long)Read_Word (R[m]);
+  tempm = Read_16 (R[m]);
   R[m] += 2;
 
   templ = MACL;
@@ -7083,8 +7079,7 @@ the immediate value and writes the result back to the memory byte.
 {R"(
 void ANDM (long i)
 {
-  long temp;
-  temp = (long)Read_Byte (GBR + R[0]);
+  long temp = Read_8 (GBR + R[0]);
   temp &= 0x000000FF & (long)i;
   Write_Byte (GBR + R[0], temp);
   PC += 2;
@@ -7257,8 +7252,7 @@ the immediate value and writes the result back to the memory byte.
 {R"(
 void ORM (int i)
 {
-  long temp;
-  temp = (long)Read_Byte (GBR + R[0]);
+  long temp = Read_8 (GBR + R[0]);
   temp |= (0x000000FF & (long)i);
   Write_Byte (GBR + R[0], temp);
   PC += 2;
@@ -7328,7 +7322,7 @@ non-cacheable space when the cache is enabled.
 {R"(
 void TAS (int n)
 {
-  int temp = (int)Read_Byte (R[n]); // Bus Lock
+  int temp = Read_8 (R[n]); // Bus Lock
 
   if (temp == 0)
     T = 1;
@@ -7484,8 +7478,7 @@ The contents of the memory byte are not changed.
 {R"(
 void TSTM (int i)
 {
-  long temp;
-  temp = (long)Read_Byte (GBR + R[0]);
+  long temp = Read_8 (GBR + R[0]);
   temp &= (0x000000FF & (long)i);
 
   if (temp == 0)
@@ -7621,8 +7614,7 @@ the immediate value and writes the result back to the memory byte.
 {R"(
 void XORM (int i)
 {
-  int temp;
-  temp = (long)Read_Byte (GBR + R[0]);
+  int temp = Read_8 (GBR + R[0]);
   temp ^= (0x000000FF & (long)i);
   Write_Byte (GBR + R[0], temp);
   PC += 2;
@@ -9143,7 +9135,7 @@ void JSRNM (int d)
   temp = PC;
   PR = PC + 2;
   disp = (0x000000FF & d);
-  PC = Read_Long (TBR + (disp << 2));
+  PC = Read_32 (TBR + (disp << 2));
 }
 )"})
 
@@ -9600,13 +9592,13 @@ user mode will cause an illegal instruction exception.
 void LDCMSR (int m)
 {
   #if SH1 || SH2 || SH2 || SH3
-  SR = Read_Long (R[m]) & 0x0FFF0FFF;
+  SR = Read_32 (R[m]) & 0x0FFF0FFF;
 
   #elif SH2A
-  SR = Read_Long (R[m]) & 0x000063F3;
+  SR = Read_32 (R[m]) & 0x000063F3;
 
   #elif SH4 || SH4A
-  SR = Read_Long (R[m]) & 0x700083F3;
+  SR = Read_32 (R[m]) & 0x700083F3;
 
   #endif
 
@@ -9734,7 +9726,7 @@ This instruction can also be issued in user mode.
 {R"(
 void LDCMGBR (int m)
 {
-  GBR = Read_Long (R[m]);
+  GBR = Read_32 (R[m]);
   R[m] += 4;
   PC += 2;
 }
@@ -9819,7 +9811,7 @@ Stores a source operand in control register VBR.
 {R"(
 void LDCMVBR (int m)
 {
-  VBR = Read_Long(R[m]);
+  VBR = Read_32 (R[m]);
   R[m] += 4;
   PC += 2;
 }
@@ -9903,7 +9895,7 @@ On the SH-DSP the latency of this instruction is 3 cycles.
 {R"(
 void LDCMMOD (int m)
 {
-  MOD = Read_Long (R[m]);
+  MOD = Read_32 (R[m]);
   R[m] += 4;
   PC += 2;
 }
@@ -9983,7 +9975,7 @@ On the SH-DSP the latency of this instruction is 3 cycles.
 {R"(
 void LDCMRE (int m)
 {
-  RE = Read_Long (R[m]);
+  RE = Read_32 (R[m]);
   R[m] += 4;
   PC += 2;
 }
@@ -10062,7 +10054,7 @@ On the SH-DSP the latency of this instruction is 3 cycles.
 {R"(
 void LDCMRS (int m)
 {
-  RS = Read_Long (R[m]);
+  RS = Read_32 (R[m]);
   R[m] += 4;
   PC += 2;
 }
@@ -10148,7 +10140,7 @@ manuals.
 {R"(
 void LDCMSGR (int m)
 {
-  SGR = Read_Long (R[m]);
+  SGR = Read_32 (R[m]);
   R[m] += 4;
   PC += 2;
 }
@@ -10235,7 +10227,7 @@ Stores a source operand in control register SSR.
 {R"(
 void LDCMSSR (int m)
 {
-  SSR = Read_Long (R[m]);
+  SSR = Read_32 (R[m]);
   R[m] += 4;
   PC += 2;
 }
@@ -10322,7 +10314,7 @@ Stores a source operand in control register SPC.
 {R"(
 void LDCMSPC (int m)
 {
-  SPC = Read_Long (R[m]);
+  SPC = Read_32 (R[m]);
   R[m] += 4;
   PC += 2;
 }
@@ -10409,7 +10401,7 @@ Stores a source operand in control register DBR.
 {R"(
 void LDCMDBR (int m)
 {
-  DBR = Read_Long (R[m]);
+  DBR = Read_32 (R[m]);
   R[m] += 4;
   PC += 2;
 }
@@ -10500,7 +10492,7 @@ accessed when this bit is 0.
 {R"(
 void LDCMRn_BANK (int m)
 {
-  Rn_BANK = Read_Long (R[m]);
+  Rn_BANK = Read_32 (R[m]);
   R[m] += 4;
   PC += 2;
 }
@@ -10730,7 +10722,7 @@ Stores the source operand into the system register MACH.
 {R"(
 void LDSMMACH (int m)
 {
-  MACH = Read_Long (R[m]);
+  MACH = Read_32 (R[m]);
 
   #if SH1
   if ((MACH & 0x00000200) == 0)
@@ -10822,7 +10814,7 @@ Stores the source operand into the system register MACL.
 {R"(
 void LDSMMACL (int m)
 {
-  MACL = Read_Long (R[m]);
+  MACL = Read_32 (R[m]);
   R[m] += 4;
   PC += 2;
 }
@@ -10906,7 +10898,7 @@ Stores the source operand into the system register PR.
 {R"(
 void LDSMPR (int m)
 {
-  PR = Read_Long (R[m]);
+  PR = Read_32 (R[m]);
   R[m] += 4;
   PC += 2;
 }
@@ -10988,7 +10980,7 @@ On the SH-DSP the latency of this instruction is 1 cycle.
 {R"(
 void LDSMDSR (int m)
 {
-  DSR = Read_Long (R[m]) & 0x0000000F;
+  DSR = Read_32 (R[m]) & 0x0000000F;
   R[m] += 4;
   PC += 2;
 }
@@ -11075,7 +11067,7 @@ copied into A0G.
 {R"(
 void LDSMA0 (int m)
 {
-  A0 = Read_Long (R[m]);
+  A0 = Read_32 (R[m]);
 
   if ((A0 & 0x80000000) == 0)
     A0G = 0x00;
@@ -11160,7 +11152,7 @@ Stores the source operand into the DSP register X0.
 {R"(
 void LDSMX0 (int m)
 {
-  X0 = Read_Long (R[m]);
+  X0 = Read_32 (R[m]);
   R[m] += 4;
   PC += 2;
 }
@@ -11239,7 +11231,7 @@ Stores the source operand into the DSP register X1.
 {R"(
 void LDSMX1 (int m)
 {
-  X1 = Read_Long (R[m]);
+  X1 = Read_32 (R[m]);
   R[m] += 4;
   PC += 2;
 }
@@ -11319,7 +11311,7 @@ Stores the source operand into the DSP register Y0.
 {R"(
 void LDSMY0 (int m)
 {
-  Y0 = Read_Long (R[m]);
+  Y0 = Read_32 (R[m]);
   R[m] += 4;
   PC += 2;
 }
@@ -11399,7 +11391,7 @@ Stores the source operand into the DSP register Y1.
 {R"(
 void LDSMY1 (int m)
 {
-  Y1 = Read_Long (R[m]);
+  Y1 = Read_32 (R[m]);
   R[m] += 4;
   PC += 2;
 }
@@ -11882,17 +11874,17 @@ void RESBANK (void)
   {
     for (int i = 0; i <= 14; i++)
     {
-      R[i] = Read_Long (R[15]);
+      R[i] = Read_32 (R[15]);
       R[15] += 4;
     }
 
-    PR = Read_Long (R[15]);
+    PR = Read_32 (R[15]);
     R[15] += 4;
-    GBR=Read_Long (R[15]);
+    GBR = Read_32 (R[15]);
     R[15] += 4;
-    MACH = Read_Long (R[15]);
+    MACH = Read_32 (R[15]);
     R[15] += 4;
-    MACL = Read_Long (R[15]);
+    MACL = Read_32 (R[15]);
     R[15] += 4;
   }
 
@@ -11960,10 +11952,10 @@ void RTE (void)
   unsigned long temp = PC;
 
   #if SH1 || SH2 || SH2A
-  PC = Read_Long (R[15]);
-  R[15]+=4;
-  SR = Read_Long (R[15]) & 0x000063F3;
-  R[15]+=4;
+  PC = Read_32 (R[15]);
+  R[15] += 4;
+  SR = Read_32 (R[15]) & 0x000063F3;
+  R[15] += 4;
 
   #elif SH3 || SH4 || SH4A
   SR = SSR;
@@ -14130,7 +14122,7 @@ void TRAPA (int i)
   Write_Long (R[15], SR);
   R[15] -= 4;
   Write_Long (R[15], PC + 2);
-  PC = Read_Long (VBR + (imm << 2));
+  PC = Read_32 (VBR + (imm << 2));
 
   #elif SH3 || SH4 || SH4A
   TRA = imm << 2;
@@ -14231,7 +14223,7 @@ Transfers contents of memory at address indicated by Rm to FRn.
 {R"(
 void FMOV_LOAD (int m, int n)
 {
-  Read_Long (R[m], FR[n]);
+  Read_32 (R[m], FR[n]);
   PC += 2;
 }
 )"})
@@ -14275,7 +14267,7 @@ Rm.
 {R"(
 void FMOV_RESTORE (int m, int n)
 {
-  Read_Long (R[m], FR[n]);
+  Read_32 (R[m], FR[n]);
   R[m] += 4;
   PC += 2;
 }
@@ -14319,7 +14311,7 @@ Transfers contents of memory at address indicated by (R0 + Rm) to FRn.
 {R"(
 void FMOV_INDEX_LOAD (int m, int n)
 {
-  Read_Long (R[0] + R[m], FR[n]);
+  Read_32 (R[0] + R[m], FR[n]);
   PC += 2;
 }
 )"})
@@ -14362,7 +14354,7 @@ Transfers memory contents at the address indicated by (disp + Rn) to FRn.
 void FMOV_INDEX_DISP12_LOAD (int m, int n)
 {
   long disp = (0x00000FFF & (long)d);
-  FR[n] = Read_Long (R[m] + (disp << 2));
+  FR[n] = Read_32 (R[m] + (disp << 2));
   PC += 4;
 }
 )"})
