@@ -14526,7 +14526,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers DRm contents to DRn.
 )"})
 
   (note
@@ -14536,7 +14536,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FMOV_DR (int m, int n)
+{
+  DR[n >> 1] = DR[m >> 1];
+  PC += 2;
+}
 )"})
 
   (example
@@ -14562,7 +14566,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers contents of memory at address indicated by Rm to DRn.
 )"})
 
   (note
@@ -14572,7 +14576,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FMOV_LOAD_DR (int m, int n)
+{
+  Read_64 (R[m], DR[n >> 1]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -14582,7 +14590,10 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -14598,7 +14609,8 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers contents of memory at address indicated by Rm to DRn, and adds 8 to
+Rm.
 )"})
 
   (note
@@ -14608,7 +14620,12 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FMOV_RESTORE_DR (int m, int n)
+{
+  Read_64 (R[m], DR[n >> 1]);
+  R[m] += 8;
+  PC += 2;
+}
 )"})
 
   (example
@@ -14618,7 +14635,10 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -14634,7 +14654,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers contents of memory at address indicated by (R0 + Rm) to DRn.
 )"})
 
   (note
@@ -14644,7 +14664,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FMOV_INDEX_LOAD_DR (int m, int n)
+{
+  Read_64 (R[0] + R[m], DR[n >> 1]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -14654,7 +14678,10 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -14669,7 +14696,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers memory contents at the address indicated by (disp + Rn) to DRn.
 )"})
 
   (note
@@ -14679,7 +14706,12 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FMOV_INDEX_DISP12_LOAD_DR (int m, int n, int d)
+{
+  long disp = (0x00000FFF & (long)d);
+  DR[n >> 1] = Read_64 (R[m] + (disp << 3));
+  PC += 4;
+}
 )"})
 
   (example
@@ -14689,7 +14721,7 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data address error</li>
 )"})
 )
 
@@ -14705,7 +14737,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers DRm contents to memory at address indicated by Rn.
 )"})
 
   (note
@@ -14715,7 +14747,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FMOV_STORE_DR (int m, int n)
+{
+  Write_64 (DR[m >> 1], R[n]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -14725,7 +14761,11 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -14741,7 +14781,8 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Subtracts 8 from Rn, and transfers DRm contents to memory at address indicated
+by resulting Rn value.
 )"})
 
   (note
@@ -14751,7 +14792,12 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FMOV_SAVE_DR (int m, int n)
+{
+  Write_64 (DR[m >> 1], R[n] - 8);
+  R[n] -= 8;
+  PC += 2;
+}
 )"})
 
   (example
@@ -14761,7 +14807,11 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -14777,7 +14827,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers DRm contents to memory at address indicated by (R0 + Rn).
 )"})
 
   (note
@@ -14787,7 +14837,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FMOV_INDEX_STORE_DR (int m, int n)
+{
+  Write_64 (DR[m >> 1], R[0] + R[n]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -14797,7 +14851,11 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -14812,7 +14870,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers DRm contents to memory at the address indicated by (disp + Rn).
 )"})
 
   (note
@@ -14822,7 +14880,12 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FMOV_INDEX_DISP12_STORE_DR (int m, int n, int d)
+{
+  long disp = (0x00000FFF & (long)d);
+  Write_64 (R[n] + (disp << 3), DR[m >> 1]);
+  PC += 4;
+}
 )"})
 
   (example
@@ -14832,7 +14895,11 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -14848,7 +14915,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers DRm contents to XDn.
 )"})
 
   (note
@@ -14858,7 +14925,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FMOV_DRXD (int m, int n)
+{
+  XD[n >> 1] = DR[m >> 1];
+  PC += 2;
+}
 )"})
 
   (example
@@ -14884,7 +14955,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers XDm contents to DRn.
 )"})
 
   (note
@@ -14894,7 +14965,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FMOV_XDDR (int m, int n)
+{
+  DR[n >> 1] = XD[m >> 1];
+  PC += 2;
+}
 )"})
 
   (example
@@ -14920,7 +14995,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers XDm contents to XDn.
 )"})
 
   (note
@@ -14930,7 +15005,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FMOV_XDXD (int m, int n)
+{
+  XD[n >> 1] = XD[m >> 1];
+  PC += 2;
+}
 )"})
 
   (example
@@ -14956,7 +15035,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers contents of memory at address indicated by Rm to XDn.
 )"})
 
   (note
@@ -14966,7 +15045,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FMOV_LOAD_XD (int m, int n)
+{
+  Read_64 (R[m], XD[n >> 1]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -14976,7 +15059,10 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -14992,7 +15078,8 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers contents of memory at address indicated by Rm to XDn, and adds 8 to
+Rm.
 )"})
 
   (note
@@ -15002,7 +15089,12 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FMOV_RESTORE_XD (int m, int n)
+{
+  Read_64 (R[m], XD[n >> 1]);
+  R[m] += 8;
+  PC += 2;
+}
 )"})
 
   (example
@@ -15012,7 +15104,10 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -15028,7 +15123,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers contents of memory at address indicated by (R0 + Rm) to XDn.
 )"})
 
   (note
@@ -15038,7 +15133,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FMOV_INDEX_LOAD_XD (int m, int n)
+{
+  Read_64 (R[0] + R[m], XD[n >> 1]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -15048,7 +15147,10 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -15064,7 +15166,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers contents of memory at address indicated by (R0 + Rm) to XDn.
 )"})
 
   (note
@@ -15079,12 +15181,20 @@ __sexpr (insn_blocks.push_back
 
   (example
 {R"(
-
+void FMOV_STORE_XD (int m, int n)
+{
+  Write_64 (XD[m >> 1], R[n]);
+  PC += 2;
+}
 )"})
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -15100,7 +15210,8 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Subtracts 8 from Rn, and transfers XDm contents to memory at address indicated
+by resulting Rn value.
 )"})
 
   (note
@@ -15110,7 +15221,12 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FMOV_SAVE_XD (int m, int n)
+{
+  Write_64 (XD[m >> 1], R[n] - 8);
+  R[n] -= 8;
+  PC += 2;
+}
 )"})
 
   (example
@@ -15120,12 +15236,16 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fmov	XDm,@(R0 + Rn)"
+(insn "fmov	XDm,@(R0,Rn)"
   SH4 SH4A
   (abstract "XDm -> (R0 + Rn)")
   (code "1111nnnnmmm10111")
@@ -15136,7 +15256,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers XDm contents to memory at address indicated by (R0 + Rn).
 )"})
 
   (note
@@ -15146,7 +15266,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FMOV_INDEX_STORE_XD (int m, int n)
+{
+  Write_64 (XD[m >> 1], R[0] + R[n]);
+  PC += 2;
+}
 )"})
 
   (example
@@ -15156,7 +15280,11 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
