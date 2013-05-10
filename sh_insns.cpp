@@ -14515,7 +14515,7 @@ __sexpr (insn_blocks.push_back
 (insns "64 Bit Floating-Point Data Transfer Instructions (FPSCR.SZ = 1)"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fmov.d	DRm,DRn"
+(insn "fmov	DRm,DRn"
   SH4 SH4A SH2A
   (abstract "DRm -> DRn")
   (code "1111nnn0mmm01100")
@@ -14551,355 +14551,6 @@ void FMOV_DR (int m, int n)
   (exceptions
 {R"(
 
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fmov.d	@Rm,DRn"
-  SH4 SH4A SH2A
-  (abstract "(Rm) -> DRn")
-  (code "1111nnn0mmmm1000")
-
-  (group SH4A "LS" SH4 "LS")
-  (issue SH4A "1" SH2A "2" SH4 "1")
-  (latency SH4A "1" SH2A "0/4" SH4 "2")
-
-  (description
-{R"(
-Transfers contents of memory at address indicated by Rm to DRn.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void FMOV_LOAD_DR (int m, int n)
-{
-  Read_64 (R[m], DR[n >> 1]);
-  PC += 2;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data TLB multiple-hit exception</li>
-<li>Data TLB miss exception</li>
-<li>Data TLB protection violation exception</li>
-<li>Data address error</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fmov.d	@Rm+,DRn"
-  SH4 SH4A SH2A
-  (abstract "(Rm) -> DRn, Rm + 8 -> Rm")
-  (code "1111nnn0mmmm1001")
-
-  (group SH4A "LS" SH4 "LS")
-  (issue SH4A "1" SH2A "2" SH4 "1")
-  (latency SH4A "1" SH2A "1/4" SH4 "1/2")
-
-  (description
-{R"(
-Transfers contents of memory at address indicated by Rm to DRn, and adds 8 to
-Rm.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void FMOV_RESTORE_DR (int m, int n)
-{
-  Read_64 (R[m], DR[n >> 1]);
-  R[m] += 8;
-  PC += 2;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data TLB multiple-hit exception</li>
-<li>Data TLB miss exception</li>
-<li>Data TLB protection violation exception</li>
-<li>Data address error</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fmov.d	@(R0,Rm),DRn"
-  SH4 SH4A SH2A
-  (abstract "(R0 + Rm) -> DRn")
-  (code "1111nnn0mmmm0110")
-
-  (group SH4A "LS" SH4 "LS")
-  (issue SH4A "1" SH2A "2" SH4 "1")
-  (latency SH4A "1" SH2A "0/4" SH4 "2")
-
-  (description
-{R"(
-Transfers contents of memory at address indicated by (R0 + Rm) to DRn.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void FMOV_INDEX_LOAD_DR (int m, int n)
-{
-  Read_64 (R[0] + R[m], DR[n >> 1]);
-  PC += 2;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data TLB multiple-hit exception</li>
-<li>Data TLB miss exception</li>
-<li>Data TLB protection violation exception</li>
-<li>Data address error</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fmov.d	@(disp12,Rm),DRn"
-  SH2A
-  (abstract "(disp*8 + Rm) -> DRn")
-  (code "0011nnn0mmmm0001 0111dddddddddddd")
-
-  (issue SH2A "2")
-  (latency SH2A "0/4")
-
-  (description
-{R"(
-Transfers memory contents at the address indicated by (disp + Rn) to DRn.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void FMOV_INDEX_DISP12_LOAD_DR (int m, int n, int d)
-{
-  long disp = (0x00000FFF & (long)d);
-  DR[n >> 1] = Read_64 (R[m] + (disp << 3));
-  PC += 4;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data address error</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fmov.d	DRm,@Rn"
-  SH4 SH4A SH2A
-  (abstract "DRm -> (Rn)")
-  (code "1111nnnnmmm01010")
-
-  (group SH4A "LS" SH4 "LS")
-  (issue SH4A "1" SH2A "2" SH4 "1")
-  (latency SH4A "1" SH2A "0" SH4 "1")
-
-  (description
-{R"(
-Transfers DRm contents to memory at address indicated by Rn.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void FMOV_STORE_DR (int m, int n)
-{
-  Write_64 (DR[m >> 1], R[n]);
-  PC += 2;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data TLB multiple-hit exception</li>
-<li>Data TLB miss exception</li>
-<li>Data TLB protection violation exception</li>
-<li>Data address error</li>
-<li>Initial page write exception</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fmov.d	DRm,@-Rn"
-  SH4 SH4A SH2A
-  (abstract "Rn-8 -> Rn, DRm -> (Rn)")
-  (code "1111nnnnmmm01011")
-
-  (group SH4A "LS" SH4 "LS")
-  (issue SH4A "1" SH2A "2" SH4 "1")
-  (latency SH4A "1" SH2A "0/1" SH4 "1/1")
-
-  (description
-{R"(
-Subtracts 8 from Rn, and transfers DRm contents to memory at address indicated
-by resulting Rn value.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void FMOV_SAVE_DR (int m, int n)
-{
-  Write_64 (DR[m >> 1], R[n] - 8);
-  R[n] -= 8;
-  PC += 2;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data TLB multiple-hit exception</li>
-<li>Data TLB miss exception</li>
-<li>Data TLB protection violation exception</li>
-<li>Data address error</li>
-<li>Initial page write exception</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fmov.d	DRm,@(R0,Rn)"
-  SH4 SH4A SH2A
-  (abstract "DRm -> (R0 + Rn)")
-  (code "1111nnnnmmm00111")
-
-  (group SH4A "LS" SH4 "LS")
-  (issue SH4A "1" SH2A "2" SH4 "1")
-  (latency SH4A "1" SH2A "0" SH4 "1")
-
-  (description
-{R"(
-Transfers DRm contents to memory at address indicated by (R0 + Rn).
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void FMOV_INDEX_STORE_DR (int m, int n)
-{
-  Write_64 (DR[m >> 1], R[0] + R[n]);
-  PC += 2;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data TLB multiple-hit exception</li>
-<li>Data TLB miss exception</li>
-<li>Data TLB protection violation exception</li>
-<li>Data address error</li>
-<li>Initial page write exception</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fmov.d	DRm,@(disp12,Rn)"
-  SH2A
-  (abstract "DRm -> (disp*8 + Rn)")
-  (code "0011nnnnmmm00001 0011dddddddddddd")
-
-  (issue SH2A "2")
-  (latency SH2A "0")
-
-  (description
-{R"(
-Transfers DRm contents to memory at the address indicated by (disp + Rn).
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void FMOV_INDEX_DISP12_STORE_DR (int m, int n, int d)
-{
-  long disp = (0x00000FFF & (long)d);
-  Write_64 (R[n] + (disp << 3), DR[m >> 1]);
-  PC += 4;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data TLB multiple-hit exception</li>
-<li>Data TLB miss exception</li>
-<li>Data TLB protection violation exception</li>
-<li>Data address error</li>
-<li>Initial page write exception</li>
 )"})
 )
 
@@ -15024,7 +14675,50 @@ void FMOV_XDXD (int m, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fmov	@Rm,XDn"
+(insn "fmov.d	@Rm,DRn"
+  SH4 SH4A SH2A
+  (abstract "(Rm) -> DRn")
+  (code "1111nnn0mmmm1000")
+
+  (group SH4A "LS" SH4 "LS")
+  (issue SH4A "1" SH2A "2" SH4 "1")
+  (latency SH4A "1" SH2A "0/4" SH4 "2")
+
+  (description
+{R"(
+Transfers contents of memory at address indicated by Rm to DRn.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void FMOV_LOAD_DR (int m, int n)
+{
+  Read_64 (R[m], DR[n >> 1]);
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fmov.d	@Rm,XDn"
   SH4 SH4A
   (abstract "(Rm) -> XDn")
   (code "1111nnn1mmmm1000")
@@ -15067,7 +14761,141 @@ void FMOV_LOAD_XD (int m, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fmov	@Rm+,XDn"
+(insn "fmov.d	DRm,@Rn"
+  SH4 SH4A SH2A
+  (abstract "DRm -> (Rn)")
+  (code "1111nnnnmmm01010")
+
+  (group SH4A "LS" SH4 "LS")
+  (issue SH4A "1" SH2A "2" SH4 "1")
+  (latency SH4A "1" SH2A "0" SH4 "1")
+
+  (description
+{R"(
+Transfers DRm contents to memory at address indicated by Rn.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void FMOV_STORE_DR (int m, int n)
+{
+  Write_64 (DR[m >> 1], R[n]);
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fmov.d	XDm,@Rn"
+  SH4 SH4A
+  (abstract "XDm -> (Rn)")
+  (code "1111nnnnmmm11010")
+
+  (group SH4A "LS" SH4 "LS")
+  (issue SH4A "1" SH4 "1")
+  (latency SH4A "1" SH4 "1")
+
+  (description
+{R"(
+Transfers contents of memory at address indicated by (R0 + Rm) to XDn.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+void FMOV_STORE_XD (int m, int n)
+{
+  Write_64 (XD[m >> 1], R[n]);
+  PC += 2;
+}
+)"})
+
+  (exceptions
+{R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
+)"})
+)
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fmov.d	@Rm+,DRn"
+  SH4 SH4A SH2A
+  (abstract "(Rm) -> DRn, Rm + 8 -> Rm")
+  (code "1111nnn0mmmm1001")
+
+  (group SH4A "LS" SH4 "LS")
+  (issue SH4A "1" SH2A "2" SH4 "1")
+  (latency SH4A "1" SH2A "1/4" SH4 "1/2")
+
+  (description
+{R"(
+Transfers contents of memory at address indicated by Rm to DRn, and adds 8 to
+Rm.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void FMOV_RESTORE_DR (int m, int n)
+{
+  Read_64 (R[m], DR[n >> 1]);
+  R[m] += 8;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fmov.d	@Rm+,XDn"
   SH4 SH4A
   (abstract "(Rm) -> XDn, Rm+8 -> Rm")
   (code "1111nnn1mmmm1001")
@@ -15112,18 +14940,19 @@ void FMOV_RESTORE_XD (int m, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fmov	@(R0,Rm),XDn"
-  SH4 SH4A
-  (abstract "(R0 + Rm) -> XDn")
-  (code "1111nnn1mmmm0110")
+(insn "fmov.d	DRm,@-Rn"
+  SH4 SH4A SH2A
+  (abstract "Rn-8 -> Rn, DRm -> (Rn)")
+  (code "1111nnnnmmm01011")
 
   (group SH4A "LS" SH4 "LS")
-  (issue SH4A "1" SH4 "1")
-  (latency SH4A "1" SH4 "2")
+  (issue SH4A "1" SH2A "2" SH4 "1")
+  (latency SH4A "1" SH2A "0/1" SH4 "1/1")
 
   (description
 {R"(
-Transfers contents of memory at address indicated by (R0 + Rm) to XDn.
+Subtracts 8 from Rn, and transfers DRm contents to memory at address indicated
+by resulting Rn value.
 )"})
 
   (note
@@ -15133,9 +14962,10 @@ Transfers contents of memory at address indicated by (R0 + Rm) to XDn.
 
   (operation
 {R"(
-void FMOV_INDEX_LOAD_XD (int m, int n)
+void FMOV_SAVE_DR (int m, int n)
 {
-  Read_64 (R[0] + R[m], XD[n >> 1]);
+  Write_64 (DR[m >> 1], R[n] - 8);
+  R[n] -= 8;
   PC += 2;
 }
 )"})
@@ -15143,49 +14973,6 @@ void FMOV_INDEX_LOAD_XD (int m, int n)
   (example
 {R"(
 
-)"})
-
-  (exceptions
-{R"(
-<li>Data TLB multiple-hit exception</li>
-<li>Data TLB miss exception</li>
-<li>Data TLB protection violation exception</li>
-<li>Data address error</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fmov	XDm,@Rn"
-  SH4 SH4A
-  (abstract "XDm -> (Rn)")
-  (code "1111nnnnmmm11010")
-
-  (group SH4A "LS" SH4 "LS")
-  (issue SH4A "1" SH4 "1")
-  (latency SH4A "1" SH4 "1")
-
-  (description
-{R"(
-Transfers contents of memory at address indicated by (R0 + Rm) to XDn.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-void FMOV_STORE_XD (int m, int n)
-{
-  Write_64 (XD[m >> 1], R[n]);
-  PC += 2;
-}
 )"})
 
   (exceptions
@@ -15199,7 +14986,7 @@ void FMOV_STORE_XD (int m, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fmov	XDm,@-Rn"
+(insn "fmov.d	XDm,@-Rn"
   SH4 SH4A
   (abstract "Rn-8 -> Rn, (Rn) -> XDm")
   (code "1111nnnnmmm11011")
@@ -15245,7 +15032,137 @@ void FMOV_SAVE_XD (int m, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fmov	XDm,@(R0,Rn)"
+(insn "fmov.d	@(R0,Rm),DRn"
+  SH4 SH4A SH2A
+  (abstract "(R0 + Rm) -> DRn")
+  (code "1111nnn0mmmm0110")
+
+  (group SH4A "LS" SH4 "LS")
+  (issue SH4A "1" SH2A "2" SH4 "1")
+  (latency SH4A "1" SH2A "0/4" SH4 "2")
+
+  (description
+{R"(
+Transfers contents of memory at address indicated by (R0 + Rm) to DRn.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void FMOV_INDEX_LOAD_DR (int m, int n)
+{
+  Read_64 (R[0] + R[m], DR[n >> 1]);
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fmov.d	@(R0,Rm),XDn"
+  SH4 SH4A
+  (abstract "(R0 + Rm) -> XDn")
+  (code "1111nnn1mmmm0110")
+
+  (group SH4A "LS" SH4 "LS")
+  (issue SH4A "1" SH4 "1")
+  (latency SH4A "1" SH4 "2")
+
+  (description
+{R"(
+Transfers contents of memory at address indicated by (R0 + Rm) to XDn.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void FMOV_INDEX_LOAD_XD (int m, int n)
+{
+  Read_64 (R[0] + R[m], XD[n >> 1]);
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fmov.d	DRm,@(R0,Rn)"
+  SH4 SH4A SH2A
+  (abstract "DRm -> (R0 + Rn)")
+  (code "1111nnnnmmm00111")
+
+  (group SH4A "LS" SH4 "LS")
+  (issue SH4A "1" SH2A "2" SH4 "1")
+  (latency SH4A "1" SH2A "0" SH4 "1")
+
+  (description
+{R"(
+Transfers DRm contents to memory at address indicated by (R0 + Rn).
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void FMOV_INDEX_STORE_DR (int m, int n)
+{
+  Write_64 (DR[m >> 1], R[0] + R[n]);
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fmov.d	XDm,@(R0,Rn)"
   SH4 SH4A
   (abstract "XDm -> (R0 + Rn)")
   (code "1111nnnnmmm10111")
@@ -15270,6 +15187,90 @@ void FMOV_INDEX_STORE_XD (int m, int n)
 {
   Write_64 (XD[m >> 1], R[0] + R[n]);
   PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fmov.d	@(disp12,Rm),DRn"
+  SH2A
+  (abstract "(disp*8 + Rm) -> DRn")
+  (code "0011nnn0mmmm0001 0111dddddddddddd")
+
+  (issue SH2A "2")
+  (latency SH2A "0/4")
+
+  (description
+{R"(
+Transfers memory contents at the address indicated by (disp + Rn) to DRn.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void FMOV_INDEX_DISP12_LOAD_DR (int m, int n, int d)
+{
+  long disp = (0x00000FFF & (long)d);
+  DR[n >> 1] = Read_64 (R[m] + (disp << 3));
+  PC += 4;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fmov.d	DRm,@(disp12,Rn)"
+  SH2A
+  (abstract "DRm -> (disp*8 + Rn)")
+  (code "0011nnnnmmm00001 0011dddddddddddd")
+
+  (issue SH2A "2")
+  (latency SH2A "0")
+
+  (description
+{R"(
+Transfers DRm contents to memory at the address indicated by (disp + Rn).
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void FMOV_INDEX_DISP12_STORE_DR (int m, int n, int d)
+{
+  long disp = (0x00000FFF & (long)d);
+  Write_64 (R[n] + (disp << 3), DR[m >> 1]);
+  PC += 4;
 }
 )"})
 
