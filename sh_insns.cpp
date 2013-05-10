@@ -675,6 +675,46 @@ __sexpr (insn_blocks.push_back
 (insns "Data Transfer Instructions"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "mov	Rm,Rn"
+  SH_ANY
+  (abstract "Rm -> Rn")
+  (code "0110nnnnmmmm0011")
+
+  (group SH4 "MT" SH4A "MT")
+  (issue SH_ANY "1")
+  (latency SH1 "1" SH2 "1" SH3 "1" SH2A "0" SH4 "0" SH4A "1")
+
+  (description
+{R"(
+Transfers the source operand to the destination.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void MOV (int m, int n)
+{
+  R[n] = R[m];
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "mov	#imm,Rn"
   SH_ANY
   (abstract "imm -> sign extension -> Rn")
@@ -715,6 +755,153 @@ void MOVI (int i, int n)
   (exceptions
 {R"(
 
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "movi20	#imm20,Rn"
+  SH2A
+  (abstract "imm -> sign extension -> Rn")
+  (code "0000nnnniiii0000 iiiiiiiiiiiiiiii")
+
+  (issue SH2A "1")
+  (latency SH2A "1")
+
+  (description
+{R"(
+Stores immediate data that has been sign-extended to longword in general
+register Rn.
+<br/><img src="movi20.svg" height="140"/>
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void MOVI20 (int i, int n)
+{
+  if (i & 0x00080000) == 0)
+    R[n] = (0x000FFFFF & (long)i);
+  else
+    R[n] = (0xFFF00000 | (long)i);
+
+  PC += 4;
+}
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "movi20s	#imm20,Rn"
+  SH2A
+  (abstract "imm << 8 -> sign extension -> Rn")
+  (code "0000nnnniiii0001 iiiiiiiiiiiiiiii")
+
+  (issue SH2A "1")
+  (latency SH2A "1")
+
+  (description
+{R"(
+Shifts immediate data 8 bits to the left and performs sign extension to
+longword, then stores the resulting data in general register Rn. Using an OR or
+ADD instruction as the next instruction enables a 28-bit absolute address to be
+generated.
+<br/><img src="movi20s.svg" height="150"/>
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void MOVI20S (int i, int n)
+{
+  if (i & 0x00080000) == 0)
+    R[n] = (0x000FFFFF & (long)i);
+  else
+    R[n] = (0xFFF00000 | (long)i);
+
+  R[n] <<= 8;
+  PC += 4;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "mova	@(disp,PC),R0"
+  SH_ANY
+  (abstract "(disp*4) + (PC & 0xFFFFFFFC) + 4 -> R0")
+  (code "11000111dddddddd")
+
+  (group SH4 "EX" SH4A "LS")
+  (issue SH_ANY "1")
+  (latency SH_ANY "1")
+
+  (description
+{R"(
+Stores the effective address of the source operand into general
+register R0.  The 8-bit displacement is zero-extended and quadrupled.
+Consequently, the relative interval from the operand is PC + 1020 bytes.  The PC
+is the address four bytes after this instruction, but the lowest two bits of the
+PC are fixed at 00.
+)"})
+
+  (note
+{R"(
+SH1*, SH2*, SH3*:<br/>
+If this instruction is placed immediately after a delayed branch instruction,
+the PC must point to an address specified by (the starting address of the branch
+destination) + 2.<br/><br/>
+
+SH4*:<br/>
+If this instruction is executed in a delay slot, a slot illegal instruction
+exception will be generated.
+)"})
+
+  (operation
+{R"(
+void MOVA (int d)
+{
+  unsigned int disp;
+  disp = (unsigned int)(0x000000FF & d);
+  R[0] = (PC & 0xFFFFFFFC) + 4 + (disp << 2);
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Slot illegal instruction</li>
 )"})
 )
 
@@ -821,179 +1008,6 @@ void MOVLI (int d, int n)
 <li>Slot illegal instruction exception</li>
 <li>Data TLB miss exception</li>
 <li>Data TLB protection violation exception</li>
-)"})
-)
-
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov	Rm,Rn"
-  SH_ANY
-  (abstract "Rm -> Rn")
-  (code "0110nnnnmmmm0011")
-
-  (group SH4 "MT" SH4A "MT")
-  (issue SH_ANY "1")
-  (latency SH1 "1" SH2 "1" SH3 "1" SH2A "0" SH4 "0" SH4A "1")
-
-  (description
-{R"(
-Transfers the source operand to the destination.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void MOV (int m, int n)
-{
-  R[n] = R[m];
-  PC += 2;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.b	Rm,@Rn"
-  SH_ANY
-  (abstract "Rm -> (Rn)")
-  (code "0010nnnnmmmm0000")
-
-  (group SH4A "LS" SH4 "LS")
-  (issue SH_ANY "1")
-  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
-
-  (description
-{R"(
-Transfers the source operand to the destination.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void MOVBS (int m, int n)
-{
-  Write_Byte (R[n], R[m]);
-  PC += 2;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data TLB multiple-hit exception</li>
-<li>Data TLB miss exception</li>
-<li>Data TLB protection violation exception</li>
-<li>Data address error</li>
-<li>Initial page write exception</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.w	Rm,@Rn"
-  SH_ANY
-  (abstract "Rm -> (Rn)")
-  (code "0010nnnnmmmm0001")
-
-  (group SH4A "LS" SH4 "LS")
-  (issue SH_ANY "1")
-  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
-
-  (description
-{R"(
-Transfers the source operand to the destination.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void MOVWS (int m, int n)
-{
-  Write_Word (R[n], R[m]);
-  PC += 2;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data TLB multiple-hit exception</li>
-<li>Data TLB miss exception</li>
-<li>Data TLB protection violation exception</li>
-<li>Data address error</li>
-<li>Initial page write exception</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.l	Rm,@Rn"
-  SH_ANY
-  (abstract "Rm -> (Rn)")
-  (code "0010nnnnmmmm0010")
-
-  (group SH4A "LS" SH4 "LS")
-  (issue SH_ANY "1")
-  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
-
-  (description
-{R"(
-Transfers the source operand to the destination.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void MOVLS (int m, int n)
-{
-  Write_Long (R[n], R[m]);
-  PC += 2;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data TLB multiple-hit exception</li>
-<li>Data TLB miss exception</li>
-<li>Data TLB protection violation exception</li>
-<li>Data address error</li>
-<li>Initial page write exception</li>
 )"})
 )
 
@@ -1141,14 +1155,14 @@ void MOVLL (int m, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.b	Rm,@-Rn"
+(insn "mov.b	Rm,@Rn"
   SH_ANY
-  (abstract "Rn-1 -> Rn, Rm -> (Rn)")
-  (code "0010nnnnmmmm0100")
+  (abstract "Rm -> (Rn)")
+  (code "0010nnnnmmmm0000")
 
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
-  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "1/1")
+  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
 
   (description
 {R"(
@@ -1162,10 +1176,9 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-void MOVBM (int m, int n)
+void MOVBS (int m, int n)
 {
-  Write_Byte (R[n] - 1, R[m]);
-  R[n] -= 1;
+  Write_Byte (R[n], R[m]);
   PC += 2;
 }
 )"})
@@ -1186,14 +1199,14 @@ void MOVBM (int m, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.w	Rm,@-Rn"
+(insn "mov.w	Rm,@Rn"
   SH_ANY
-  (abstract "Rn-2 -> Rn, Rm -> (Rn)")
-  (code "0010nnnnmmmm0101")
+  (abstract "Rm -> (Rn)")
+  (code "0010nnnnmmmm0001")
 
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
-  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "1/1")
+  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
 
   (description
 {R"(
@@ -1207,10 +1220,9 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-void MOVWM (int m, int n)
+void MOVWS (int m, int n)
 {
-  Write_Word (R[n] - 2, R[m]);
-  R[n] -= 2;
+  Write_Word (R[n], R[m]);
   PC += 2;
 }
 )"})
@@ -1231,14 +1243,14 @@ void MOVWM (int m, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.l	Rm,@-Rn"
+(insn "mov.l	Rm,@Rn"
   SH_ANY
-  (abstract "Rn-4 -> Rn, Rm -> (Rn)")
-  (code "0010nnnnmmmm0110")
+  (abstract "Rm -> (Rn)")
+  (code "0010nnnnmmmm0010")
 
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
-  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "1/1")
+  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
 
   (description
 {R"(
@@ -1252,10 +1264,9 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-void MOVLM (int m, int n)
+void MOVLS (int m, int n)
 {
-  Write_Long (R[n] - 4, R[m]);
-  R[n] -= 4;
+  Write_Long (R[n], R[m]);
   PC += 2;
 }
 )"})
@@ -1430,21 +1441,18 @@ void MOVLP (int m, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.b	R0,@(disp,Rn)"
+(insn "mov.b	Rm,@-Rn"
   SH_ANY
-  (abstract "R0 -> (disp + Rn)")
-  (code "10000000nnnndddd")
+  (abstract "Rn-1 -> Rn, Rm -> (Rn)")
+  (code "0010nnnnmmmm0100")
 
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
-  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "1/1")
 
   (description
 {R"(
 Transfers the source operand to the destination.
-The 4-bit displacement is only zero-extended, so a range up to +15 bytes
-can be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can
-be used instead.
 )"})
 
   (note
@@ -1454,11 +1462,10 @@ be used instead.
 
   (operation
 {R"(
-void MOVBS4 (int d, int n)
+void MOVBM (int m, int n)
 {
-  long disp;
-  disp = (0x0000000F & (long)d);
-  Write_Byte (R[n] + disp, R[0]);
+  Write_Byte (R[n] - 1, R[m]);
+  R[n] -= 1;
   PC += 2;
 }
 )"})
@@ -1479,21 +1486,18 @@ void MOVBS4 (int d, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.w	R0,@(disp,Rn)"
+(insn "mov.w	Rm,@-Rn"
   SH_ANY
-  (abstract "R0 -> (disp*2 + Rn)")
-  (code "10000001nnnndddd")
+  (abstract "Rn-2 -> Rn, Rm -> (Rn)")
+  (code "0010nnnnmmmm0101")
 
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
-  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "1/1")
 
   (description
 {R"(
 Transfers the source operand to the destination.
-The 4-bit displacement is multiplied by two after zero-extension, enabling a
-range up to +30 bytes to be specified.  If a memory operand cannot be reached,
-the @(R0,Rn) mode can be used instead.
 )"})
 
   (note
@@ -1503,11 +1507,10 @@ the @(R0,Rn) mode can be used instead.
 
   (operation
 {R"(
-void MOVWS4 (int d, int n)
+void MOVWM (int m, int n)
 {
-  long disp;
-  disp = (0x0000000F & (long)d);
-  Write_Word (R[n] + (disp << 1), R[0]);
+  Write_Word (R[n] - 2, R[m]);
+  R[n] -= 2;
   PC += 2;
 }
 )"})
@@ -1528,21 +1531,18 @@ void MOVWS4 (int d, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.l	Rm,@(disp,Rn)"
+(insn "mov.l	Rm,@-Rn"
   SH_ANY
-  (abstract "Rm -> (disp*4 + Rn)")
-  (code "0001nnnnmmmmdddd")
+  (abstract "Rn-4 -> Rn, Rm -> (Rn)")
+  (code "0010nnnnmmmm0110")
 
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
-  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "1" SH4 "1/1")
 
   (description
 {R"(
 Transfers the source operand to the destination.
-The 4-bit displacement is multiplied by four after zero-extension, enabling a
-range up to +60 bytes to be specified.  If a memory operand cannot be reached,
-the @(R0,Rn) mode can be used instead.
 )"})
 
   (note
@@ -1552,11 +1552,10 @@ the @(R0,Rn) mode can be used instead.
 
   (operation
 {R"(
-void MOVLS4 (int m, int d, int n)
+void MOVLM (int m, int n)
 {
-  long disp;
-  disp = (0x0000000F & (long)d);
-  Write_Long (R[n] + (disp << 2), R[m]);
+  Write_Long (R[n] - 4, R[m]);
+  R[n] -= 4;
   PC += 2;
 }
 )"})
@@ -1573,6 +1572,262 @@ void MOVLS4 (int m, int d, int n)
 <li>Data TLB protection violation exception</li>
 <li>Data address error</li>
 <li>Initial page write exception</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "mov.b	@-Rm,R0"
+  SH2A
+  (abstract "Rm-1 -> Rm, (Rm) -> sign extension -> R0")
+  (code "0100mmmm11001011")
+
+  (issue SH2A "1")
+  (latency SH2A "2")
+
+  (description
+{R"(
+Transfers the source operand to the destination.
+The loaded data is sign-extended to 32 bit before being stored in the
+destination register.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void MOVRSBM (int m)
+{
+  R[m] -= 1;
+  R[0] = (long)Read_Word (R[m]);
+
+  if ((R[0] & 0x80) == 0)
+    R[0] &= 0x000000FF;
+  else
+    R[0] |= 0xFFFFFF00;
+
+  PC+=2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "mov.w	@-Rm,R0"
+  SH2A
+  (abstract "Rm-2 -> Rm, (Rm) -> sign extension -> R0")
+  (code "0100mmmm11011011")
+
+  (issue SH2A "1")
+  (latency SH2A "2")
+
+  (description
+{R"(
+Transfers the source operand to the destination.
+The loaded data is sign-extended to 32 bit before being stored in the
+destination register.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void MOVRSWM (int m)
+{
+  R[m]-= 2;
+  R[0] = (long)Read_Word (R[m]);
+
+  if ((R[0] & 0x8000) == 0)
+    R[0] &= 0x0000FFFF;
+  else
+    R[0] |= 0xFFFF0000;
+
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "mov.l	@-Rm,R0"
+  SH2A
+  (abstract "Rm-4 -> Rm, (Rm) -> R0")
+  (code "0100mmmm11101011")
+
+  (issue SH2A "1")
+  (latency SH2A "2")
+
+  (description
+{R"(
+Transfers the source operand to the destination.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void MOVRSLM (int m)
+{
+  R[m] -= 4;
+  R[0] = Read_Long (R[m]);
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "mov.b	R0,@Rn+"
+  SH2A
+  (abstract "R0 -> (Rn), Rn+1 -> Rn")
+  (code "0100nnnn10001011")
+
+  (issue SH2A "1")
+  (latency SH2A "1")
+
+  (description
+{R"(
+Transfers the source operand to the destination.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void MOVRSBP (int n)
+{
+  Write_Byte (R[n], R[0]);
+  R[n] += 1;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "mov.w	R0,@Rn+"
+  SH2A
+  (abstract "R0 -> (Rn), Rn+2 -> Rn")
+  (code "0100nnnn10011011")
+
+  (issue SH2A "1")
+  (latency SH2A "1")
+
+  (description
+{R"(
+Transfers the source operand to the destination.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void MOVRSWP (int n)
+{
+  Write_Word (R[n], R[0]);
+  R[n] += 2;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "mov.l	R0,@Rn+"
+  SH2A
+  (abstract "R0 -> (Rn), Rn+4 -> Rn")
+  (code "0100nnnn10101011")
+
+  (issue SH2A "1")
+  (latency SH2A "1")
+
+  (description
+{R"(
+Transfers the source operand to the destination.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void MOVRSLP (int n)
+{
+  Write_Long (R[n], R[0]);
+  R[n] += 4;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
 )"})
 )
 
@@ -1633,6 +1888,102 @@ void MOVBL4 (int m, int d)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "mov.b	@(disp12,Rm),Rn"
+  SH2A
+  (abstract "(disp + Rm) -> sign extension -> Rn")
+  (code "0011nnnnmmmm0001 0100dddddddddddd")
+
+  (issue SH2A "1")
+  (latency SH2A "2")
+
+  (description
+{R"(
+Transfers the source operand to the destination.  This
+instruction is ideal for data access in a structure or the stack.
+The loaded data is sign-extended to 32 bit before being stored in the
+destination register.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void MOVBL12 (int d, int m, int n)
+{
+  long disp;
+  disp = (0x00000FFF & (long)d);
+  R[n] = Read_Byte (R[m] + disp);
+
+  if ((R[n] & 0x80) == 0)
+    R[n] &= 0x000000FF;
+  else
+    R[n] |= 0xFFFFFF00;
+
+  PC += 4;
+}
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "movu.b	@(disp12,Rm),Rn"
+  SH2A
+  (abstract "(disp + Rm) -> zero extension -> Rn")
+  (code "0011nnnnmmmm0001 1000dddddddddddd")
+
+  (issue SH2A "1")
+  (latency SH2A "2")
+
+  (description
+{R"(
+Transfers a source operand to a destination, performing unsigned data transfer.
+This instruction is ideal for data access in a structure or the stack.
+The loaded data is zero-extended to 32 bit before being stored in the
+destination register.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void MOVBUL12 (int d, int m, int n)
+{
+  long disp;
+  disp = (0x00000FFF & (long)d);
+  R[n] = Read_Byte (R[m] + disp);
+  R[n] &= 0x000000FF;
+  PC += 4;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "mov.w	@(disp,Rm),R0"
   SH_ANY
   (abstract "(disp*2 + Rm) -> sign extension -> R0")
@@ -1689,6 +2040,101 @@ void MOVWL4 (int m, int d)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "mov.w	@(disp12,Rm),Rn"
+  SH2A
+  (abstract "(disp*2 + Rm) -> sign extension -> Rn")
+  (code "0011nnnnmmmm0001 0101dddddddddddd")
+
+  (issue SH2A "1")
+  (latency SH2A "2")
+
+  (description
+{R"(
+Transfers the source operand to the destination.  This
+instruction is ideal for data access in a structure or the stack.
+The loaded data is sign-extended to 32 bit before being stored in the
+destination register.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void MOVWL12 (int d, int m, int n)
+{
+  long disp;
+  disp = (0x00000FFF & (long)d);
+  R[n] = Read_Word (R[m] + (disp << 1));
+
+  if ((R[n] & 0x8000) == 0)
+    R[n] &= 0x0000FFFF;
+  else
+    R[n] |= 0xFFFF0000;
+
+  PC += 4;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "movu.w	@(disp12,Rm),Rn"
+  SH2A
+  (abstract "(disp*2 + Rm) -> zero extension -> Rn")
+  (code "0011nnnnmmmm0001 1001dddddddddddd")
+
+  (issue SH2A "1")
+  (latency SH2A "2")
+
+  (description
+{R"(
+Transfers a source operand to a destination, performing unsigned data transfer.
+This instruction is ideal for data access in a structure or the stack.
+The loaded data is zero-extended to 32 bit before being stored in the
+destination register.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void MOVWUL12 (int d, int m, int n)
+{
+  long disp;
+  disp = (0x00000FFF & (long)d);
+  R[n] = Read_Word (R[m] + (disp << 1));
+  R[n] &= 0x0000FFFF;
+  PC += 4;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "mov.l	@(disp,Rm),Rn"
   SH_ANY
   (abstract "(disp*4 + Rm) -> Rn")
@@ -1737,18 +2183,18 @@ void MOVLL4 (int m, int d, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.b	Rm,@(R0,Rn)"
-  SH_ANY
-  (abstract "Rm -> (R0 + Rn)")
-  (code "0000nnnnmmmm0100")
+(insn "mov.l	@(disp12,Rm),Rn"
+  SH2A
+  (abstract "(disp*4 + Rm) -> Rn")
+  (code "0011nnnnmmmm0001 0110dddddddddddd")
 
-  (group SH4A "LS" SH4 "LS")
-  (issue SH_ANY "1")
-  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+  (issue SH2A "1")
+  (latency SH2A "2")
 
   (description
 {R"(
-Transfers the source operand to the destination.
+Transfers the source operand to the destination.  This
+instruction is ideal for data access in a structure or the stack.
 )"})
 
   (note
@@ -1758,9 +2204,56 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-void MOVBS0 (int m, int n)
+void MOVLL12 (int d, int m, int n)
 {
-  Write_Byte (R[n] + R[0], R[m]);
+  long disp;
+  disp = (0x00000FFF & (long)d);
+  R[n] = Read_Long (R[m] + (disp << 2));
+  PC += 4;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "mov.b	R0,@(disp,Rn)"
+  SH_ANY
+  (abstract "R0 -> (disp + Rn)")
+  (code "10000000nnnndddd")
+
+  (group SH4A "LS" SH4 "LS")
+  (issue SH_ANY "1")
+  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+
+  (description
+{R"(
+Transfers the source operand to the destination.
+The 4-bit displacement is only zero-extended, so a range up to +15 bytes
+can be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can
+be used instead.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void MOVBS4 (int d, int n)
+{
+  long disp;
+  disp = (0x0000000F & (long)d);
+  Write_Byte (R[n] + disp, R[0]);
   PC += 2;
 }
 )"})
@@ -1781,18 +2274,18 @@ void MOVBS0 (int m, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.w	Rm,@(R0,Rn)"
-  SH_ANY
-  (abstract "Rm -> (R0 + Rn)")
-  (code "0000nnnnmmmm0101")
+(insn "mov.b	Rm,@(disp12,Rn)"
+  SH2A
+  (abstract "Rm -> (disp + Rn)")
+  (code "0011nnnnmmmm0001 0000dddddddddddd")
 
-  (group SH4A "LS" SH4 "LS")
-  (issue SH_ANY "1")
-  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+  (issue SH2A "1")
+  (latency SH2A "0")
 
   (description
 {R"(
-Transfers the source operand to the destination.
+Transfers the source operand to the destination.  This
+instruction is ideal for data access in a structure or the stack.
 )"})
 
   (note
@@ -1802,10 +2295,57 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-void MOVWS0 (int m, int n)
+void MOVBS12 (int d, int m, int n)
 {
-  Write_Word (R[n] + R[0], R[m]);
-  PC+=2;
+  long disp;
+  disp = (0x00000FFF & (long)d);
+  Write_Byte (R[n] + disp, R[m]);
+  PC += 4;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "mov.w	R0,@(disp,Rn)"
+  SH_ANY
+  (abstract "R0 -> (disp*2 + Rn)")
+  (code "10000001nnnndddd")
+
+  (group SH4A "LS" SH4 "LS")
+  (issue SH_ANY "1")
+  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+
+  (description
+{R"(
+Transfers the source operand to the destination.
+The 4-bit displacement is multiplied by two after zero-extension, enabling a
+range up to +30 bytes to be specified.  If a memory operand cannot be reached,
+the @(R0,Rn) mode can be used instead.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void MOVWS4 (int d, int n)
+{
+  long disp;
+  disp = (0x0000000F & (long)d);
+  Write_Word (R[n] + (disp << 1), R[0]);
+  PC += 2;
 }
 )"})
 
@@ -1825,18 +2365,18 @@ void MOVWS0 (int m, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.l	Rm,@(R0,Rn)"
-  SH_ANY
-  (abstract "Rm -> (R0 + Rn)")
-  (code "0000nnnnmmmm0110")
+(insn "mov.w	Rm,@(disp12,Rn)"
+  SH2A
+  (abstract "Rm -> (disp*2 + Rn)")
+  (code "0011nnnnmmmm0001 0001dddddddddddd")
 
-  (group SH4A "LS" SH4 "LS")
-  (issue SH_ANY "1")
-  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+  (issue SH2A "1")
+  (latency SH2A "0")
 
   (description
 {R"(
-Transfers the source operand to the destination.
+Transfers the source operand to the destination.  This
+instruction is ideal for data access in a structure or the stack.
 )"})
 
   (note
@@ -1846,9 +2386,57 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-void MOVLS0 (int m, int n)
+void MOVWS12 (int d, int m, int n)
 {
-  Write_Long (R[n] + R[0], R[m]);
+  long disp;
+  disp = (0x00000FFF & (long)d);
+  Write_Word (R[n] + (disp << 1), R[m]);
+  PC += 4;
+}
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "mov.l	Rm,@(disp,Rn)"
+  SH_ANY
+  (abstract "Rm -> (disp*4 + Rn)")
+  (code "0001nnnnmmmmdddd")
+
+  (group SH4A "LS" SH4 "LS")
+  (issue SH_ANY "1")
+  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+
+  (description
+{R"(
+Transfers the source operand to the destination.
+The 4-bit displacement is multiplied by four after zero-extension, enabling a
+range up to +60 bytes to be specified.  If a memory operand cannot be reached,
+the @(R0,Rn) mode can be used instead.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void MOVLS4 (int m, int d, int n)
+{
+  long disp;
+  disp = (0x0000000F & (long)d);
+  Write_Long (R[n] + (disp << 2), R[m]);
   PC += 2;
 }
 )"})
@@ -1865,6 +2453,48 @@ void MOVLS0 (int m, int n)
 <li>Data TLB protection violation exception</li>
 <li>Data address error</li>
 <li>Initial page write exception</li>
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "mov.l	Rm,@(disp12,Rn)"
+  SH2A
+  (abstract "Rm -> (disp*4 + Rn)")
+  (code "0011nnnnmmmm0001 0010dddddddddddd")
+
+  (issue SH2A "1")
+  (latency SH2A "0")
+
+  (description
+{R"(
+Transfers the source operand to the destination.  This
+instruction is ideal for data access in a structure or the stack.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void MOVLS12 (int d, int m, int n)
+{
+  long disp;
+  disp = (0x00000FFF & (long)d);
+  Write_Long (R[n] + (disp << 2), R[m]);
+  PC += 4;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data address error</li>
 )"})
 )
 
@@ -2014,10 +2644,10 @@ void MOVLL0 (int m, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.b	R0,@(disp,GBR)"
+(insn "mov.b	Rm,@(R0,Rn)"
   SH_ANY
-  (abstract "R0 -> (disp + GBR)")
-  (code "11000000dddddddd")
+  (abstract "Rm -> (R0 + Rn)")
+  (code "0000nnnnmmmm0100")
 
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
@@ -2026,8 +2656,6 @@ void MOVLL0 (int m, int n)
   (description
 {R"(
 Transfers the source operand to the destination.
-The 8-bit displacement is only zero-extended, so a range up to +255 bytes can be
-specified.
 )"})
 
   (note
@@ -2037,11 +2665,9 @@ specified.
 
   (operation
 {R"(
-void MOVBSG (int d)
+void MOVBS0 (int m, int n)
 {
-  unsigned int disp;
-  disp = (unsigned int)(0x000000FF & d);
-  Write_Byte (GBR + disp, R[0]);
+  Write_Byte (R[n] + R[0], R[m]);
   PC += 2;
 }
 )"})
@@ -2062,10 +2688,10 @@ void MOVBSG (int d)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.w	R0,@(disp,GBR)"
+(insn "mov.w	Rm,@(R0,Rn)"
   SH_ANY
-  (abstract "R0 -> (disp*2 + GBR)")
-  (code "11000001dddddddd")
+  (abstract "Rm -> (R0 + Rn)")
+  (code "0000nnnnmmmm0101")
 
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
@@ -2074,8 +2700,6 @@ void MOVBSG (int d)
   (description
 {R"(
 Transfers the source operand to the destination.
-The 8-bit displacement is multiplied by two after zero-extension, enabling a
-range up to +510 bytes to be specified.
 )"})
 
   (note
@@ -2085,12 +2709,10 @@ range up to +510 bytes to be specified.
 
   (operation
 {R"(
-void MOVWSG (int d)
+void MOVWS0 (int m, int n)
 {
-  unsigned int disp;
-  disp = (unsigned int)(0x000000FF & d);
-  Write_Word (GBR + (disp << 1), R[0]);
-  PC += 2;
+  Write_Word (R[n] + R[0], R[m]);
+  PC+=2;
 }
 )"})
 
@@ -2110,10 +2732,10 @@ void MOVWSG (int d)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.l	R0,@(disp,GBR)"
+(insn "mov.l	Rm,@(R0,Rn)"
   SH_ANY
-  (abstract "R0 -> (disp*4 + GBR)")
-  (code "11000010dddddddd")
+  (abstract "Rm -> (R0 + Rn)")
+  (code "0000nnnnmmmm0110")
 
   (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
@@ -2122,8 +2744,6 @@ void MOVWSG (int d)
   (description
 {R"(
 Transfers the source operand to the destination.
-The 8-bit displacement is multiplied by four after zero-extension, enabling a
-range up to +1020 bytes to be specified.
 )"})
 
   (note
@@ -2133,11 +2753,9 @@ range up to +1020 bytes to be specified.
 
   (operation
 {R"(
-void MOVLSG (int d)
+void MOVLS0 (int m, int n)
 {
-  unsigned int disp;
-  disp = (unsigned int)(0x000000FF & (long)d);
-  Write_Long (GBR + (disp << 2), R[0]);
+  Write_Long (R[n] + R[0], R[m]);
   PC += 2;
 }
 )"})
@@ -2315,569 +2933,34 @@ void MOVLLG (int d)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.b	R0,@Rn+"
-  SH2A
-  (abstract "R0 -> (Rn), Rn+1 -> Rn")
-  (code "0100nnnn10001011")
-
-  (issue SH2A "1")
-  (latency SH2A "1")
-
-  (description
-{R"(
-Transfers the source operand to the destination.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void MOVRSBP (int n)
-{
-  Write_Byte (R[n], R[0]);
-  R[n] += 1;
-  PC += 2;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data address error</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.w	R0,@Rn+"
-  SH2A
-  (abstract "R0 -> (Rn), Rn+2 -> Rn")
-  (code "0100nnnn10011011")
-
-  (issue SH2A "1")
-  (latency SH2A "1")
-
-  (description
-{R"(
-Transfers the source operand to the destination.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void MOVRSWP (int n)
-{
-  Write_Word (R[n], R[0]);
-  R[n] += 2;
-  PC += 2;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data address error</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.l	R0,@Rn+"
-  SH2A
-  (abstract "R0 -> (Rn), Rn+4 -> Rn")
-  (code "0100nnnn10101011")
-
-  (issue SH2A "1")
-  (latency SH2A "1")
-
-  (description
-{R"(
-Transfers the source operand to the destination.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void MOVRSLP (int n)
-{
-  Write_Long (R[n], R[0]);
-  R[n] += 4;
-  PC += 2;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data address error</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.b	@-Rm,R0"
-  SH2A
-  (abstract "Rm-1 -> Rm, (Rm) -> sign extension -> R0")
-  (code "0100mmmm11001011")
-
-  (issue SH2A "1")
-  (latency SH2A "2")
-
-  (description
-{R"(
-Transfers the source operand to the destination.
-The loaded data is sign-extended to 32 bit before being stored in the
-destination register.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void MOVRSBM (int m)
-{
-  R[m] -= 1;
-  R[0] = (long)Read_Word (R[m]);
-
-  if ((R[0] & 0x80) == 0)
-    R[0] &= 0x000000FF;
-  else
-    R[0] |= 0xFFFFFF00;
-
-  PC+=2;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data address error</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.w	@-Rm,R0"
-  SH2A
-  (abstract "Rm-2 -> Rm, (Rm) -> sign extension -> R0")
-  (code "0100mmmm11011011")
-
-  (issue SH2A "1")
-  (latency SH2A "2")
-
-  (description
-{R"(
-Transfers the source operand to the destination.
-The loaded data is sign-extended to 32 bit before being stored in the
-destination register.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void MOVRSWM (int m)
-{
-  R[m]-= 2;
-  R[0] = (long)Read_Word (R[m]);
-
-  if ((R[0] & 0x8000) == 0)
-    R[0] &= 0x0000FFFF;
-  else
-    R[0] |= 0xFFFF0000;
-
-  PC += 2;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data address error</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.l	@-Rm,R0"
-  SH2A
-  (abstract "Rm-4 -> Rm, (Rm) -> R0")
-  (code "0100mmmm11101011")
-
-  (issue SH2A "1")
-  (latency SH2A "2")
-
-  (description
-{R"(
-Transfers the source operand to the destination.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void MOVRSLM (int m)
-{
-  R[m] -= 4;
-  R[0] = Read_Long (R[m]);
-  PC += 2;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data address error</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.b	Rm,@(disp12,Rn)"
-  SH2A
-  (abstract "Rm -> (disp + Rn)")
-  (code "0011nnnnmmmm0001 0000dddddddddddd")
-
-  (issue SH2A "1")
-  (latency SH2A "0")
-
-  (description
-{R"(
-Transfers the source operand to the destination.  This
-instruction is ideal for data access in a structure or the stack.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void MOVBS12 (int d, int m, int n)
-{
-  long disp;
-  disp = (0x00000FFF & (long)d);
-  Write_Byte (R[n] + disp, R[m]);
-  PC += 4;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data address error</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.w	Rm,@(disp12,Rn)"
-  SH2A
-  (abstract "Rm -> (disp*2 + Rn)")
-  (code "0011nnnnmmmm0001 0001dddddddddddd")
-
-  (issue SH2A "1")
-  (latency SH2A "0")
-
-  (description
-{R"(
-Transfers the source operand to the destination.  This
-instruction is ideal for data access in a structure or the stack.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void MOVWS12 (int d, int m, int n)
-{
-  long disp;
-  disp = (0x00000FFF & (long)d);
-  Write_Word (R[n] + (disp << 1), R[m]);
-  PC += 4;
-}
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data address error</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.l	Rm,@(disp12,Rn)"
-  SH2A
-  (abstract "Rm -> (disp*4 + Rn)")
-  (code "0011nnnnmmmm0001 0010dddddddddddd")
-
-  (issue SH2A "1")
-  (latency SH2A "0")
-
-  (description
-{R"(
-Transfers the source operand to the destination.  This
-instruction is ideal for data access in a structure or the stack.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void MOVLS12 (int d, int m, int n)
-{
-  long disp;
-  disp = (0x00000FFF & (long)d);
-  Write_Long (R[n] + (disp << 2), R[m]);
-  PC += 4;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data address error</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.b	@(disp12,Rm),Rn"
-  SH2A
-  (abstract "(disp + Rm) -> sign extension -> Rn")
-  (code "0011nnnnmmmm0001 0100dddddddddddd")
-
-  (issue SH2A "1")
-  (latency SH2A "2")
-
-  (description
-{R"(
-Transfers the source operand to the destination.  This
-instruction is ideal for data access in a structure or the stack.
-The loaded data is sign-extended to 32 bit before being stored in the
-destination register.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void MOVBL12 (int d, int m, int n)
-{
-  long disp;
-  disp = (0x00000FFF & (long)d);
-  R[n] = Read_Byte (R[m] + disp);
-
-  if ((R[n] & 0x80) == 0)
-    R[n] &= 0x000000FF;
-  else
-    R[n] |= 0xFFFFFF00;
-
-  PC += 4;
-}
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data address error</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.w	@(disp12,Rm),Rn"
-  SH2A
-  (abstract "(disp*2 + Rm) -> sign extension -> Rn")
-  (code "0011nnnnmmmm0001 0101dddddddddddd")
-
-  (issue SH2A "1")
-  (latency SH2A "2")
-
-  (description
-{R"(
-Transfers the source operand to the destination.  This
-instruction is ideal for data access in a structure or the stack.
-The loaded data is sign-extended to 32 bit before being stored in the
-destination register.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void MOVWL12 (int d, int m, int n)
-{
-  long disp;
-  disp = (0x00000FFF & (long)d);
-  R[n] = Read_Word (R[m] + (disp << 1));
-
-  if ((R[n] & 0x8000) == 0)
-    R[n] &= 0x0000FFFF;
-  else
-    R[n] |= 0xFFFF0000;
-
-  PC += 4;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data address error</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mov.l	@(disp12,Rm),Rn"
-  SH2A
-  (abstract "(disp*4 + Rm) -> Rn")
-  (code "0011nnnnmmmm0001 0110dddddddddddd")
-
-  (issue SH2A "1")
-  (latency SH2A "2")
-
-  (description
-{R"(
-Transfers the source operand to the destination.  This
-instruction is ideal for data access in a structure or the stack.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void MOVLL12 (int d, int m, int n)
-{
-  long disp;
-  disp = (0x00000FFF & (long)d);
-  R[n] = Read_Long (R[m] + (disp << 2));
-  PC += 4;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-<li>Data address error</li>
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "mova	@(disp,PC),R0"
+(insn "mov.b	R0,@(disp,GBR)"
   SH_ANY
-  (abstract "(disp*4) + (PC & 0xFFFFFFFC) + 4 -> R0")
-  (code "11000111dddddddd")
+  (abstract "R0 -> (disp + GBR)")
+  (code "11000000dddddddd")
 
-  (group SH4 "EX" SH4A "LS")
+  (group SH4A "LS" SH4 "LS")
   (issue SH_ANY "1")
-  (latency SH_ANY "1")
+  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
 
   (description
 {R"(
-Stores the effective address of the source operand into general
-register R0.  The 8-bit displacement is zero-extended and quadrupled.
-Consequently, the relative interval from the operand is PC + 1020 bytes.  The PC
-is the address four bytes after this instruction, but the lowest two bits of the
-PC are fixed at 00.
+Transfers the source operand to the destination.
+The 8-bit displacement is only zero-extended, so a range up to +255 bytes can be
+specified.
 )"})
 
   (note
 {R"(
-SH1*, SH2*, SH3*:<br/>
-If this instruction is placed immediately after a delayed branch instruction,
-the PC must point to an address specified by (the starting address of the branch
-destination) + 2.<br/><br/>
 
-SH4*:<br/>
-If this instruction is executed in a delay slot, a slot illegal instruction
-exception will be generated.
 )"})
 
   (operation
 {R"(
-void MOVA (int d)
+void MOVBSG (int d)
 {
   unsigned int disp;
   disp = (unsigned int)(0x000000FF & d);
-  R[0] = (PC & 0xFFFFFFFC) + 4 + (disp << 2);
+  Write_Byte (GBR + disp, R[0]);
   PC += 2;
 }
 )"})
@@ -2889,24 +2972,29 @@ void MOVA (int d)
 
   (exceptions
 {R"(
-<li>Slot illegal instruction</li>
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "movi20	#imm20,Rn"
-  SH2A
-  (abstract "imm -> sign extension -> Rn")
-  (code "0000nnnniiii0000 iiiiiiiiiiiiiiii")
+(insn "mov.w	R0,@(disp,GBR)"
+  SH_ANY
+  (abstract "R0 -> (disp*2 + GBR)")
+  (code "11000001dddddddd")
 
-  (issue SH2A "1")
-  (latency SH2A "1")
+  (group SH4A "LS" SH4 "LS")
+  (issue SH_ANY "1")
+  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
 
   (description
 {R"(
-Stores immediate data that has been sign-extended to longword in general
-register Rn.
-<br/><img src="movi20.svg" height="140"/>
+Transfers the source operand to the destination.
+The 8-bit displacement is multiplied by two after zero-extension, enabling a
+range up to +510 bytes to be specified.
 )"})
 
   (note
@@ -2916,63 +3004,12 @@ register Rn.
 
   (operation
 {R"(
-void MOVI20 (int i, int n)
+void MOVWSG (int d)
 {
-  if (i & 0x00080000) == 0)
-    R[n] = (0x000FFFFF & (long)i);
-  else
-    R[n] = (0xFFF00000 | (long)i);
-
-  PC += 4;
-}
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "movi20s	#imm20,Rn"
-  SH2A
-  (abstract "imm << 8 -> sign extension -> Rn")
-  (code "0000nnnniiii0001 iiiiiiiiiiiiiiii")
-
-  (issue SH2A "1")
-  (latency SH2A "1")
-
-  (description
-{R"(
-Shifts immediate data 8 bits to the left and performs sign extension to
-longword, then stores the resulting data in general register Rn. Using an OR or
-ADD instruction as the next instruction enables a 28-bit absolute address to be
-generated.
-<br/><img src="movi20s.svg" height="150"/>
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void MOVI20S (int i, int n)
-{
-  if (i & 0x00080000) == 0)
-    R[n] = (0x000FFFFF & (long)i);
-  else
-    R[n] = (0xFFF00000 | (long)i);
-
-  R[n] <<= 8;
-  PC += 4;
+  unsigned int disp;
+  disp = (unsigned int)(0x000000FF & d);
+  Write_Word (GBR + (disp << 1), R[0]);
+  PC += 2;
 }
 )"})
 
@@ -2983,7 +3020,59 @@ void MOVI20S (int i, int n)
 
   (exceptions
 {R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
+)"})
+)
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "mov.l	R0,@(disp,GBR)"
+  SH_ANY
+  (abstract "R0 -> (disp*4 + GBR)")
+  (code "11000010dddddddd")
+
+  (group SH4A "LS" SH4 "LS")
+  (issue SH_ANY "1")
+  (latency SH1 "1" SH2 "1" SH3 "1" SH4A "1" SH2A "0" SH4 "1")
+
+  (description
+{R"(
+Transfers the source operand to the destination.
+The 8-bit displacement is multiplied by four after zero-extension, enabling a
+range up to +1020 bytes to be specified.
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+void MOVLSG (int d)
+{
+  unsigned int disp;
+  disp = (unsigned int)(0x000000FF & (long)d);
+  Write_Long (GBR + (disp << 2), R[0]);
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -3521,96 +3610,6 @@ void MOVT (int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "movu.b	@(disp12,Rm),Rn"
-  SH2A
-  (abstract "(disp + Rm) -> zero extension -> Rn")
-  (code "0011nnnnmmmm0001 1000dddddddddddd")
-
-  (issue SH2A "1")
-  (latency SH2A "2")
-
-  (description
-{R"(
-Transfers a source operand to a destination, performing unsigned data transfer.
-This instruction is ideal for data access in a structure or the stack.
-The loaded data is zero-extended to 32 bit before being stored in the
-destination register.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void MOVBUL12 (int d, int m, int n)
-{
-  long disp;
-  disp = (0x00000FFF & (long)d);
-  R[n] = Read_Byte (R[m] + disp);
-  R[n] &= 0x000000FF;
-  PC += 4;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "movu.w	@(disp12,Rm),Rn"
-  SH2A
-  (abstract "(disp*2 + Rm) -> zero extension -> Rn")
-  (code "0011nnnnmmmm0001 1001dddddddddddd")
-
-  (issue SH2A "1")
-  (latency SH2A "2")
-
-  (description
-{R"(
-Transfers a source operand to a destination, performing unsigned data transfer.
-This instruction is ideal for data access in a structure or the stack.
-The loaded data is zero-extended to 32 bit before being stored in the
-destination register.
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-void MOVWUL12 (int d, int m, int n)
-{
-  long disp;
-  disp = (0x00000FFF & (long)d);
-  R[n] = Read_Word (R[m] + (disp << 1));
-  R[n] &= 0x0000FFFF;
-  PC += 4;
-}
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "nott"
   SH2A
   (abstract "~T -> T")
@@ -3795,7 +3794,6 @@ void XTRCT (int m, int n)
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ));
-
 
 __sexpr (insn_blocks.push_back
 (insns "Bit Manipulation Instructions"
@@ -20669,7 +20667,6 @@ __sexpr (insn_blocks.push_back
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ));
-
 
 } // void build_insn_blocks (void)
 
