@@ -14351,7 +14351,7 @@ Transfers memory contents at the address indicated by (disp + Rn) to FRn.
 
   (operation
 {R"(
-void FMOV_INDEX_DISP12_LOAD (int m, int n)
+void FMOV_INDEX_DISP12_LOAD (int m, int n, int d)
 {
   long disp = (0x00000FFF & (long)d);
   FR[n] = Read_32 (R[m] + (disp << 2));
@@ -14525,7 +14525,7 @@ Transfers FRm contents to memory at the address indicated by (disp + Rn).
 
   (operation
 {R"(
-void FMOV_INDEX_DISP12_STORE (int m, int n)
+void FMOV_INDEX_DISP12_STORE (int m, int n, int d)
 {
   long disp = (0x00000FFF & (long)d);
   Write_Long (R[n] + (disp << 2), FR[m]);
