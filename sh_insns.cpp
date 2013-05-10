@@ -1220,7 +1220,7 @@ Transfers the source operand to the destination.
 {R"(
 void MOVWS (int m, int n)
 {
-  Write_Word (R[n], R[m]);
+  Write_16 (R[n], R[m]);
   PC += 2;
 }
 )"})
@@ -1507,7 +1507,7 @@ Transfers the source operand to the destination.
 {R"(
 void MOVWM (int m, int n)
 {
-  Write_Word (R[n] - 2, R[m]);
+  Write_16 (R[n] - 2, R[m]);
   R[n] -= 2;
   PC += 2;
 }
@@ -1772,7 +1772,7 @@ Transfers the source operand to the destination.
 {R"(
 void MOVRSWP (int n)
 {
-  Write_Word (R[n], R[0]);
+  Write_16 (R[n], R[0]);
   R[n] += 2;
   PC += 2;
 }
@@ -2337,9 +2337,8 @@ the @(R0,Rn) mode can be used instead.
 {R"(
 void MOVWS4 (int d, int n)
 {
-  long disp;
-  disp = (0x0000000F & (long)d);
-  Write_Word (R[n] + (disp << 1), R[0]);
+  long disp = (0x0000000F & (long)d);
+  Write_16 (R[n] + (disp << 1), R[0]);
   PC += 2;
 }
 )"})
@@ -2383,12 +2382,10 @@ instruction is ideal for data access in a structure or the stack.
 {R"(
 void MOVWS12 (int d, int m, int n)
 {
-  long disp;
-  disp = (0x00000FFF & (long)d);
-  Write_Word (R[n] + (disp << 1), R[m]);
+  long disp = (0x00000FFF & (long)d);
+  Write_16 (R[n] + (disp << 1), R[m]);
   PC += 4;
 }
-
 )"})
 
   (example
@@ -2706,8 +2703,8 @@ Transfers the source operand to the destination.
 {R"(
 void MOVWS0 (int m, int n)
 {
-  Write_Word (R[n] + R[0], R[m]);
-  PC+=2;
+  Write_16 (R[n] + R[0], R[m]);
+  PC += 2;
 }
 )"})
 
@@ -2999,9 +2996,8 @@ range up to +510 bytes to be specified.
 {R"(
 void MOVWSG (int d)
 {
-  unsigned int disp;
-  disp = (unsigned int)(0x000000FF & d);
-  Write_Word (GBR + (disp << 1), R[0]);
+  unsigned int disp = (0x000000FF & d);
+  Write_16 (GBR + (disp << 1), R[0]);
   PC += 2;
 }
 )"})
