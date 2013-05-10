@@ -1176,7 +1176,7 @@ Transfers the source operand to the destination.
 {R"(
 void MOVBS (int m, int n)
 {
-  Write_Byte (R[n], R[m]);
+  Write_8 (R[n], R[m]);
   PC += 2;
 }
 )"})
@@ -1462,7 +1462,7 @@ Transfers the source operand to the destination.
 {R"(
 void MOVBM (int m, int n)
 {
-  Write_Byte (R[n] - 1, R[m]);
+  Write_8 (R[n] - 1, R[m]);
   R[n] -= 1;
   PC += 2;
 }
@@ -1732,7 +1732,7 @@ Transfers the source operand to the destination.
 {R"(
 void MOVRSBP (int n)
 {
-  Write_Byte (R[n], R[0]);
+  Write_8 (R[n], R[0]);
   R[n] += 1;
   PC += 2;
 }
@@ -2248,9 +2248,8 @@ be used instead.
 {R"(
 void MOVBS4 (int d, int n)
 {
-  long disp;
-  disp = (0x0000000F & (long)d);
-  Write_Byte (R[n] + disp, R[0]);
+  long disp = (0x0000000F & (long)d);
+  Write_8 (R[n] + disp, R[0]);
   PC += 2;
 }
 )"})
@@ -2294,9 +2293,8 @@ instruction is ideal for data access in a structure or the stack.
 {R"(
 void MOVBS12 (int d, int m, int n)
 {
-  long disp;
-  disp = (0x00000FFF & (long)d);
-  Write_Byte (R[n] + disp, R[m]);
+  long disp = (0x00000FFF & (long)d);
+  Write_8 (R[n] + disp, R[m]);
   PC += 4;
 }
 )"})
@@ -2664,7 +2662,7 @@ Transfers the source operand to the destination.
 {R"(
 void MOVBS0 (int m, int n)
 {
-  Write_Byte (R[n] + R[0], R[m]);
+  Write_8 (R[n] + R[0], R[m]);
   PC += 2;
 }
 )"})
@@ -2954,9 +2952,8 @@ specified.
 {R"(
 void MOVBSG (int d)
 {
-  unsigned int disp;
-  disp = (unsigned int)(0x000000FF & d);
-  Write_Byte (GBR + disp, R[0]);
+  unsigned int disp = (0x000000FF & d);
+  Write_8 (GBR + disp, R[0]);
   PC += 2;
 }
 )"})
@@ -3931,13 +3928,12 @@ resulting data is then written to memory as a byte unit.
 {R"(
 void BCLRM (int d, int i, int n)
 {
-  long disp, imm, temp;
-  disp = (0x00000FFF & (long)d);
-  imm = (0x00000007 & (long)i);
-  temp = Read_8 (R[n] + disp);
+  long disp = (0x00000FFF & (long)d);
+  long imm = (0x00000007 & (long)i);
+  long temp = Read_8 (R[n] + disp);
   temp &= (~(0x00000001 < <imm));
-  Write_Byte (R[n] + disp, temp);
-  PC+=4;
+  Write_8 (R[n] + disp, temp);
+  PC += 4;
 }
 )"})
 
@@ -4292,12 +4288,11 @@ then written to memory as a byte unit.
 {R"(
 void BSETM (int d, int i, int n)
 {
-  long disp, imm, temp;
-  disp = (0x00000FFF & (long)d);
-  imm = (0x00000007 & (long)i);
-  temp = Read_8 (R[n] + disp);
+  long disp = (0x00000FFF & (long)d);
+  long imm = (0x00000007 & (long)i);
+  long temp = Read_8 (R[n] + disp);
   temp |= (0x00000001 << imm);
-  Write_Byte (R[n] + disp, temp);
+  Write_8 (R[n] + disp, temp);
   PC += 4;
 }
 )"})
@@ -4386,17 +4381,16 @@ to memory as a byte unit.
 {R"(
 void BSTM (int d, int i, int n)
 {
-  long disp, imm, temp;
-  disp = (0x00000FFF & (long)d);
-  imm = (0x00000007 & (long)i);
-  temp = Read_8 (R[n] + disp);
+  long disp = (0x00000FFF & (long)d);
+  long imm = (0x00000007 & (long)i);
+  long temp = Read_8 (R[n] + disp);
 
   if (T == 0)
     temp &= (~(0x00000001 << imm));
   else
     temp |= (0x00000001 << imm);
 
-  Write_Byte (R[n] + disp, temp);
+  Write_8 (R[n] + disp, temp);
   PC += 4;
 }
 )"})
@@ -7081,7 +7075,7 @@ void ANDM (long i)
 {
   long temp = Read_8 (GBR + R[0]);
   temp &= 0x000000FF & (long)i;
-  Write_Byte (GBR + R[0], temp);
+  Write_8 (GBR + R[0], temp);
   PC += 2;
 }
 )"})
@@ -7254,7 +7248,7 @@ void ORM (int i)
 {
   long temp = Read_8 (GBR + R[0]);
   temp |= (0x000000FF & (long)i);
-  Write_Byte (GBR + R[0], temp);
+  Write_8 (GBR + R[0], temp);
   PC += 2;
 }
 )"})
@@ -7330,7 +7324,7 @@ void TAS (int n)
     T = 0;
 
   temp |= 0x00000080;
-  Write_Byte (R[n], temp);  // Bus unlock
+  Write_8 (R[n], temp);  // Bus unlock
   PC += 2;
 }
 )"})
@@ -7616,7 +7610,7 @@ void XORM (int i)
 {
   int temp = Read_8 (GBR + R[0]);
   temp ^= (0x000000FF & (long)i);
-  Write_Byte (GBR + R[0], temp);
+  Write_8 (GBR + R[0], temp);
   PC += 2;
 }
 )"})
