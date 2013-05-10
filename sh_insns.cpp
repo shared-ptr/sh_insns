@@ -671,6 +671,7 @@ Last updated: )html" << __DATE__ << " " << __TIME__ << R"html(
 void build_insn_blocks (void)
 {
 
+#if 0
 __sexpr (insn_blocks.push_back
 (insns "Data Transfer Instructions"
 
@@ -14117,7 +14118,7 @@ void TRAPA (int i)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ));
 
-
+#endif
 
 __sexpr (insn_blocks.push_back
 (insns "32 Bit Floating-Point Data Transfer Instructions (FPSCR.SZ = 0)"
@@ -15309,7 +15310,9 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+When FPSCR.PR = 0, this instruction loads floating-point 0.0 (0x00000000) into
+FRn.<br/>
+If FPSCR.PR = 1, the instruction is handled as an illegal instruction.
 )"})
 
   (note
@@ -15319,7 +15322,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FLDI0 (int n)
+{
+  FR[n] = 0x00000000;
+  PC += 2;
+}
 )"})
 
   (example
@@ -15345,7 +15352,9 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+When FPSCR.PR = 0, this instruction loads floating-point 1.0 (0x3F800000) into
+FRn.<br/>
+If FPCSR.PR = 1, the instruction is handled as an illegal instruction.
 )"})
 
   (note
@@ -15355,7 +15364,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FLDI1 (int n)
+{
+  FR[n] = 0x3F800000;
+  PC += 2;
+}
 )"})
 
   (example
@@ -15381,7 +15394,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the contents of floating-point register FRm into system register FPUL.
 )"})
 
   (note
@@ -15391,7 +15404,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FLDS (int m)
+{
+  FPUL = FR[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -15417,7 +15434,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the contents of system register FPUL to floating-point register FRn.
 )"})
 
   (note
@@ -15427,7 +15444,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FSTS (int n)
+{
+  FR[n] = FPUL;
+  PC += 2;
+}
 )"})
 
   (example
@@ -15453,17 +15474,22 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Clears the most significant bit of the contents of floating-point register FRn
+to 0, and stores the result in FRn.
 )"})
 
   (note
 {R"(
-
+The cause and flag fields in FPSCR are not updated.
 )"})
 
   (operation
 {R"(
-
+void FABS (int n)
+{
+  FR[n] = FR[n] & 0x7FFFFFFFF;
+  PC += 2;
+}
 )"})
 
   (example
@@ -15489,17 +15515,96 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Arithmetically adds the two single-precision floating-point numbers in FRn and
+FRm, and stores the result in FRn.
+<br/><br/>
+When FPSCR.enable.I is set, an FPU exception trap is generated regardless of
+whether or not an exception has occurred. When FPSCR.enable.O/U is set, FPU
+exception traps are generated on actual generation by the FPU exception source
+and on the satisfaction of certain special conditions that apply to this the
+instruction. When an exception occurs, correct exception information is
+reflected in FPSCR.cause and FPSCR.flag and FRn is not updated. Appropriate
+processing should therefore be performed by software.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="fadd.svg" height="300"/>
 )"})
 
   (note
 {R"(
-
+SH2E and SH3E support only invalid operation (V) and division by zero
+(Z) exception flags.
 )"})
 
   (operation
 {R"(
+void FADD (int m, int n)
+{
+  PC += 2;
+  clear_cause ();
 
+  if (data_type_of (m) == sNaN || data_type_of (n) == sNaN)
+    invalid (n);
+  else if (data_type_of (m) == qNaN || data_type_of (n) == qNaN)
+    qnan (n);
+  else if (data_type_of (m) == DENORM || data_type_of (n) == DENORM)
+    set_E ();
+  else
+    switch (data_type_of (m))
+    {
+    case NORM:
+      switch (data_type_of (n))
+      {
+      case NORM:
+        normal_faddsub (m, n, ADD);
+        break;
+      case PZERO:
+      case NZERO:
+        register_copy (m, n);
+        break;
+      default:
+        break;
+      }
+      break;
+
+    case PZERO:
+      switch (data_type_of (n))
+      {
+      case NZERO:
+        zero (n, 0);
+        break;
+      default:
+        break;
+      }
+      break;
+
+    case NZERO:
+      break;
+
+    case PINF:
+      switch (data_type_of (n))
+      {
+      case NINF:
+        invalid (n);
+        break;
+      default:
+        inf (n, 0);
+        break;
+      }
+      break;
+
+     case NINF:
+       switch (data_type_of (n))
+       {
+       case PINF:
+         invalid (n);
+         break;
+       default:
+         inf (n, 1);
+         break;
+       }
+       break;
+    }
+}
 )"})
 
   (example
@@ -15509,7 +15614,31 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
+<li>FPU Error</li>
+<li>Invalid Operation</li>
 
+<li>Overflow
+<br/>
+Generation of overflow-exception traps
+<br/>
+FPSCR.PR = 0: FRn and FRm have the same sign and the exponent of at least one
+value is 0xFE
+<br/>
+FPSCR.PR = 1: DRn and DRm have the same sign and the exponent of at least one
+value is 0x7FE
+</li>
+
+<li>Underflow
+Generation of underflow-exception traps
+<br/>
+FPSCR.PR = 0: FRn and FRm have different signs and neither has an exponent
+greater than 0x18
+<br/>
+FPSCR.PR = 1: DRn and DRm have different signs and neither has an exponent
+greater than 0x035
+</li>
+
+<li>Inexact</li>
 )"})
 )
 
@@ -15531,7 +15660,8 @@ __sexpr (insn_blocks.push_back
 
   (note
 {R"(
-
+SH2E and SH3E support only invalid operation (V) and division by zero
+(Z) exception flags.
 )"})
 
   (operation
@@ -15568,7 +15698,8 @@ __sexpr (insn_blocks.push_back
 
   (note
 {R"(
-
+SH2E and SH3E support only invalid operation (V) and division by zero
+(Z) exception flags.
 )"})
 
   (operation
@@ -15604,7 +15735,8 @@ __sexpr (insn_blocks.push_back
 
   (note
 {R"(
-
+SH2E and SH3E support only invalid operation (V) and division by zero
+(Z) exception flags.
 )"})
 
   (operation
@@ -15640,7 +15772,8 @@ __sexpr (insn_blocks.push_back
 
   (note
 {R"(
-
+SH2E and SH3E support only invalid operation (V) and division by zero
+(Z) exception flags.
 )"})
 
   (operation
@@ -15676,7 +15809,8 @@ __sexpr (insn_blocks.push_back
 
   (note
 {R"(
-
+SH2E and SH3E support only invalid operation (V) and division by zero
+(Z) exception flags.
 )"})
 
   (operation
@@ -15712,7 +15846,8 @@ __sexpr (insn_blocks.push_back
 
   (note
 {R"(
-
+SH2E and SH3E support only invalid operation (V) and division by zero
+(Z) exception flags.
 )"})
 
   (operation
@@ -15748,7 +15883,6 @@ __sexpr (insn_blocks.push_back
 
   (note
 {R"(
-
 )"})
 
   (operation
@@ -15784,7 +15918,8 @@ __sexpr (insn_blocks.push_back
 
   (note
 {R"(
-
+SH3E supports only invalid operation (V) and division by zero
+(Z) exception flags.
 )"})
 
   (operation
@@ -15820,7 +15955,8 @@ __sexpr (insn_blocks.push_back
 
   (note
 {R"(
-
+SH2E and SH3E support only invalid operation (V) and division by zero
+(Z) exception flags.
 )"})
 
   (operation
@@ -15856,7 +15992,8 @@ __sexpr (insn_blocks.push_back
 
   (note
 {R"(
-
+SH2E and SH3E support only invalid operation (V) and division by zero
+(Z) exception flags.
 )"})
 
   (operation
@@ -16040,17 +16177,23 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
+Clears the most significant bit of the contents of floating-point register DRn
+to 0, and stores the result in DRn.
 
 )"})
 
   (note
 {R"(
-
+The cause and flag fields in FPSCR are not updated.
 )"})
 
   (operation
 {R"(
-
+void FABS (int n)
+{
+  FR[n << 1] = FR[n << 1] & 0x7FFFFFFFF;
+  PC += 2;
+}
 )"})
 
   (example
