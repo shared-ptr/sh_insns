@@ -3799,7 +3799,7 @@ __sexpr (insn_blocks.push_back
 (insns "Bit Manipulation Instructions"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "band.b	#imm3,@disp12,Rn"
+(insn "band.b     #imm3,@disp12,Rn"
   SH2A
   (abstract "(imm of (disp+Rn)) & T -> T")
   (code "0011nnnn0iii1001 0100dddddddddddd")
@@ -3908,7 +3908,7 @@ void BANDNOTM (int d, int i, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "bclr.b	#imm3,@(disp12,Rn)"
+(insn "bclr.b     #imm3,@(disp12,Rn)"
   SH2A
   (abstract "0 -> (imm of (disp+Rn))")
   (code "0011nnnn0iii1001 0000dddddddddddd")
@@ -3957,7 +3957,7 @@ void BCLRM (int d, int i, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "bclr	#imm3,Rn"
+(insn "bclr       #imm3,Rn"
   SH2A
   (abstract "0 -> imm of Rn")
   (code "10000110nnnn0iii")
@@ -4001,7 +4001,7 @@ void CLR (int i, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "bld.b	#imm3,@(disp12,Rn)"
+(insn "bld.b      #imm3,@(disp12,Rn)"
   SH2A
   (abstract "(imm of (disp+Rn)) -> T")
   (code "0011nnnn0iii1001 0011dddddddddddd")
@@ -4055,7 +4055,7 @@ void BLDM (int d, int i, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "bld	#imm3,Rn"
+(insn "bld        #imm3,Rn"
   SH2A
   (abstract "imm of Rn -> T")
   (code "10000111nnnn1iii")
@@ -4106,7 +4106,7 @@ void BLD (int i, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "bldnot.b  #imm3,@(disp12,Rn)"
+(insn "bldnot.b   #imm3,@(disp12,Rn)"
   SH2A
   (abstract "~(imm of (disp+Rn)) -> T")
   (code "0011nnnn0iii1001 1011dddddddddddd")
@@ -4160,7 +4160,7 @@ void BLDNOTM (int d, int i, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "bor.b	#imm3,@(disp12,Rn)"
+(insn "bor.b      #imm3,@(disp12,Rn)"
   SH2A
   (abstract "(imm of (disp+Rn)) | T -> T")
   (code "0011nnnn0iii1001 0101dddddddddddd")
@@ -4214,7 +4214,7 @@ void BORM (int d, int i, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "bornot.b  #imm3,@(disp12,Rn)"
+(insn "bornot.b   #imm3,@(disp12,Rn)"
   SH2A
   (abstract "~(imm of (disp+Rn)) | T -> T")
   (code "0011nnnn0iii1001 1101dddddddddddd")
@@ -4269,7 +4269,7 @@ void BORNOTM (int d, int i, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "bset.b	#imm3,@(disp12,Rn)"
+(insn "bset.b     #imm3,@(disp12,Rn)"
   SH2A
   (abstract "1 -> (imm of (disp+Rn))")
   (code "0011nnnn0iii1001 0001dddddddddddd")
@@ -4318,7 +4318,7 @@ void BSETM (int d, int i, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "bset	#imm3,Rn"
+(insn "bset       #imm3,Rn"
   SH2A
   (abstract "1 -> imm of Rn")
   (code "10000110nnnn1iii")
@@ -4362,7 +4362,7 @@ void BSET (int i, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "bst.b	#imm3,@(disp12,Rn)"
+(insn "bst.b      #imm3,@(disp12,Rn)"
   SH2A
   (abstract "T -> (imm of (disp+Rn))")
   (code "0011nnnn0iii1001 0010dddddddddddd")
@@ -4417,7 +4417,7 @@ void BSTM (int d, int i, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "bst	#imm3,Rn"
+(insn "bst        #imm3,Rn"
   SH2A
   (abstract "T -> imm of Rn")
   (code "10000111nnnn0iii")
@@ -4468,7 +4468,7 @@ void BST (int i, int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "bxor.b	#imm3,@(disp12,Rn)"
+(insn "bxor.b     #imm3,@(disp12,Rn)"
   SH2A
   (abstract "(imm of (disp+Rn)) ^ T -> T")
   (code "0011nnnn0iii1001 0110dddddddddddd")
