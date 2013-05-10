@@ -696,7 +696,7 @@ Stores immediate data, sign-extended to longword, in general register Rn.
 
   (operation
 {R"(
-MOVI (int i, int n)
+void MOVI (int i, int n)
 {
   if ((i & 0x80) == 0)
     R[n] = (0x000000FF & i);
@@ -745,7 +745,7 @@ illegal instruction.
 
   (operation
 {R"(
-MOVWI (int d, int n)
+void MOVWI (int d, int n)
 {
   unsigned int disp;
   disp = (unsigned int)(0x000000FF & d);
@@ -801,7 +801,7 @@ illegal instruction.
 
   (operation
 {R"(
-MOVLI (int d, int n)
+void MOVLI (int d, int n)
 {
   unsigned int disp;
   disp = (unsigned int)(0x000000FF & (int)d);
@@ -847,7 +847,7 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-MOV (int m, int n)
+void MOV (int m, int n)
 {
   R[n] = R[m];
   PC += 2;
@@ -887,7 +887,7 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-MOVBS (int m, int n)
+void MOVBS (int m, int n)
 {
   Write_Byte (R[n], R[m]);
   PC += 2;
@@ -931,7 +931,7 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-MOVWS (int m, int n)
+void MOVWS (int m, int n)
 {
   Write_Word (R[n], R[m]);
   PC += 2;
@@ -975,7 +975,7 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-MOVLS (int m, int n)
+void MOVLS (int m, int n)
 {
   Write_Long (R[n], R[m]);
   PC += 2;
@@ -1021,7 +1021,7 @@ destination register.
 
   (operation
 {R"(
-MOVBL (int m, int n)
+void MOVBL (int m, int n)
 {
   R[n] = (long)Read_Byte(R[m]);
   if ((R[n] & 0x80) == 0)
@@ -1071,7 +1071,7 @@ destination register.
 
   (operation
 {R"(
-MOVWL (int m, int n)
+void MOVWL (int m, int n)
 {
   R[n] = (long)Read_Word (R[m]);
   if ((R[n] & 0x8000) == 0)
@@ -1119,7 +1119,7 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-MOVLL (int m, int n)
+void MOVLL (int m, int n)
 {
   R[n] = Read_Long (R[m]);
   PC += 2;
@@ -1162,7 +1162,7 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-MOVBM (int m, int n)
+void MOVBM (int m, int n)
 {
   Write_Byte (R[n] - 1, R[m]);
   R[n] -= 1;
@@ -1207,7 +1207,7 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-MOVWM (int m, int n)
+void MOVWM (int m, int n)
 {
   Write_Word (R[n] - 2, R[m]);
   R[n] -= 2;
@@ -1252,7 +1252,7 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-MOVLM (int m, int n)
+void MOVLM (int m, int n)
 {
   Write_Long (R[n] - 4, R[m]);
   R[n] -= 4;
@@ -1299,7 +1299,7 @@ destination register.
 
   (operation
 {R"(
-MOVBP (int m, int n)
+void MOVBP (int m, int n)
 {
   R[n] = (long)Read_Byte (R[m]);
   if ((R[n] & 0x80) == 0)
@@ -1352,7 +1352,7 @@ destination register.
 
   (operation
 {R"(
-MOVWP (int m, int n)
+void MOVWP (int m, int n)
 {
   R[n] = (long)Read_Word (R[m]);
   if ((R[n] & 0x8000) == 0)
@@ -1403,7 +1403,7 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-MOVLP (int m, int n)
+void MOVLP (int m, int n)
 {
   R[n] = Read_Long (R[m]);
 
@@ -1454,7 +1454,7 @@ be used instead.
 
   (operation
 {R"(
-MOVBS4 (int d, int n)
+void MOVBS4 (int d, int n)
 {
   long disp;
   disp = (0x0000000F & (long)d);
@@ -1503,7 +1503,7 @@ the @(R0,Rn) mode can be used instead.
 
   (operation
 {R"(
-MOVWS4 (int d, int n)
+void MOVWS4 (int d, int n)
 {
   long disp;
   disp = (0x0000000F & (long)d);
@@ -1552,7 +1552,7 @@ the @(R0,Rn) mode can be used instead.
 
   (operation
 {R"(
-MOVLS4 (int m, int d, int n)
+void MOVLS4 (int m, int d, int n)
 {
   long disp;
   disp = (0x0000000F & (long)d);
@@ -1603,7 +1603,7 @@ destination register.
 
   (operation
 {R"(
-MOVBL4 (int m, int d)
+void MOVBL4 (int m, int d)
 {
   long disp;
   disp = (0x0000000F & (long)d);
@@ -1659,7 +1659,7 @@ destination register.
 
   (operation
 {R"(
-MOVWL4 (int m, int d)
+void MOVWL4 (int m, int d)
 {
   long disp;
   disp = (0x0000000F & (long)d);
@@ -1713,7 +1713,7 @@ the @(R0,Rn) mode can be used instead.
 
   (operation
 {R"(
-MOVLL4 (int m, int d, int n)
+void MOVLL4 (int m, int d, int n)
 {
   long disp;
   disp = (0x0000000F & (long)d);
@@ -1758,7 +1758,7 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-MOVBS0 (int m, int n)
+void MOVBS0 (int m, int n)
 {
   Write_Byte (R[n] + R[0], R[m]);
   PC += 2;
@@ -1802,7 +1802,7 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-MOVWS0 (int m, int n)
+void MOVWS0 (int m, int n)
 {
   Write_Word (R[n] + R[0], R[m]);
   PC+=2;
@@ -1846,7 +1846,7 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-MOVLS0 (int m, int n)
+void MOVLS0 (int m, int n)
 {
   Write_Long (R[n] + R[0], R[m]);
   PC += 2;
@@ -1892,7 +1892,7 @@ destination register.
 
   (operation
 {R"(
-MOVBL0 (int m, int n)
+void MOVBL0 (int m, int n)
 {
   R[n] = (long)Read_Byte (R[m] + R[0]);
 
@@ -1942,7 +1942,7 @@ destination register.
 
   (operation
 {R"(
-MOVWL0 (int m, int n)
+void MOVWL0 (int m, int n)
 {
   R[n] = (long)Read_Word (R[m] + R[0]);
 
@@ -1991,7 +1991,7 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-MOVLL0 (int m, int n)
+void MOVLL0 (int m, int n)
 {
   R[n] = Read_Long (R[m] + R[0]);
   PC += 2;
@@ -2037,7 +2037,7 @@ specified.
 
   (operation
 {R"(
-MOVBSG (int d)
+void MOVBSG (int d)
 {
   unsigned int disp;
   disp = (unsigned int)(0x000000FF & d);
@@ -2085,7 +2085,7 @@ range up to +510 bytes to be specified.
 
   (operation
 {R"(
-MOVWSG (int d)
+void MOVWSG (int d)
 {
   unsigned int disp;
   disp = (unsigned int)(0x000000FF & d);
@@ -2133,7 +2133,7 @@ range up to +1020 bytes to be specified.
 
   (operation
 {R"(
-MOVLSG (int d)
+void MOVLSG (int d)
 {
   unsigned int disp;
   disp = (unsigned int)(0x000000FF & (long)d);
@@ -2183,7 +2183,7 @@ destination register.
 
   (operation
 {R"(
-MOVBLG (int d)
+void MOVBLG (int d)
 {
   unsigned int disp;
   disp = (unsigned int)(0x000000FF & d);
@@ -2238,7 +2238,7 @@ destination register.
 
   (operation
 {R"(
-MOVWLG (int d)
+void MOVWLG (int d)
 {
   unsigned int disp;
   disp = (unsigned int)(0x000000FF & d);
@@ -2291,7 +2291,7 @@ range up to +1020 bytes to be specified.
 
   (operation
 {R"(
-MOVLLG (int d)
+void MOVLLG (int d)
 {
   unsigned int disp;
   disp = (unsigned int)(0x000000FF & d);
@@ -2335,7 +2335,7 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-MOVRSBP (int n)
+void MOVRSBP (int n)
 {
   Write_Byte (R[n], R[0]);
   R[n] += 1;
@@ -2375,7 +2375,7 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-MOVRSWP (int n)
+void MOVRSWP (int n)
 {
   Write_Word (R[n], R[0]);
   R[n] += 2;
@@ -2415,7 +2415,7 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-MOVRSLP (int n)
+void MOVRSLP (int n)
 {
   Write_Long (R[n], R[0]);
   R[n] += 4;
@@ -2457,7 +2457,7 @@ destination register.
 
   (operation
 {R"(
-MOVRSBM (int m)
+void MOVRSBM (int m)
 {
   R[m] -= 1;
   R[0] = (long)Read_Word (R[m]);
@@ -2505,7 +2505,7 @@ destination register.
 
   (operation
 {R"(
-MOVRSWM (int m)
+void MOVRSWM (int m)
 {
   R[m]-= 2;
   R[0] = (long)Read_Word (R[m]);
@@ -2551,7 +2551,7 @@ Transfers the source operand to the destination.
 
   (operation
 {R"(
-MOVRSLM (int m)
+void MOVRSLM (int m)
 {
   R[m] -= 4;
   R[0] = Read_Long (R[m]);
@@ -2592,7 +2592,7 @@ instruction is ideal for data access in a structure or the stack.
 
   (operation
 {R"(
-MOVBS12 (int d, int m, int n)
+void MOVBS12 (int d, int m, int n)
 {
   long disp;
   disp = (0x00000FFF & (long)d);
@@ -2634,7 +2634,7 @@ instruction is ideal for data access in a structure or the stack.
 
   (operation
 {R"(
-MOVWS12 (int d, int m, int n)
+void MOVWS12 (int d, int m, int n)
 {
   long disp;
   disp = (0x00000FFF & (long)d);
@@ -2677,7 +2677,7 @@ instruction is ideal for data access in a structure or the stack.
 
   (operation
 {R"(
-MOVLS12 (int d, int m, int n)
+void MOVLS12 (int d, int m, int n)
 {
   long disp;
   disp = (0x00000FFF & (long)d);
@@ -2721,7 +2721,7 @@ destination register.
 
   (operation
 {R"(
-MOVBL12 (int d, int m, int n)
+void MOVBL12 (int d, int m, int n)
 {
   long disp;
   disp = (0x00000FFF & (long)d);
@@ -2772,7 +2772,7 @@ destination register.
 
   (operation
 {R"(
-MOVWL12 (int d, int m, int n)
+void MOVWL12 (int d, int m, int n)
 {
   long disp;
   disp = (0x00000FFF & (long)d);
@@ -2820,7 +2820,7 @@ instruction is ideal for data access in a structure or the stack.
 
   (operation
 {R"(
-MOVLL12 (int d, int m, int n)
+void MOVLL12 (int d, int m, int n)
 {
   long disp;
   disp = (0x00000FFF & (long)d);
@@ -2873,7 +2873,7 @@ exception will be generated.
 
   (operation
 {R"(
-MOVA (int d)
+void MOVA (int d)
 {
   unsigned int disp;
   disp = (unsigned int)(0x000000FF & d);
@@ -2916,7 +2916,7 @@ register Rn.
 
   (operation
 {R"(
-MOVI20 (int i, int n)
+void MOVI20 (int i, int n)
 {
   if (i & 0x00080000) == 0)
     R[n] = (0x000FFFFF & (long)i);
@@ -2964,7 +2964,7 @@ generated.
 
   (operation
 {R"(
-MOVI20S (int i, int n)
+void MOVI20S (int i, int n)
 {
   if (i & 0x00080000) == 0)
     R[n] = (0x000FFFFF & (long)i);
@@ -3017,7 +3017,7 @@ exception has occurred between the execution of the MOVLI and MOVCO instructions
 
   (operation
 {R"(
-MOVCO (int n)
+void MOVCO (int n)
 {
   T = LDST;
   if (T == 1)
@@ -3072,7 +3072,7 @@ to 0, the MOVCO instruction clears the T bit and does not proceed with storage.
 
   (operation
 {R"(
-MOVLINK (int m)
+void MOVLINK (int m)
 {
   LDST = 1;
   R[0] = Read_Long (R[m]);
@@ -3121,7 +3121,7 @@ exceptions do not occur when access is to non-longword-boundary addresses
 
   (operation
 {R"(
-MOVUAL (int m)
+void MOVUAL (int m)
 {
   Read_Unaligned_Long (R0, R[m]);
   PC += 2;
@@ -3169,7 +3169,7 @@ exceptions do not occur when access is to non-longword-boundary addresses
 
   (operation
 {R"(
-MOVUALP (int m)
+void MOVUALP (int m)
 {
   Read_Unaligned_Long(R0,R[m]);
 
@@ -3227,7 +3227,7 @@ subject to transfer.
 
   (operation
 {R"(
-MOVLMML (int m)
+void MOVLMML (int m)
 {
   int i;
   for (i = m; i >= 0; i--)
@@ -3288,7 +3288,7 @@ subject to transfer.
 
   (operation
 {R"(
-MOVLPML (int n)
+void MOVLPML (int n)
 {
   int i;
   for (i = 0; i <= n; i++)
@@ -3347,7 +3347,7 @@ If R15 is specified, PR is transferred instead of R15.
 
   (operation
 {R"(
-MOVLMMU (int m)
+void MOVLMMU (int m)
 {
   int i;
   Write_Long (R[15] - 4, PR);
@@ -3406,7 +3406,7 @@ If R15 is specified, PR is transferred instead of R15.
 
   (operation
 {R"(
-MOVLPMU (int n)
+void MOVLPMU (int n)
 {
   int i;
   for (i = n; i <= 14; i++)
@@ -3454,7 +3454,7 @@ The value of Rn is 0 when T = 1 and 1 when T = 0.
 
   (operation
 {R"(
-MOVRT (int n)
+void MOVRT (int n)
 {
   if (T == 1)
     R[n] = 0x00000000;
@@ -3499,7 +3499,7 @@ The value of Rn is 1 when T = 1 and 0 when T = 0.
 
   (operation
 {R"(
-MOVT (int n)
+void MOVT (int n)
 {
   if (T == 1)
     R[n] = 0x00000001;
@@ -3544,7 +3544,7 @@ destination register.
 
   (operation
 {R"(
-MOVBUL12 (int d, int m, int n)
+void MOVBUL12 (int d, int m, int n)
 {
   long disp;
   disp = (0x00000FFF & (long)d);
@@ -3589,7 +3589,7 @@ destination register.
 
   (operation
 {R"(
-MOVWUL12 (int d, int m, int n)
+void MOVWUL12 (int d, int m, int n)
 {
   long disp;
   disp = (0x00000FFF & (long)d);
@@ -3632,7 +3632,7 @@ Inverts the T bit, then stores the resulting value in the T bit.
 
   (operation
 {R"(
-NOTT ()
+void NOTT (void)
 {
   if (T == 1)
     T = 0;
@@ -3680,7 +3680,7 @@ Rn.
 
   (operation
 {R"(
-SWAPB (int m, int n)
+void SWAPB (int m, int n)
 {
   unsigned long temp0, temp1;
   temp0 = R[m] & 0xFFFF0000;
@@ -3727,7 +3727,7 @@ The 16 bits from bit 31 to bit 16 of Rm are swapped with the 16 bits from bit
 
   (operation
 {R"(
-SWAPW (int m, int n)
+void SWAPW (int m, int n)
 {
   unsigned long temp;
   temp = (R[m] >> 16) & 0x0000FFFF;
@@ -3772,7 +3772,7 @@ Rm and Rn, and stores the result in Rn.
 
   (operation
 {R"(
-XTRCT (int m, int n)
+void XTRCT (int m, int n)
 {
   unsigned long temp;
   temp = (R[m] << 16) & 0xFFFF0000;
@@ -3826,7 +3826,7 @@ immediate data. With this instruction, data is read from memory as a byte unit.
 
   (operation
 {R"(
-BANDM (int d, int i, int n)
+void BANDM (int d, int i, int n)
 {
   long disp, imm, temp, assignbit;
   disp = (0x00000FFF & (long)d);
@@ -3881,7 +3881,7 @@ is read from memory as a byte unit.
 
   (operation
 {R"(
-BANDNOTM (int d, int i, int n)
+void BANDNOTM (int d, int i, int n)
 {
   long disp, imm, temp, assignbit;
   disp = (0x00000FFF & (long)d);
@@ -3935,7 +3935,7 @@ resulting data is then written to memory as a byte unit.
 
   (operation
 {R"(
-BCLRM (int d, int i, int n)
+void BCLRM (int d, int i, int n)
 {
   long disp, imm, temp;
   disp = (0x00000FFF & (long)d);
@@ -3982,7 +3982,7 @@ The bit number is specified by 3-bit immediate data.
 
   (operation
 {R"(
-CLR (int i, int n)
+void CLR (int i, int n)
 {
   long imm, temp;
   imm = (0x00000007 & (long)i);
@@ -4028,7 +4028,7 @@ memory as a byte unit.
 
   (operation
 {R"(
-BLDM (int d, int i, int n)
+void BLDM (int d, int i, int n)
 {
   long disp, imm, temp, assignbit;
   disp = (0x00000FFF & (long)d);
@@ -4081,7 +4081,7 @@ The bit number is specified by 3-bit immediate data.
 
   (operation
 {R"(
-BLD (int i, int n)
+void BLD (int i, int n)
 {
   long imm, assignbit;
   imm = (0x00000007 & (long)i);
@@ -4133,7 +4133,7 @@ immediate data. Data is read from memory as a byte unit.
 
   (operation
 {R"(
-BLDNOTM (int d, int i, int n)
+void BLDNOTM (int d, int i, int n)
 {
   long disp, imm, temp, assignbit;
   disp = (0x00000FFF & (long)d);
@@ -4187,7 +4187,7 @@ immediate data. Data is read from memory as a byte unit.
 
   (operation
 {R"(
-BORM (int d, int i, int n)
+void BORM (int d, int i, int n)
 {
   long disp, imm, temp, assignbit;
   disp = (0x00000FFF & (long)d);
@@ -4242,7 +4242,7 @@ data is read from memory as a byte unit.
 
   (operation
 {R"(
-BORNOTM (int d, int i, int n)
+void BORNOTM (int d, int i, int n)
 {
   long disp, imm, temp, assignbit;
   disp = (0x00000FFF & (long)d);
@@ -4296,7 +4296,7 @@ then written to memory as a byte unit.
 
   (operation
 {R"(
-BSETM (int d, int i, int n)
+void BSETM (int d, int i, int n)
 {
   long disp, imm, temp;
   disp = (0x00000FFF & (long)d);
@@ -4343,7 +4343,7 @@ number is specified by 3-bit immediate data.
 
   (operation
 {R"(
-BSET (int i, int n)
+void BSET (int i, int n)
 {
   long imm, temp;
   imm = (0x00000007 & (long)i);
@@ -4390,7 +4390,7 @@ to memory as a byte unit.
 
   (operation
 {R"(
-BSTM (int d, int i, int n)
+void BSTM (int d, int i, int n)
 {
   long disp, imm, temp;
   disp = (0x00000FFF & (long)d);
@@ -4443,7 +4443,7 @@ immediate data.
 
   (operation
 {R"(
-BST (int i, int n)
+void BST (int i, int n)
 {
   long disp, imm;
   disp = (0x00000FFF & (long)d);
@@ -4496,7 +4496,7 @@ byte unit.
 
   (operation
 {R"(
-BXORM (int d, int i, int n)
+void BXORM (int d, int i, int n)
 {
   long disp, imm, temp, assignbit;
   disp = (0x00000FFF & (long)d);
@@ -4564,7 +4564,7 @@ result in Rn.
 
   (operation
 {R"(
-ADD (long m, long n)
+void ADD (int m, int n)
 {
   R[n] += R[m];
   PC += 2;
@@ -4608,7 +4608,7 @@ operations.
 
   (operation
 {R"(
-ADDI (long i, long n)
+void ADDI (int i, int n)
 {
   if ((i & 0x80) == 0)
     R[n] += (0x000000FF & (long)i);
@@ -4658,7 +4658,7 @@ bits.
 
   (operation
 {R"(
-ADDC (long m, long n)
+void ADDC (int m, int n)
 {
   unsigned long tmp0, tmp1;
   tmp1 = R[n] + R[m];
@@ -4717,7 +4717,7 @@ in Rn.  If overflow occurs, the T bit is set.
 
   (operation
 {R"(
-ADDV (long m, long n)
+void ADDV (int m, int n)
 {
   long dest, src, ans;
 
@@ -4796,7 +4796,7 @@ The contents of R0 are not changed.
 
   (operation
 {R"(
-CMPIM (int i)
+void CMPIM (int i)
 {
   long imm;
 
@@ -4849,7 +4849,7 @@ The contents of Rn and Rm are not changed.
 
   (operation
 {R"(
-CMPEQ (int m, int n)
+void CMPEQ (int m, int n)
 {
   if (R[n] == R[m])
     T = 1;
@@ -4896,7 +4896,7 @@ values.  The contents of Rn and Rm are not changed.
 
   (operation
 {R"(
-CMPHI (int m, int n)
+void CMPHI (int m, int n)
 {
   if ((unsigned long)R[n] >= (unsigned long)R[m])
     T = 1;
@@ -4943,7 +4943,7 @@ values.  The contents of Rn and Rm are not changed.
 
   (operation
 {R"(
-CMPGE (int m, int n)
+void CMPGE (int m, int n)
 {
   if ((long)R[n] >= (long)R[m])
     T = 1;
@@ -4990,7 +4990,7 @@ The contents of Rn and Rm are not changed.
 
   (operation
 {R"(
-CMPHI (int m, int n)
+void CMPHI (int m, int n)
 {
   if ((unsigned long)R[n] > (unsigned long)R[m])
     T = 1;
@@ -5037,7 +5037,7 @@ The contents of Rn and Rm are not changed.
 
   (operation
 {R"(
-CMPGT (int m, int n)
+void CMPGT (int m, int n)
 {
   if ((long)R[n] > (long)R[m])
     T = 1;
@@ -5084,7 +5084,7 @@ are not changed.
 
   (operation
 {R"(
-CMPPL (int n)
+void CMPPL (int n)
 {
   if ((long)R[n] > 0)
     T = 1;
@@ -5131,7 +5131,7 @@ contents of Rn are not changed.
 
   (operation
 {R"(
-CMPPZ (int n)
+void CMPPZ (int n)
 {
   if ((long)R[n] >= 0)
     T = 1;
@@ -5179,7 +5179,7 @@ finding the string length of a zero terminated string or string matching.
 
   (operation
 {R"(
-CMPSTR (int m, int n)
+void CMPSTR (int m, int n)
 {
   unsigned long temp;
   long HH, HL, LH, LL;
@@ -5240,7 +5240,7 @@ lower-limit value.
 
   (operation
 {R"(
-CLIPSB (int n)
+void CLIPSB (int n)
 {
   if (R[n] > 0x0000007F)
   {
@@ -5297,7 +5297,7 @@ lower-limit value.
 
   (operation
 {R"(
-CLIPSW (int n)
+void CLIPSW (int n)
 {
   if (R[n] > 0x00007FFF)
   {
@@ -5350,7 +5350,7 @@ exceed the saturation upper-limit value.
 
   (operation
 {R"(
-CLIPUB (int n)
+void CLIPUB (int n)
 {
   if (R[n] > 0x000000FF)
   {
@@ -5398,7 +5398,7 @@ exceed the saturation upper-limit value.
 
   (operation
 {R"(
-CLIPUW (int n)
+void CLIPUW (int n)
 {
   if (R[n] > 0x0000FFFF)
   {
@@ -5449,7 +5449,7 @@ are not equal, T will be set to 1.
 
   (operation
 {R"(
-DIV0S (int m, int n)
+void DIV0S (int m, int n)
 {
   if ((R[n] & 0x80000000) == 0)
     Q = 0;
@@ -5503,7 +5503,7 @@ DIV1 instruction for details.
 
   (operation
 {R"(
-DIV0U ()
+void DIV0U (void)
 {
   M = Q = T = 0;
   PC += 2;
@@ -5564,7 +5564,7 @@ the examples for details of the division sequence.
 
   (operation
 {R"(
-DIV1 (int m, int n)
+void DIV1 (int m, int n)
 {
   unsigned long tmp0, tmp2;
   unsigned char old_q, tmp1;
@@ -5769,7 +5769,7 @@ latency.
 
   (operation
 {R"(
-DIVS (int n)
+void DIVS (int n)
 {
   R[n] = R[n] / R[0];
   PC += 2;
@@ -5818,7 +5818,7 @@ latency.
 
   (operation
 {R"(
-DIVU (long n)
+void DIVU (int n)
 {
   R[n]= (unsigned long)R[n] / (unsigned long)R[0];
   PC += 2;
@@ -5860,7 +5860,7 @@ The multiplication is performed as a signed arithmetic operation.
 
   (operation
 {R"(
-DMULS (int m, int n)
+void DMULS (int m, int n)
 {
   unsigned long RnL, RnH, RmL, RmH, Res0, Res1, Res2;
   unsigned long temp0, temp1, temp2, temp3;
@@ -5956,7 +5956,7 @@ The multiplication is performed as an unsigned arithmetic operation.
 
   (operation
 {R"(
-DMULU (int m, int n)
+void DMULU (int m, int n)
 {
   unsigned long RnL, RnH, RmL, RmH, Res0, Res1, Res2;
   unsigned long temp0, temp1, temp2, temp3;
@@ -6025,7 +6025,7 @@ If the result is nonzero, the T bit is cleared to 0.
 
   (operation
 {R"(
-DT (int n)
+void DT (int n)
 {
   R[n]--;
 
@@ -6076,7 +6076,7 @@ The value of Rm bit 7 is transferred to Rn bits 8 to 31.
 
   (operation
 {R"(
-EXTSB (int m, int n)
+void EXTSB (int m, int n)
 {
   R[n] = R[m];
 
@@ -6123,7 +6123,7 @@ The value of Rm bit 15 is transferred to Rn bits 16 to 31.
 
   (operation
 {R"(
-EXTSW (int m, int n)
+void EXTSW (int m, int n)
 {
   R[n] = R[m];
 
@@ -6170,7 +6170,12 @@ Zero-extends the contents of general register Rm and stores the result in Rn.
 
   (operation
 {R"(
-
+void EXTUB (int m, int n)
+{
+  R[n] = R[m];
+  R[n] &= 0x000000FF;
+  PC += 2;
+}
 )"})
 
   (example
@@ -6200,29 +6205,24 @@ Zero-extends the contents of general register Rm and stores the result in Rn.
 0 is transferred to Rn bits 16 to 31.
 )"})
 
-  (note
-{R"(
-
-)"})
-
   (operation
 {R"(
-EXTUB (int m, int n)
-{
-  R[n] = R[m];
-  R[n] &= 0x000000FF;
-  PC += 2;
-}
-)"})
-
-  (example
-{R"(
-EXTUW (int m, int n)
+void EXTUW (int m, int n)
 {
   R[n] = R[m];
   R[n] &= 0x0000FFFF;
   PC += 2;
 }
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (example
+{R"(
+
 )"})
 
   (exceptions
@@ -6264,7 +6264,7 @@ of 0xFFFF800000000000 (minimum) and 0x00007FFFFFFFFFFF (maximum).
 
   (operation
 {R"(
-MACL (int m, int n)
+void MACL (int m, int n)
 {
   unsigned long RnL, RnH, RmL, RmH, Res0, Res1, Res2;
   unsigned long temp0, temp1, temp2, temp3;
@@ -6412,7 +6412,7 @@ multiply and accumulate operation and the SH1 CPU performs a 16 * 16 + 42 ->
 
   (operation
 {R"(
-MACW (int m, int n)
+void MACW (int m, int n)
 {
   long tempm, tempn, dest, src, ans;
   unsigned long templ;
@@ -6522,7 +6522,7 @@ of MACH are not changed.
 
   (operation
 {R"(
-MULL (int m, int n)
+void MULL (int m, int n)
 {
   MACL = R[n] * R[m];
   PC += 2;
@@ -6562,7 +6562,7 @@ and stores the lower 32 bits of the result in general register Rn.
 
   (operation
 {R"(
-MULR (int n)
+void MULR (int n)
 {
   R[n] = R[0] * R[n];
   PC += 2;
@@ -6605,7 +6605,7 @@ changed.
 
   (operation
 {R"(
-MULS (int m, int n)
+void MULS (int m, int n)
 {
   MACL = ((long)(short)R[n] * (long)(short)R[m]);
   PC += 2;
@@ -6648,7 +6648,7 @@ changed.
 
   (operation
 {R"(
-MULU (int m, int n)
+void MULU (int m, int n)
 {
   MACL = ((unsigned long)(unsigned short)R[n]* (unsigned long)(unsigned short)R[m];
   PC += 2;
@@ -6689,7 +6689,7 @@ the result in Rn. That is, it subtracts Rm from 0 and stores the result in Rn.
 
   (operation
 {R"(
-NEG (int m, int n)
+void NEG (int m, int n)
 {
   R[n] = 0 - R[m];
   PC += 2;
@@ -6734,7 +6734,7 @@ in a general register, if the MOVRT instruction is not available.
 
   (operation
 {R"(
-NEGC (int m, int n)
+void NEGC (int m, int n)
 {
   unsigned long temp;
   temp = 0 - R[m];
@@ -6804,7 +6804,7 @@ ADD #imm,Rn should be used.
 
   (operation
 {R"(
-SUB (int m, int n)
+void SUB (int m, int n)
 {
   R[n] -= R[m];
   PC += 2;
@@ -6849,7 +6849,7 @@ general register.
 
   (operation
 {R"(
-SUBC (int m, int n)
+void SUBC (int m, int n)
 {
   unsigned long tmp0, tmp1;
   tmp1 = R[n] - R[m];
@@ -6918,7 +6918,7 @@ register Rn, and stores the result in Rn. If underflow occurs, the T bit is set.
 
   (operation
 {R"(
-SUBV (int m, int n)
+void SUBV (int m, int n)
 {
   long dest, src, ans;
 
@@ -7000,7 +7000,7 @@ ANDs the contents of general registers Rn and Rm and stores the result in Rn.
 
   (operation
 {R"(
-AND (int m, int n)
+void AND (int m, int n)
 {
   R[n] &= R[m];
   PC += 2;
@@ -7042,7 +7042,7 @@ always cleared to zero.
 
   (operation
 {R"(
-ANDI (int i)
+void ANDI (int i)
 {
   R[0] &= (0x000000FF & (long)i);
   PC += 2;
@@ -7083,7 +7083,7 @@ the immediate value and writes the result back to the memory byte.
 
   (operation
 {R"(
-ANDM (long i)
+void ANDM (long i)
 {
   long temp;
   temp = (long)Read_Byte (GBR + R[0]);
@@ -7134,7 +7134,7 @@ the result in Rn. That is, it inverts the Rm bits and stores the result in Rn.
 
   (operation
 {R"(
-NOT (int m, int n)
+void NOT (int m, int n)
 {
   R[n] = ∼R[m];
   PC += 2;
@@ -7174,7 +7174,7 @@ ORs the contents of general registers Rn and Rm and stores the result in Rn.
 
   (operation
 {R"(
-OR (int m, int n)
+void OR (int m, int n)
 {
   R[n] |= R[m];
   PC += 2;
@@ -7216,7 +7216,7 @@ not modified.
 
   (operation
 {R"(
-ORI (int i)
+void ORI (int i)
 {
   R[0] |= (0x000000FF & (long)i);
   PC += 2;
@@ -7257,7 +7257,7 @@ the immediate value and writes the result back to the memory byte.
 
   (operation
 {R"(
-ORM (int i)
+void ORM (int i)
 {
   long temp;
   temp = (long)Read_Byte (GBR + R[0]);
@@ -7328,7 +7328,7 @@ non-cacheable space when the cache is enabled.
 
   (operation
 {R"(
-TAS (int n)
+void TAS (int n)
 {
   int temp = (int)Read_Byte (R[n]); // Bus Lock
 
@@ -7386,7 +7386,7 @@ Rn are not changed.
 
   (operation
 {R"(
-TST (int m, int n)
+void TST (int m, int n)
 {
   if ((R[n] & R[m]) == 0)
     T = 1;
@@ -7434,7 +7434,7 @@ used to test the lower 8 bits of R0.
 
   (operation
 {R"(
-TSTI (int i)
+void TSTI (int i)
 {
   long temp = R[0] & (0x000000FF & (long)i);
 
@@ -7484,7 +7484,7 @@ The contents of the memory byte are not changed.
 
   (operation
 {R"(
-TSTM (int i)
+void TSTM (int i)
 {
   long temp;
   temp = (long)Read_Byte (GBR + R[0]);
@@ -7538,7 +7538,7 @@ XORs the contents of general registers Rn and Rm and stores the result in Rn.
 
   (operation
 {R"(
-XOR (long m, long n)
+void XOR (long m, long n)
 {
   R[n] ^= R[m];
   PC += 2;
@@ -7580,7 +7580,7 @@ not modified.
 
   (operation
 {R"(
-XORI (int i)
+void XORI (int i)
 {
   R[0] ^= (0x000000FF & (long)i);
   PC += 2;
@@ -7621,7 +7621,7 @@ the immediate value and writes the result back to the memory byte.
 
   (operation
 {R"(
-XORM (int i)
+void XORM (int i)
 {
   int temp;
   temp = (long)Read_Byte (GBR + R[0]);
@@ -7682,7 +7682,7 @@ transferred to the T bit.
 
   (operation
 {R"(
-ROTCL (int n)
+void ROTCL (int n)
 {
   long temp;
 
@@ -7744,7 +7744,7 @@ transferred to the T bit.
 
   (operation
 {R"(
-ROTCR (int n)
+void ROTCR (int n)
 {
   long temp;
 
@@ -7806,7 +7806,7 @@ result in Rn. The bit rotated out of the operand is transferred to the T bit.
 
   (operation
 {R"(
-ROTL (int n)
+void ROTL (int n)
 {
   if ((R[n] & 0x80000000) == 0)
     T = 0;
@@ -7860,7 +7860,7 @@ result in Rn. The bit rotated out of the operand is transferred to the T bit.
 
   (operation
 {R"(
-ROTR (int n)
+void ROTR (int n)
 {
   if ((R[n] & 0x00000001) == 0)
     T = 0;
@@ -7922,7 +7922,7 @@ right shift range, 1 to 32.
 
   (operation
 {R"(
-SHAD (int m, int n)
+void SHAD (int m, int n)
 {
   int sgn = R[m] & 0x80000000;
 
@@ -7979,7 +7979,7 @@ to the T bit.
 
   (operation
 {R"(
-SHAL (int n)
+void SHAL (int n)
 {
   if ((R[n] & 0x80000000) == 0)
     T = 0;
@@ -8028,7 +8028,7 @@ to the T bit.
 
   (operation
 {R"(
-SHAR (int n)
+void SHAR (int n)
 {
   long temp;
 
@@ -8097,7 +8097,7 @@ right shift range, 1 to 32.
 
   (operation
 {R"(
-SHLD (int m, int n)
+void SHLD (int m, int n)
 {
   int sgn = R[m] & 0x80000000;
 
@@ -8149,7 +8149,7 @@ Effectively, the operation performed is the same as the SHAL instruction.
 
   (operation
 {R"(
-SHLL (int n)
+void SHLL (int n)
 {
   if ((R[n] & 0x80000000) == 0)
     T = 0;
@@ -8196,7 +8196,7 @@ stores the result in Rn. The bits shifted out of the operand are discarded.
 
   (operation
 {R"(
-SHLL2 (int n)
+void SHLL2 (int n)
 {
   R[n] <<= 2;
   PC += 2;
@@ -8238,7 +8238,7 @@ stores the result in Rn. The bits shifted out of the operand are discarded.
 
   (operation
 {R"(
-SHLL8 (int n)
+void SHLL8 (int n)
 {
   R[n] <<= 8;
   PC += 2;
@@ -8280,7 +8280,7 @@ stores the result in Rn. The bits shifted out of the operand are discarded.
 
   (operation
 {R"(
-SHLL16 (int n)
+void SHLL16 (int n)
 {
   R[n] <<= 16;
   PC += 2;
@@ -8324,7 +8324,7 @@ the T bit.
 
   (operation
 {R"(
-SHLR (int n)
+void SHLR (int n)
 {
   if ((R[n] & 0x00000001) == 0)
     T = 0;
@@ -8372,7 +8372,7 @@ stores the result in Rn. The bits shifted out of the operand are discarded.
 
   (operation
 {R"(
-SHLR2 (int n)
+void SHLR2 (int n)
 {
   R[n] >>= 2;
   R[n] &= 0x3FFFFFFF;
@@ -8415,7 +8415,7 @@ stores the result in Rn. The bits shifted out of the operand are discarded.
 
   (operation
 {R"(
-SHLR8 (int n)
+void SHLR8 (int n)
 {
   R[n] >>= 8;
   R[n] &= 0x00FFFFFF;
@@ -8458,7 +8458,7 @@ stores the result in Rn. The bits shifted out of the operand are discarded.
 
   (operation
 {R"(
-SHLR16 (int n)
+void SHLR16 (int n)
 {
   R[n] >>= 16;
   R[n] &= 0x0000FFFF;
@@ -8516,7 +8516,7 @@ be utilized for efficient conditional operations.
 
   (operation
 {R"(
-BF (int d)
+void BF (int d)
 {
   int disp;
   if ((d & 0x80) == 0)
@@ -8585,7 +8585,7 @@ BF/S in combination with a BRA or JMP instruction, for example.
 
   (operation
 {R"(
-BFS (int d)
+void BFS (int d)
 {
   int disp;
   unsigned int temp;
@@ -8647,7 +8647,7 @@ be utilized for efficient conditional operations.
 
   (operation
 {R"(
-BT (int d)
+void BT (int d)
 {
   int disp;
   if ((d & 0x80) == 0)
@@ -8710,7 +8710,7 @@ BT/S in combination with a BRA or JMP instruction, for example.
 
   (operation
 {R"(
-BTS (int d)
+void BTS (int d)
 {
   int disp;
   unsigned temp;
@@ -8775,7 +8775,7 @@ illegal instruction.
 
   (operation
 {R"(
-BRA (int d)
+void BRA (int d)
 {
   int disp;
   unsigned int temp;
@@ -8832,7 +8832,7 @@ illegal instruction.
 
   (operation
 {R"(
-BRAF (int m)
+void BRAF (int m)
 {
   unsigned int temp;
   temp = PC;
@@ -8886,7 +8886,7 @@ illegal instruction.
 
   (operation
 {R"(
-BSR (int d)
+void BSR (int d)
 {
   int disp;
   unsigned int temp;
@@ -8945,7 +8945,7 @@ illegal instruction.
 
   (operation
 {R"(
-BSRF (int m)
+void BSRF (int m)
 {
   unsigned int temp;
   temp = PC;
@@ -8995,7 +8995,7 @@ illegal instruction.
 
   (operation
 {R"(
-JMP (int m)
+void JMP (int m)
 {
   unsigned int temp;
   temp = PC;
@@ -9047,7 +9047,7 @@ illegal instruction.
 
   (operation
 {R"(
-JSR (int m)
+void JSR (int m)
 {
   unsigned int temp;
   temp = PC;
@@ -9093,7 +9093,7 @@ This is not a delayed branch instruction.
 
   (operation
 {R"(
-JSRN (long m)
+void JSRN (int m)
 {
   unsigned long temp;
   temp = PC;
@@ -9138,12 +9138,7 @@ This is not a delayed branch instruction.
 
   (operation
 {R"(
-
-)"})
-
-  (example
-{R"(
-JSRNM (long d)
+void JSRNM (int d)
 {
   unsigned long temp;
   long disp;
@@ -9152,6 +9147,10 @@ JSRNM (long d)
   disp = (0x000000FF & d);
   PC = Read_Long (TBR + (disp << 2));
 }
+)"})
+
+  (example
+{R"(
 )"})
 
   (exceptions
@@ -9195,7 +9194,7 @@ This restore instruction cannot be in the RTS delay slot.
 
   (operation
 {R"(
-RTS ()
+void RTS (void)
 {
   unsigned int temp;
   temp = PC;
@@ -9239,11 +9238,10 @@ This is not a delayed branch instruction.
 
   (operation
 {R"(
-RTSN ()
+void RTSN (void)
 {
   PC = PR;
 }
-
 )"})
 
   (example
@@ -9282,7 +9280,7 @@ This is not a delayed branch instruction.
 
   (operation
 {R"(
-RTVN (int m)
+void RTVN (int m)
 {
   R[0] = R[m];
   PC = PR;
@@ -9329,7 +9327,7 @@ Clears the MACH and MACL registers.
 
   (operation
 {R"(
-CLRMAC ()
+void CLRMAC (void)
 {
   MACH = 0;
   MACL = 0;
@@ -9370,10 +9368,10 @@ Clears the S bit to 0.
 
   (operation
 {R"(
-CLRS ()
+void CLRS (void)
 {
-S = 0;
-PC += 2;
+  S = 0;
+  PC += 2;
 }
 )"})
 
@@ -9411,7 +9409,7 @@ Clears the T bit.
 
   (operation
 {R"(
-CLRT ()
+void CLRT (void)
 {
   T = 0;
   PC += 2;
@@ -9458,7 +9456,7 @@ non-overwritten instructions are stored.
 
   (operation
 {R"(
-ICBI (int n)
+void ICBI (int n)
 {
   invalidate_instruction_cache_block (R[n]);
   PC += 2;
@@ -9506,7 +9504,7 @@ differs depending on the product.
 
   (operation
 {R"(
-LDBANK (int m)
+void LDBANK (int m)
 {
   R[0] = Read_Bank_Long (R[m]);
   PC+=2;
@@ -9548,7 +9546,7 @@ user mode will cause an illegal instruction exception.
 
   (operation
 {R"(
-LDCSR (int m)
+void LDCSR (int m)
 {
   #if SH1 || SH2 || SH2 || SH3
   SR = R[m] & 0x0FFF0FFF;
@@ -9601,7 +9599,7 @@ user mode will cause an illegal instruction exception.
 
   (operation
 {R"(
-LDCMSR (int m)
+void LDCMSR (int m)
 {
   #if SH1 || SH2 || SH2 || SH3
   SR = Read_Long (R[m]) & 0x0FFF0FFF;
@@ -9656,7 +9654,7 @@ Stores a source operand in control register TBR.
 
   (operation
 {R"(
-LDCTBR (int m)
+void LDCTBR (int m)
 {
   TBR = R[m];
   PC += 2;
@@ -9696,7 +9694,7 @@ This instruction can also be issued in user mode.
 
   (operation
 {R"(
-LDCGBR (int m)
+void LDCGBR (int m)
 {
   GBR = R[m];
   PC += 2;
@@ -9736,7 +9734,7 @@ This instruction can also be issued in user mode.
 
   (operation
 {R"(
-LDCMGBR (int m)
+void LDCMGBR (int m)
 {
   GBR = Read_Long (R[m]);
   R[m] += 4;
@@ -9780,7 +9778,7 @@ Stores a source operand in control register VBR.
 
   (operation
 {R"(
-LDCVBR (int m)
+void LDCVBR (int m)
 {
   VBR = R[m];
   PC += 2;
@@ -9821,7 +9819,7 @@ Stores a source operand in control register VBR.
 
   (operation
 {R"(
-LDCMVBR (int m)
+void LDCMVBR (int m)
 {
   VBR = Read_Long(R[m]);
   R[m] += 4;
@@ -9866,7 +9864,7 @@ On the SH-DSP the latency of this instruction is 1 cycle.
 
   (operation
 {R"(
-LDCMOD (int m)
+void LDCMOD (int m)
 {
   MOD = R[m];
   PC += 2;
@@ -9905,7 +9903,7 @@ On the SH-DSP the latency of this instruction is 3 cycles.
 
   (operation
 {R"(
-LDCMMOD (int m)
+void LDCMMOD (int m)
 {
   MOD = Read_Long (R[m]);
   R[m] += 4;
@@ -9946,7 +9944,7 @@ On the SH-DSP the latency of this instruction is 1 cycle.
 
   (operation
 {R"(
-LDCRE (int m)
+void LDCRE (int m)
 {
   RE = R[m];
   PC += 2;
@@ -9985,7 +9983,7 @@ On the SH-DSP the latency of this instruction is 3 cycles.
 
   (operation
 {R"(
-LDCMRE (int m)
+void LDCMRE (int m)
 {
   RE = Read_Long (R[m]);
   R[m] += 4;
@@ -10025,7 +10023,7 @@ On the SH-DSP the latency of this instruction is 1 cycle.
 
   (operation
 {R"(
-LDCRS (int m)
+void LDCRS (int m)
 {
   RS = R[m];
   PC += 2;
@@ -10064,7 +10062,7 @@ On the SH-DSP the latency of this instruction is 3 cycles.
 
   (operation
 {R"(
-LDCMRS (int m)
+void LDCMRS (int m)
 {
   RS = Read_Long (R[m]);
   R[m] += 4;
@@ -10107,7 +10105,7 @@ manuals.
 
   (operation
 {R"(
-LDCSGR (int m)
+void LDCSGR (int m)
 {
   SGR = R[m];
   PC += 2;
@@ -10150,7 +10148,7 @@ manuals.
 
   (operation
 {R"(
-LDCMSGR (int m)
+void LDCMSGR (int m)
 {
   SGR = Read_Long (R[m]);
   R[m] += 4;
@@ -10196,7 +10194,7 @@ Stores a source operand in control register SSR.
 
   (operation
 {R"(
-LDCSSR (int m)
+void LDCSSR (int m)
 {
   SSR = R[m],
   PC += 2;
@@ -10237,7 +10235,7 @@ Stores a source operand in control register SSR.
 
   (operation
 {R"(
-LDCMSSR (int m)
+void LDCMSSR (int m)
 {
   SSR = Read_Long (R[m]);
   R[m] += 4;
@@ -10283,7 +10281,7 @@ Stores a source operand in control register SPC.
 
   (operation
 {R"(
-LDCSPC (int m)
+void LDCSPC (int m)
 {
   SPC = R[m];
   PC += 2;
@@ -10324,7 +10322,7 @@ Stores a source operand in control register SPC.
 
   (operation
 {R"(
-LDCMSPC (int m)
+void LDCMSPC (int m)
 {
   SPC = Read_Long (R[m]);
   R[m] += 4;
@@ -10370,7 +10368,7 @@ Stores a source operand in control register DBR.
 
   (operation
 {R"(
-LDCDBR (int m)
+void LDCDBR (int m)
 {
   DBR = R[m];
   PC += 2;
@@ -10411,7 +10409,7 @@ Stores a source operand in control register DBR.
 
   (operation
 {R"(
-LDCMDBR (int m)
+void LDCMDBR (int m)
 {
   DBR = Read_Long (R[m]);
   R[m] += 4;
@@ -10459,7 +10457,7 @@ accessed when this bit is 0.
 
   (operation
 {R"(
-LDCRn_BANK (int m)
+void LDCRn_BANK (int m)
 {
   Rn_BANK = R[m];
   PC += 2;
@@ -10502,7 +10500,7 @@ accessed when this bit is 0.
 
   (operation
 {R"(
-LDCMRn_BANK (int m)
+void LDCMRn_BANK (int m)
 {
   Rn_BANK = Read_Long (R[m]);
   R[m] += 4;
@@ -10558,7 +10556,7 @@ On the SH-DSP the latency of this instruction is 1 cycle.
 
   (operation
 {R"(
-LDRE (int d)
+void LDRE (int d)
 {
   long disp;
 
@@ -10626,7 +10624,7 @@ On the SH-DSP the latency of this instruction is 1 cycle.
 
   (operation
 {R"(
-LDRS (int d)
+void LDRS (int d)
 {
   long disp;
 
@@ -10684,7 +10682,7 @@ On SH1, only the lower 10 bits are stored in MACH.
 
   (operation
 {R"(
-LDSMACH (int m)
+void LDSMACH (int m)
 {
   MACH = R[m];
 
@@ -10732,7 +10730,7 @@ Stores the source operand into the system register MACH.
 
   (operation
 {R"(
-LDSMMACH (int m)
+void LDSMMACH (int m)
 {
   MACH = Read_Long (R[m]);
 
@@ -10784,7 +10782,7 @@ Stores the source operand into the system register MACL.
 
   (operation
 {R"(
-LDSMACL (int m)
+void LDSMACL (int m)
 {
   MACL = R[m];
   PC += 2;
@@ -10824,7 +10822,7 @@ Stores the source operand into the system register MACL.
 
   (operation
 {R"(
-LDSMMACL (int m)
+void LDSMMACL (int m)
 {
   MACL = Read_Long (R[m]);
   R[m] += 4;
@@ -10868,7 +10866,7 @@ Stores the source operand into the system register PR.
 
   (operation
 {R"(
-LDSPR (int m)
+void LDSPR (int m)
 {
   PR = R[m];
   PC += 2;
@@ -10908,7 +10906,7 @@ Stores the source operand into the system register PR.
 
   (operation
 {R"(
-LDSMPR (int m)
+void LDSMPR (int m)
 {
   PR = Read_Long (R[m]);
   R[m] += 4;
@@ -10951,7 +10949,7 @@ Stores the source operand into the DSP register DSR.
 
   (operation
 {R"(
-LDSDSR (int m)
+void LDSDSR (int m)
 {
   DSR = R[m] & 0x0000000F;
   PC += 2;
@@ -10990,7 +10988,7 @@ On the SH-DSP the latency of this instruction is 1 cycle.
 
   (operation
 {R"(
-LDSMDSR (int m)
+void LDSMDSR (int m)
 {
   DSR = Read_Long (R[m]) & 0x0000000F;
   R[m] += 4;
@@ -11031,7 +11029,7 @@ copied into A0G.
 
   (operation
 {R"(
-LDSA0 (int m)
+void LDSA0 (int m)
 {
   A0 = R[m];
 
@@ -11077,7 +11075,7 @@ copied into A0G.
 
   (operation
 {R"(
-LDSMA0 (int m)
+void LDSMA0 (int m)
 {
   A0 = Read_Long (R[m]);
 
@@ -11123,7 +11121,7 @@ Stores the source operand into the DSP register X0.
 
   (operation
 {R"(
-LDSX0 (int m)
+void LDSX0 (int m)
 {
   X0 = R[m];
   PC += 2;
@@ -11162,7 +11160,7 @@ Stores the source operand into the DSP register X0.
 
   (operation
 {R"(
-LDSMX0 (int m)
+void LDSMX0 (int m)
 {
   X0 = Read_Long (R[m]);
   R[m] += 4;
@@ -11202,7 +11200,7 @@ Stores the source operand into the DSP register X1.
 
   (operation
 {R"(
-LDSX1 (int m)
+void LDSX1 (int m)
 {
   X1 = R[m];
   PC += 2;
@@ -11241,7 +11239,7 @@ Stores the source operand into the DSP register X1.
 
   (operation
 {R"(
-LDSMX1 (int m)
+void LDSMX1 (int m)
 {
   X1 = Read_Long (R[m]);
   R[m] += 4;
@@ -11282,7 +11280,7 @@ Stores the source operand into the DSP register Y0.
 
   (operation
 {R"(
-LDSY0 (int m)
+void LDSY0 (int m)
 {
   Y0 = R[m];
   PC += 2;
@@ -11321,7 +11319,7 @@ Stores the source operand into the DSP register Y0.
 
   (operation
 {R"(
-LDSMY0 (int m)
+void LDSMY0 (int m)
 {
   Y0 = Read_Long (R[m]);
   R[m] += 4;
@@ -11362,7 +11360,7 @@ Stores the source operand into the DSP register Y1.
 
   (operation
 {R"(
-LDSY1 (int m)
+void LDSY1 (int m)
 {
   Y1 = R[m];
   PC += 2;
@@ -11401,7 +11399,7 @@ Stores the source operand into the DSP register Y1.
 
   (operation
 {R"(
-LDSMY1 (int m)
+void LDSMY1 (int m)
 {
   Y1 = Read_Long (R[m]);
   R[m] += 4;
@@ -11457,7 +11455,7 @@ instructions prior to an RTE instruction that terminates the handler.
 
   (operation
 {R"(
-LDTLB ()
+void LDTLB (void)
 {
   #if SH3
   TLB_tag = PTEH;
@@ -11523,7 +11521,7 @@ undefined.
 
   (operation
 {R"(
-MOVCAL (int n)
+void MOVCAL (int n)
 {
   if (is_write_back_memory (R[n]) && look_up_in_operand_cache (R[n]) == MISS)
     allocate_operand_cache_block (R[n]);
@@ -11571,7 +11569,7 @@ of the next instruction.
 
   (operation
 {R"(
-NOP ()
+void NOP (void)
 {
   PC += 2;
 }
@@ -11614,7 +11612,7 @@ the case of a cache miss or an access to a non-cache area.
 
   (operation
 {R"(
-OCBI (int n)
+void OCBI (int n)
 {
   invalidate_operand_cache_block (R[n]);
   PC += 2;
@@ -11664,7 +11662,7 @@ miss or an access to a non-cache area.
 
   (operation
 {R"(
-OCBP (int n)
+void OCBP (int n)
 {
   if (is_dirty_block (R[n]))
     write_back(R[n])
@@ -11716,7 +11714,7 @@ performed.
 
   (operation
 {R"(
-OCBWB (int n)
+void OCBWB (int n)
 {
   if (is_dirty_block (R[n]))
     write_back(R[n]);
@@ -11776,7 +11774,7 @@ On products with no cache, this instruction is handled as a NOP instruction.
 
   (operation
 {R"(
-PREF (int n)
+void PREF (int n)
 {
   prefetch_operand_cache_block (R[n]);
   PC += 2;
@@ -11828,7 +11826,7 @@ instructions for execution on return from the SLEEP state.
 
   (operation
 {R"(
-PREFI (int n)
+void PREFI (int n)
 {
   prefetch_instruction_cache_block (R[n]);
   PC += 2;
@@ -11868,7 +11866,7 @@ are restored from the stack.
 
   (operation
 {R"(
-RESBANK ()
+void RESBANK (void)
 {
   int m;  // Number of register bank to which a save was last performed.
 
@@ -11959,7 +11957,7 @@ prior to RTE execution are used to fetch the instruction in the RTE delay slot.
 
   (operation
 {R"(
-RTE ()
+void RTE (void)
 {
   unsigned long temp = PC;
 
@@ -12017,7 +12015,7 @@ On the SH-DSP the latency of this instruction is 1 cycle.
 
   (operation
 {R"(
-SETRC (int m)
+void SETRC (int m)
 {
   long temp = (R[m] & 0x00000FFF) << 16;
   SR &= 0x00000FF3;
@@ -12076,7 +12074,7 @@ On the SH-DSP the latency of this instruction is 1 cycle.
 
   (operation
 {R"(
-SETRCI (int i)
+void SETRCI (int i)
 {
   long temp = ((long)i & 0x000000FF) << 16;
   SR &= 0x00000FFF;
@@ -12131,7 +12129,7 @@ Sets the S bit to 1.
 
   (operation
 {R"(
-SETS ()
+void SETS (void)
 {
   S = 1;
   PC += 2;
@@ -12172,7 +12170,7 @@ Sets the T bit to 1.
 
   (operation
 {R"(
-SETT ()
+void SETT (void)
 {
   T = 1;
   PC += 2;
@@ -12231,7 +12229,7 @@ For more information see the document "tnsh7456ae.pdf".
 
   (operation
 {R"(
-SLEEP ()
+void SLEEP (void)
 {
   Sleep_standby();
 }
@@ -12274,7 +12272,7 @@ differs depending on the product.
 
   (operation
 {R"(
-STBANK (int n)
+void STBANK (int n)
 {
   Write_Bank_Long (R[n], R[0])
   PC += 2;
@@ -12315,7 +12313,7 @@ user mode will cause an illegal instruction exception.
 
   (operation
 {R"(
-STCSR (int n)
+void STCSR (int n)
 {
   R[n] = SR;
   PC += 2;
@@ -12357,7 +12355,7 @@ user mode will cause an illegal instruction exception.
 
   (operation
 {R"(
-STCMSR (int n)
+void STCMSR (int n)
 {
   R[n] -= 4;
   Write_Long (R[n],SR);
@@ -12402,7 +12400,7 @@ Stores control register TBR in the destination.
 
   (operation
 {R"(
-STCTBR (int n)
+void STCTBR (int n)
 {
   R[n] = TBR;
   PC += 2;
@@ -12483,7 +12481,7 @@ This instruction can also be issued in user mode.
 
   (operation
 {R"(
-STCMGBR (int n)
+void STCMGBR (int n)
 {
   R[n] -= 4;
   Write_Long (R[n],GBR);
@@ -12528,7 +12526,7 @@ Stores control register VBR in the destination.
 
   (operation
 {R"(
-STCVBR (int n)
+void STCVBR (int n)
 {
   R[n] = VBR;
   PC += 2;
@@ -12569,7 +12567,7 @@ Stores control register VBR in the destination.
 
   (operation
 {R"(
-STCMVBR (int n)
+void STCMVBR (int n)
 {
   R[n] -= 4;
   Write_Long (R[n], VBR);
@@ -12615,7 +12613,7 @@ Stores control register MOD in the destination.
 
   (operation
 {R"(
-STCMOD (int n)
+void STCMOD (int n)
 {
   R[n] = MOD;
   PC += 2;
@@ -12654,7 +12652,7 @@ On the SH-DSP the latency of this instruction is 2 cycles.
 
   (operation
 {R"(
-STCMMOD (int n)
+void STCMMOD (int n)
 {
   R[n] -= 4;
   Write_Long (R[n], MOD);
@@ -12695,7 +12693,7 @@ Stores control register RE in the destination.
 
   (operation
 {R"(
-STCRE (int n)
+void STCRE (int n)
 {
   R[n] = RE;
   PC += 2;
@@ -12734,7 +12732,7 @@ On the SH-DSP the latency of this instruction is 2 cycles.
 
   (operation
 {R"(
-STCMRE (int n)
+void STCMRE (int n)
 {
   R[n] -= 4;
   Write_Long (R[n], RE);
@@ -12774,7 +12772,7 @@ Stores control register RS in the destination.
 
   (operation
 {R"(
-STCRS (int n)
+void STCRS (int n)
 {
   R[n] = RS;
   PC += 2;
@@ -12813,7 +12811,7 @@ On the SH-DSP the latency of this instruction is 2 cycles.
 
   (operation
 {R"(
-STCMRS (int n)
+void STCMRS (int n)
 {
   R[n] -= 4;
   Write_Long (R[n], RS);
@@ -12854,7 +12852,7 @@ Stores control register SGR in the destination.
 
   (operation
 {R"(
-STCSGR (int n)
+void STCSGR (int n)
 {
   R[n] = SGR;
   PC += 2;
@@ -12895,7 +12893,7 @@ Stores control register SGR in the destination.
 
   (operation
 {R"(
-STCMSGR (int n)
+void STCMSGR (int n)
 {
   R[n] -= 4;
   Write_Long (R[n], SGR);
@@ -12942,7 +12940,7 @@ Stores control register SSR in the destination.
 
   (operation
 {R"(
-STCSSR (int n)
+void STCSSR (int n)
 {
   R[n] = SSR;
   PC += 2;
@@ -12983,7 +12981,7 @@ Stores control register SSR in the destination.
 
   (operation
 {R"(
-STCMSSR (int n)
+void STCMSSR (int n)
 {
   R[n] -= 4;
   Write_Long (R[n], SSR);
@@ -13030,7 +13028,7 @@ Stores control register SPC in the destination.
 
   (operation
 {R"(
-STCSPC (int n)
+void STCSPC (int n)
 {
   R[n] = SPC;
   PC += 2;
@@ -13071,7 +13069,7 @@ Stores control register SPC in the destination.
 
   (operation
 {R"(
-STCMSPC (int n)
+void STCMSPC (int n)
 {
   R[n] -= 4;
   Write_Long (R[n], SPC);
@@ -13118,7 +13116,7 @@ Stores control register DBR in the destination.
 
   (operation
 {R"(
-STCDBR (int n)
+void STCDBR (int n)
 {
   R[n] = DBR;
   PC += 2;
@@ -13159,7 +13157,7 @@ Stores control register DBR in the destination.
 
   (operation
 {R"(
-STCMDBR (int n)
+void STCMDBR (int n)
 {
   R[n] -= 4;
   Write_Long (R[n], DBR);
@@ -13207,7 +13205,7 @@ the RB bit in the SR register is 1, and Rn_BANK1 is accessed when this bit is 0.
 
   (operation
 {R"(
-STCRm_BANK (int n)
+void STCRm_BANK (int n)
 {
   R[n] = Rm_BANK;
   PC += 2;
@@ -13249,7 +13247,7 @@ the RB bit in the SR register is 1, and Rn_BANK1 is accessed when this bit is 0.
 
   (operation
 {R"(
-STCMRm_BANK (int n)
+void STCMRm_BANK (int n)
 {
   R[n] -= 4;
   Write_Long (R[n], Rm_BANK);
@@ -13297,7 +13295,7 @@ On SH1, the value of bit 9 is transferred to and stored in the higher 22 bits
 
   (operation
 {R"(
-STSMACH (int n)
+void STSMACH (int n)
 {
   R[n] = MACH;
 
@@ -13347,7 +13345,7 @@ On SH1, the value of bit 9 is transferred to and stored in the higher 22 bits
 
   (operation
 {R"(
-STSMMACH (int n)
+void STSMMACH (int n)
 {
   R[n] -= 4;
 
@@ -13403,7 +13401,7 @@ Stores system register MACL in the destination.
 
   (operation
 {R"(
-STSMACL (int n)
+void STSMACL (int n)
 {
   R[n] = MACL;
   PC += 2;
@@ -13442,7 +13440,7 @@ Stores system register MACL in the destination.
 
   (operation
 {R"(
-STSMMACL (int n)
+void STSMMACL (int n)
 {
   R[n] -= 4;
   Write_Long (R[n], MACL);
@@ -13487,7 +13485,7 @@ Stores system register PR in the destination.
 
   (operation
 {R"(
-STSPR (int n)
+void STSPR (int n)
 {
   R[n] = PR;
   PC += 2;
@@ -13527,7 +13525,7 @@ Stores system register PR in the destination.
 
   (operation
 {R"(
-STSMPR (int n)
+void STSMPR (int n)
 {
   R[n] -= 4;
   Write_Long (R[n], PR);
@@ -13571,7 +13569,7 @@ Stores DSP register DSR in the destination.
 
   (operation
 {R"(
-STSDSR (int n)
+void STSDSR (int n)
 {
   R[n] = DSR;
   PC += 2;
@@ -13610,7 +13608,7 @@ Stores DSP register DSR in the destination.
 
   (operation
 {R"(
-STSMDSR (int n)
+void STSMDSR (int n)
 {
   R[n] -= 4;
   Write_Long (R[n], DSR);
@@ -13651,7 +13649,7 @@ Stores DSP register A0 in the destination.
 
   (operation
 {R"(
-STSA0 (int n)
+void STSA0 (int n)
 {
   R[n] = A0;
   PC += 2;
@@ -13690,7 +13688,7 @@ Stores DSP register A0 in the destination.
 
   (operation
 {R"(
-STSMA0 (int n)
+void STSMA0 (int n)
 {
   R[n] -= 4;
   Write_Long (R[n], A0);
@@ -13730,7 +13728,7 @@ Stores DSP register X0 in the destination.
 
   (operation
 {R"(
-STSX0 (int n)
+void STSX0 (int n)
 {
   R[n] = X0;
   PC += 2;
@@ -13769,7 +13767,7 @@ Stores DSP register X0 in the destination.
 
   (operation
 {R"(
-STSMX0 (int n)
+void STSMX0 (int n)
 {
   R[n] -= 4;
   Write_Long (R[n], X0);
@@ -13809,7 +13807,7 @@ Stores DSP register X1 in the destination.
 
   (operation
 {R"(
-STSX1 (int n)
+void STSX1 (int n)
 {
   R[n] = X1;
   PC += 2;
@@ -13848,7 +13846,7 @@ Stores DSP register X1 in the destination.
 
   (operation
 {R"(
-STSMX1 (int n)
+void STSMX1 (int n)
 {
   R[n] -= 4;
   Write_Long (R[n], X1);
@@ -13888,7 +13886,7 @@ Stores DSP register Y0 in the destination.
 
   (operation
 {R"(
-STSY0 (int n)
+void STSY0 (int n)
 {
   R[n] = Y0;
   PC += 2;
@@ -13927,7 +13925,7 @@ Stores DSP register Y0 in the destination.
 
   (operation
 {R"(
-STSMY0 (int n)
+void STSMY0 (int n)
 {
   R[n] -= 4;
   Write_Long (R[n], Y0);
@@ -13967,7 +13965,7 @@ Stores DSP register Y1 in the destination.
 
   (operation
 {R"(
-STSY1 (int n)
+void STSY1 (int n)
 {
   R[n] = Y1;
   PC += 2;
@@ -14006,7 +14004,7 @@ Stores DSP register Y1 in the destination.
 
   (operation
 {R"(
-STSMY1 (int n)
+void STSMY1 (int n)
 {
   R[n] -= 4;
   Write_Long (R[n], Y1);
@@ -14058,7 +14056,7 @@ Common example usages are:
 
   (operation
 {R"(
-SYNCO ()
+void SYNCO (void)
 {
   synchronize_data_operaiton ();
   PC += 2;
@@ -14125,7 +14123,7 @@ For more information see the document "tnsh7456ae.pdf".
 
   (operation
 {R"(
-TRAPA (int i)
+void TRAPA (int i)
 {
   int imm = (0x000000FF & i);
 
@@ -14183,7 +14181,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers FRm contents to FRn.
 )"})
 
   (note
@@ -14193,7 +14191,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void FMOV (int m, int n)
+{
+  FR[n] = FR[m];
+  PC += 2;
+}
 )"})
 
   (example
