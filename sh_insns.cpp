@@ -26697,17 +26697,22 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Stores the Dz operand in the MACH register.
+The DC, N, Z, V, and GT bits of the DSR register are not updated.
 )"})
 
   (note
 {R"(
-
+Though PSTS, MOVX, and MOVY can be designated in parallel, their execution may
+take two cycles.
 )"})
 
   (operation
 {R"(
-
+void plds_mach (void)
+{
+  MACH = DSP_REG[ex2_dz_no];
+}
 )"})
 
   (example
@@ -26732,17 +26737,22 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Stores the Dz operand in the MACL register.
+The DC, N, Z, V, and GT bits of the DSR register are not updated.
 )"})
 
   (note
 {R"(
-
+Though PSTS, MOVX, and MOVY can be designated in parallel, their execution may
+take two cycles.
 )"})
 
   (operation
 {R"(
-
+void plds_macl (void)
+{
+  MACL = DSP_REG[ex2_dz_no];
+}
 )"})
 
   (example
@@ -26767,17 +26777,24 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Conditionally stores the Dz operand in the MACH register.
+The instruction is executed if the DC bit is set to 1.
+The DC, N, Z, V, and GT bits of the DSR register are not updated.
 )"})
 
   (note
 {R"(
-
+Though PSTS, MOVX, and MOVY can be designated in parallel, their execution may
+take two cycles.
 )"})
 
   (operation
 {R"(
-
+void plds_mach_dct (void)
+{
+  if (DC == 1)
+    MACH = DSP_REG[ex2_dz_no];
+}
 )"})
 
   (example
@@ -26802,17 +26819,24 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Conditionally stores the Dz operand in the MACL register.
+The instruction is executed if the DC bit is set to 1.
+The DC, N, Z, V, and GT bits of the DSR register are not updated.
 )"})
 
   (note
 {R"(
-
+Though PSTS, MOVX, and MOVY can be designated in parallel, their execution may
+take two cycles.
 )"})
 
   (operation
 {R"(
-
+void plds_macl_dct (void)
+{
+  if (DC == 1)
+    MACL = DSP_REG[ex2_dz_no];
+}
 )"})
 
   (example
@@ -26837,17 +26861,24 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Conditionally stores the Dz operand in the MACH register.
+The instruction is executed if the DC bit is set to 0.
+The DC, N, Z, V, and GT bits of the DSR register are not updated.
 )"})
 
   (note
 {R"(
-
+Though PSTS, MOVX, and MOVY can be designated in parallel, their execution may
+take two cycles.
 )"})
 
   (operation
 {R"(
-
+void plds_mach_dcf (void)
+{
+  if (DC == 0)
+    MACH = DSP_REG[ex2_dz_no];
+}
 )"})
 
   (example
@@ -26872,17 +26903,24 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Conditionally stores the Dz operand in the MACL register.
+The instruction is executed if the DC bit is set to 0.
+The DC, N, Z, V, and GT bits of the DSR register are not updated.
 )"})
 
   (note
 {R"(
-
+Though PSTS, MOVX, and MOVY can be designated in parallel, their execution may
+take two cycles.
 )"})
 
   (operation
 {R"(
-
+void plds_macl_dcf (void)
+{
+  if (DC == 0)
+    MACL = DSP_REG[ex2_dz_no];
+}
 )"})
 
   (example
