@@ -24567,7 +24567,47 @@ the CS bits. The N, Z, V, and GT bits of the DSR register are also updated.
 
   (operation
 {R"(
+void prnd_sx (void)
+{
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    DSP_ALU_SRC1G = A0G;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    DSP_ALU_SRC1G = A1G;
+    break;
+  }
+
+  DSP_ALU_DST = (DSP_ALU_SRC1 + DSP_ALU_SRC2) & MASKFFFF0000;
+  carry_bit = ((DSP_ALU_SRC1_MSB | DSP_ALU_SRC2_MSB) & ! DSP_ALU_DST_MSB)
+              | (DSP_ALU_SRC1_MSB & DSP_ALU_SRC2_MSB);
+  DSP_ALU_DSTG_LSB8 = DSP_ALU_SRC1G_LSB8 + DSP_ALU_SRC2G_LSB8 + carry_bit;
+  overflow_bit = PLUS_OP_G_OV || ! (POS_NOT_OV || NEG_NOT_OV);
+
+  #include "fixed_pt_overflow_protection.c"
+  #include "fixed_pt_unconditional_update.c"
+  #include "fixed_pt_plus_dc_bit.c"
+}
 )"})
 
   (example
@@ -24607,7 +24647,42 @@ the CS bits. The N, Z, V, and GT bits of the DSR register are also updated.
 
   (operation
 {R"(
+void prnd_sx (void)
+{
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = Y0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = Y1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = M0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = M1;
+    break;
+  }
+
+  if (DSP_ALU_SRC1_MSB)
+    DSP_ALU_SRC1G = 0xFF;
+  else
+    DSP_ALU_SRC1G = 0x0;
+
+  DSP_ALU_DST = (DSP_ALU_SRC1 + DSP_ALU_SRC2) & MASKFFFF0000;
+  carry_bit = ((DSP_ALU_SRC1_MSB | DSP_ALU_SRC2_MSB) & ! DSP_ALU_DST_MSB)
+              | (DSP_ALU_SRC1_MSB & DSP_ALU_SRC2_MSB);
+  DSP_ALU_DSTG_LSB8 = DSP_ALU_SRC1G_LSB8 + DSP_ALU_SRC2G_LSB8 + carry_bit;
+  overflow_bit = PLUS_OP_G_OV || ! (POS_NOT_OV || NEG_NOT_OV);
+
+  #include "fixed_pt_overflow_protection.c"
+  #include "fixed_pt_unconditional_update.c"
+  #include "fixed_pt_plus_dc_bit.c"
+}
 )"})
 
   (example
