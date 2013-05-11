@@ -16968,9 +16968,9 @@ At least one of the following results is not less than 0xFC
   (description
 {R"(
 Takes the contents of floating-point registers XF0 to XF15 indicated by XMTRX
-as a 4-row x 4-column matrix, takes the contents of floating-point registers
-FR[n] to FR[n + 3] indicated by FVn as a 4-dimensional vector, multiplies the
-array by the vector, and stores the results in FV[n].
+as a 4-row &times 4-column matrix, takes the contents of floating-point
+registers FR[n] to FR[n + 3] indicated by FVn as a 4-dimensional vector,
+multiplies the array by the vector, and stores the results in FV[n].
 
 <br/><img src="ftrv.svg" height="128"/><br/>
 
@@ -17016,7 +17016,7 @@ updated. Appropriate processing should therefore be performed by software.
 
   (note
 {R"(
-A 4-dimensional matrix x matrix transformation can be realized by four FTRV
+A 4-dimensional matrix &times matrix transformation can be realized by four FTRV
 instructions, where every FTRV calculates a column of the result matrix.  The
 resulting matrix can be set to the XMTRX registers by toggling the FPSCR.FR bit
 to switch register banks without copying them.
@@ -17096,10 +17096,11 @@ void FTRV (int n)
   (description
 {R"(
 Takes the approximate inverse of the arithmetic square root (absolute error is
-within +-2^-21) of the single-precision floating-point in FRn and writes the
-result to FRn. Since the this instruction operates by approximation, an
-imprecision exception is required when the input is a normalized value. In
-other cases, the instruction does not require an imprecision exception.
+within &plusmn;2<sup>-21</sup>) of the single-precision floating-point in FRn
+and writes the result to FRn. Since the this instruction operates by
+approximation, an imprecision exception is required when the input is a
+normalized value. In other cases, the instruction does not require an
+imprecision exception.
 <br/><br/>
 When FPSCR.enable.I is set, an FPU exception trap is generated. When an
 exception occurs, correct exception information is reflected in FPSCR.cause and
@@ -17186,7 +17187,7 @@ void FSRRA (int n)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "fsca	FPUL,DRn"
   SH4A
-  (abstract "sin(FPUL) -> FRn\ncos(FPUL) -> FR[n+1]")
+  (abstract "sin (FPUL) -> FRn\ncos (FPUL) -> FR[n+1]")
   (code "1111nnn011111101")
 
   (group SH4A "FE")
@@ -17195,18 +17196,51 @@ void FSRRA (int n)
 
   (description
 {R"(
-
+Calculates the sine and cosine approximations of FPUL (absolute error is
+within &plusmn;2<sup>-21</sup>) as single-precision floating point values, and
+places the values of the sine and cosine in FRn and FR[n + 1], respectively.
+Since this instruction is an approximate operation instruction, an imprecision
+exception is always required (even if the input is a 0, the result is
+imprecise).
+<br/><br/>
+The input angle is specified as a signed fraction in twos complement.  The
+result of sin and cos is a single-precision floating-point number.
+<br/>
+0x7FFFFFFF to 0x00000001:
+360&times;2<sup>15</sup>&minus;360/2<sup>16</sup> to 360/2<sup>16</sup> degrees
+<br/>
+0x00000000: 0 degree
+<br/>
+0xFFFFFFFF to 0x80000000:
+&minus;360/2<sup>16</sup> to &minus;360&times2<sup>15</sup> degrees
 )"})
 
   (note
 {R"(
 This instruction is also supported by the SH7091 (SH4).
-
 )"})
 
   (operation
 {R"(
+void FSCA (int n)
+{
+  if (FPSCR_PR != 0)
+    undefined_operation ();
+  else
+  {
+    float angle;
+    long offset = 0x00010000;
+    long fraction = 0x0000FFFF;
 
+    set_I ();
+    fraction &= FPUL;  // extract sub-rotation (fraction) part
+    angle = fraction;  // convert to float
+    angle = 2 * M_PI * angle / offset;  // convert to radian
+    FR[n] = sin (angle);
+    FR[n+1] = cos (angle);
+    PC += 2;
+  }
+}
 )"})
 
   (example
@@ -17216,7 +17250,7 @@ This instruction is also supported by the SH7091 (SH4).
 
   (exceptions
 {R"(
-
+<li>Inexact</li>
 )"})
 )
 
