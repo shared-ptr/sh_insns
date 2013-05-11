@@ -25680,7 +25680,12 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Arithmetically shifts the contents of the Sx or Dz operand and stores the result
+in the Dz operand. The amount of the shift is specified by the Sy operand. 
+When the shift amount is positive, it shifts left. When the shift amount is
+negative, it shifts right.
+The DC bit of the DSR register is updated according to the specifications for
+the CS bits. The N, Z, V, and GT bits of the DSR register are also updated.
 )"})
 
   (note
@@ -25690,7 +25695,105 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+void psha (void)
+{
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    DSP_ALU_SRC1G = A0G;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    DSP_ALU_SRC1G = A1G;
+    break;
+  }
+
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC2 = Y0 & MASK007F0000;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC2 = Y1 & MASK007F0000;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC2 = M0 & MASK007F0000;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC2 = M1 & MASK007F0000;
+    break;
+  }
+
+  if (DSP_ALU_SRC2_MSB)
+    DSP_ALU_SRC2G = 0xFF;
+  else
+    DSP_ALU_SRC2G = 0x0;
+
+  if ((DSP_ALU_SRC2_HW & MASK0040) == 0)
+  {
+    // Left Shift 0 <= cnt <= 32
+    char cnt = DSP_ALU_SRC2_HW & MASK003F;
+    if (cnt > 32)
+    {
+      printf ("\nPSHA Sz,Sy,Dz Error! Shift %2X exceed range.\n", cnt);
+      exit ();
+    }
+
+    DSP_ALU_DST = DSP_ALU_SRC1 << cnt;
+    DSP_ALU_DSTG = ((DSP_ALU_SRC1G << cnt)
+                   | (DSP_ALU_SRC1 >> (32 - cnt))) & MASK000000FF;
+    carry_bit = ((DSP_ALU_DSTG & MASK00000001) == 0x1);
+  }
+  else
+  {
+    // Right Shift 0 < cnt <= 32
+    char cnt = (~DSP_ALU_SRC2_HW & MASK003F) + 1;
+    if (cnt > 32)
+    {
+      printf ("\nPSHA Sz,Sy,Dz Error! shift -%2X exceed range.\n", cnt);
+      exit ();
+    }
+
+    if ((cnt > 8) && DSP_ALU_SRC1G_BIT7)
+    {
+      // MSB copy
+      DSP_ALU_DST = (DSP_ALU_SRC1 >> 8) | (DSP_ALU_SRC1G << (32 - 8));
+      DSP_ALU_DST = (long)DSP_ALU_DST >> (cnt - 8);
+    }
+    else
+      DSP_ALU_DST = (DSP_ALU_SRC1 >> cnt) | (DSP_ALU_SRC1G << (32 - cnt));
+
+    DSP_ALU_DSTG_LSB8 = (char)DSP_ALU_SRC1G_LSB8 >> cnt--;
+    carry_bit = ((DSP_ALU_SRC1 >> cnt) & MASK00000001) == 0x1;
+  }
+
+  overflow_bit = ! (POS_NOT_OV || NEG_NOT_OV);
+
+  #include "fixed_pt_overflow_protection.c"
+  #include "fixed_pt_unconditional_update.c"
+  #include "shift_dc_bit.c"
+}
 )"})
 
   (example
@@ -25715,7 +25818,12 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Conditionally arithmetically shifts the contents of the Sx operand and
+stores the result in the Dz operand. The amount of the shift is specified by
+the Sy operand.  When the shift amount is positive, it shifts left. When the
+shift amount is negative, it shifts right.
+The instruction is executed if the DC bit is set to 1.
+The DC, N, Z, V, and GT bits are not updated.
 )"})
 
   (note
@@ -25725,7 +25833,120 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+void psha_dct (void)
+{
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    DSP_ALU_SRC1G = A0G;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    DSP_ALU_SRC1G = A1G;
+    break;
+  }
+
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC2 = Y0 & MASK007F0000;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC2 = Y1 & MASK007F0000;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC2 = M0 & MASK007F0000;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC2 = M1 & MASK007F0000;
+    break;
+  }
+
+  if (DSP_ALU_SRC2_MSB)
+    DSP_ALU_SRC2G = 0xFF;
+  else
+    DSP_ALU_SRC2G = 0x0;
+
+  if ((DSP_ALU_SRC2_HW & MASK0040) == 0)
+  {
+    // Left Shift 0 <= cnt <= 32
+    char cnt = DSP_ALU_SRC2_HW & MASK003F;
+    if (cnt > 32)
+    {
+      printf ("\nPSHA Sz,Sy,Dz Error! Shift %2X exceed range.\n", cnt);
+      exit ();
+    }
+
+    DSP_ALU_DST = DSP_ALU_SRC1 << cnt;
+    DSP_ALU_DSTG = ((DSP_ALU_SRC1G << cnt)
+                   | (DSP_ALU_SRC1 >> (32 - cnt))) & MASK000000FF;
+    carry_bit = ((DSP_ALU_DSTG & MASK00000001) == 0x1);
+  }
+  else
+  {
+    // Right Shift 0 < cnt <= 32
+    char cnt = (~DSP_ALU_SRC2_HW & MASK003F) + 1;
+    if (cnt > 32)
+    {
+      printf ("\nPSHA Sz,Sy,Dz Error! shift -%2X exceed range.\n", cnt);
+      exit ();
+    }
+
+    if ((cnt > 8) && DSP_ALU_SRC1G_BIT7)
+    {
+      // MSB copy
+      DSP_ALU_DST = (DSP_ALU_SRC1 >> 8) | (DSP_ALU_SRC1G << (32 - 8));
+      DSP_ALU_DST = (long)DSP_ALU_DST >> (cnt - 8);
+    }
+    else
+      DSP_ALU_DST = (DSP_ALU_SRC1 >> cnt) | (DSP_ALU_SRC1G << (32 - cnt));
+
+    DSP_ALU_DSTG_LSB8 = (char)DSP_ALU_SRC1G_LSB8 >> cnt--;
+    carry_bit = ((DSP_ALU_SRC1 >> cnt) & MASK00000001) == 0x1;
+  }
+
+  overflow_bit = ! (POS_NOT_OV || NEG_NOT_OV);
+
+  #include "fixed_pt_overflow_protection.c"
+
+  if (DC == 1)
+  {
+    DSP_REG[ex2_dz_no] = DSP_ALU_DST;
+    if (ex2_dz_no == 0)
+    {
+      A0G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A0G = A0G | MASKFFFFFF00;
+    }
+    else if (ex2_dz_no == 1)
+    {
+      A1G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A1G = A1G | MASKFFFFFF00;
+    }
+  }
+}
 )"})
 
   (example
@@ -25750,7 +25971,12 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Conditionally arithmetically shifts the contents of the Sx operand and
+stores the result in the Dz operand. The amount of the shift is specified by
+the Sy operand.  When the shift amount is positive, it shifts left. When the
+shift amount is negative, it shifts right.
+The instruction is executed if the DC bit is set to 0.
+The DC, N, Z, V, and GT bits are not updated.
 )"})
 
   (note
@@ -25760,7 +25986,120 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+void psha_dcf (void)
+{
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    DSP_ALU_SRC1G = A0G;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    DSP_ALU_SRC1G = A1G;
+    break;
+  }
+
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC2 = Y0 & MASK007F0000;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC2 = Y1 & MASK007F0000;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC2 = M0 & MASK007F0000;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC2 = M1 & MASK007F0000;
+    break;
+  }
+
+  if (DSP_ALU_SRC2_MSB)
+    DSP_ALU_SRC2G = 0xFF;
+  else
+    DSP_ALU_SRC2G = 0x0;
+
+  if ((DSP_ALU_SRC2_HW & MASK0040) == 0)
+  {
+    // Left Shift 0 <= cnt <= 32
+    char cnt = DSP_ALU_SRC2_HW & MASK003F;
+    if (cnt > 32)
+    {
+      printf ("\nPSHA Sz,Sy,Dz Error! Shift %2X exceed range.\n", cnt);
+      exit ();
+    }
+
+    DSP_ALU_DST = DSP_ALU_SRC1 << cnt;
+    DSP_ALU_DSTG = ((DSP_ALU_SRC1G << cnt)
+                   | (DSP_ALU_SRC1 >> (32 - cnt))) & MASK000000FF;
+    carry_bit = ((DSP_ALU_DSTG & MASK00000001) == 0x1);
+  }
+  else
+  {
+    // Right Shift 0 < cnt <= 32
+    char cnt = (~DSP_ALU_SRC2_HW & MASK003F) + 1;
+    if (cnt > 32)
+    {
+      printf ("\nPSHA Sz,Sy,Dz Error! shift -%2X exceed range.\n", cnt);
+      exit ();
+    }
+
+    if ((cnt > 8) && DSP_ALU_SRC1G_BIT7)
+    {
+      // MSB copy
+      DSP_ALU_DST = (DSP_ALU_SRC1 >> 8) | (DSP_ALU_SRC1G << (32 - 8));
+      DSP_ALU_DST = (long)DSP_ALU_DST >> (cnt - 8);
+    }
+    else
+      DSP_ALU_DST = (DSP_ALU_SRC1 >> cnt) | (DSP_ALU_SRC1G << (32 - cnt));
+
+    DSP_ALU_DSTG_LSB8 = (char)DSP_ALU_SRC1G_LSB8 >> cnt--;
+    carry_bit = ((DSP_ALU_SRC1 >> cnt) & MASK00000001) == 0x1;
+  }
+
+  overflow_bit = ! (POS_NOT_OV || NEG_NOT_OV);
+
+  #include "fixed_pt_overflow_protection.c"
+
+  if (DC == 0)
+  {
+    DSP_REG[ex2_dz_no] = DSP_ALU_DST;
+    if (ex2_dz_no == 0)
+    {
+      A0G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A0G = A0G | MASKFFFFFF00;
+    }
+    else if (ex2_dz_no == 1)
+    {
+      A1G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A1G = A1G | MASKFFFFFF00;
+    }
+  }
+}
 )"})
 
   (example
@@ -25786,7 +26125,12 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Arithmetically shifts the contents of the Dz operand and stores the result in
+the Dz operand. The amount of the shift is specified by the immediate value.
+When the shift amount is positive, it shifts left. When the shift amount is
+negative, it shifts right.
+The DC bit of the DSR register is updated according to the specifications for
+the CS bits. The N, Z, V, and GT bits of the DSR register are also updated.
 )"})
 
   (note
@@ -25796,7 +26140,74 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+void psha_imm (void)
+{
+  unsigned short tmp_imm;
+  DSP_ALU_SRC1 = DSP_REG[ex2_dz_no];
 
+  switch (ex2_dz_no)
+  {
+    case 0x0:
+      DSP_ALU_SRC1G = A0G;
+      break;
+
+    case 0x1:
+      DSP_ALU_SRC1G = A1G;
+      break;
+
+    default:
+      if (DSP_ALU_SRC1_MSB)
+        DSP_ALU_SRC1G = 0xFF;
+      else
+        DSP_ALU_SRC1G = 0x0;
+  }
+
+  tmp_imm = ((EX2_LW >> 4) & MASK0000007F); // bit[10:4]
+
+  if ((tmp_imm & MASK0040) == 0)
+  {
+    // Left Shift 0 <= cnt <= 32
+    char cnt = tmp_imm & MASK003F;
+    if (cnt > 32)
+    {
+      printf ("\nPSHA Dz,#Imm,Dz Error! #Imm=%7X exceed range.\n", tmp_imm);
+      exit ();
+    }
+
+    DSP_ALU_DST = DSP_ALU_SRC1 << cnt;
+    DSP_ALU_DSTG = ((DSP_ALU_SRC1G << cnt)
+                   | (DSP_ALU_SRC1 >> (32 - cnt))) & MASK000000FF;
+    carry_bit = (DSP_ALU_DSTG & MASK00000001) == 0x1;
+  }
+  else
+  {
+    // Right Shift 0 < cnt <= 32
+    char cnt = (~tmp_imm & MASK003F) + 1;
+    if (cnt > 32)
+    {
+      printf ("\nPSHA Dz,#Imm,Dz Error! #Imm=%7X exceed range.\n", tmp_imm);
+      exit ();
+    }
+
+    if ((cnt > 8) && DSP_ALU_SRC1G_BIT7)
+    {
+      // MSB copy
+      DSP_ALU_DST = (DSP_ALU_SRC1 >> 8) | (DSP_ALU_SRC1G << (32 - 8));
+      DSP_ALU_DST = (long)DSP_ALU_DST >> (cnt - 8);
+    }
+    else
+      DSP_ALU_DST = (DSP_ALU_SRC1 >> cnt) | (DSP_ALU_SRC1G << (32 - cnt));
+
+    DSP_ALU_DSTG_LSB8 = (char)DSP_ALU_SRC1G_LSB8 >> cnt--;
+    carry_bit = ((DSP_ALU_SRC1 >> cnt) & MASK00000001) == 0x1;
+  }
+
+  overflow_bit = ! (POS_NOT_OV || NEG_NOT_OV);
+
+  #include "fixed_pt_overflow_protection.c"
+  #include "fixed_pt_unconditional_update.c"
+  #include "shift_dc_bit.c"
+}
 )"})
 
   (example
