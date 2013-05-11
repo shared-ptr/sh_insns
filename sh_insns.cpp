@@ -14118,7 +14118,6 @@ void TRAPA (int i)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ));
 
-#endif
 
 __sexpr (insn_blocks.push_back
 (insns "32 Bit Floating-Point Data Transfer Instructions (FPSCR.SZ = 0)"
@@ -15294,6 +15293,7 @@ void FMOV_INDEX_DISP12_STORE_DR (int m, int n, int d)
 ));
 
 
+#endif
 
 __sexpr (insn_blocks.push_back
 (insns "Floating-Point Single-Precision Instructions (FPSCR.PR = 0)"
@@ -16179,7 +16179,6 @@ __sexpr (insn_blocks.push_back
 {R"(
 Clears the most significant bit of the contents of floating-point register DRn
 to 0, and stores the result in DRn.
-
 )"})
 
   (note
@@ -16219,7 +16218,18 @@ void FABS (int n)
 
   (description
 {R"(
-
+Arithmetically adds the two double-precision floating-point numbers in DRn and
+DRm, and stores the result in DRn.
+<br/><br/>
+When FPSCR.enable.I is set, an FPU exception trap is generated regardless of
+whether or not an exception has occurred. When FPSCR.enable.O/U is set, FPU
+exception traps are generated on actual generation by the FPU exception source
+and on the satisfaction of certain special conditions that apply to this the
+instruction. When an exception occurs, correct exception information is
+reflected in FPSCR.cause and FPSCR.flag and DRn is not updated. Appropriate
+processing should therefore be performed by software.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="fadd.svg" height="300"/>
 )"})
 
   (note
@@ -16229,7 +16239,74 @@ void FABS (int n)
 
   (operation
 {R"(
+void FADD (int m, int n)
+{
+  PC += 2;
+  clear_cause ();
 
+  if (data_type_of (m) == sNaN || data_type_of (n) == sNaN)
+    invalid (n);
+  else if (data_type_of (m) == qNaN || data_type_of (n) == qNaN)
+    qnan (n);
+  else if (data_type_of (m) == DENORM || data_type_of (n) == DENORM)
+    set_E ();
+  else
+    switch (data_type_of (m))
+    {
+    case NORM:
+      switch (data_type_of (n))
+      {
+      case NORM:
+        normal_faddsub (m, n, ADD);
+        break;
+      case PZERO:
+      case NZERO:
+        register_copy (m, n);
+        break;
+      default:
+        break;
+      }
+      break;
+
+    case PZERO:
+      switch (data_type_of (n))
+      {
+      case NZERO:
+        zero (n, 0);
+        break;
+      default:
+        break;
+      }
+      break;
+
+    case NZERO:
+      break;
+
+    case PINF:
+      switch (data_type_of (n))
+      {
+      case NINF:
+        invalid (n);
+        break;
+      default:
+        inf (n, 0);
+        break;
+      }
+      break;
+
+     case NINF:
+       switch (data_type_of (n))
+       {
+       case PINF:
+         invalid (n);
+         break;
+       default:
+         inf (n, 1);
+         break;
+       }
+       break;
+    }
+}
 )"})
 
   (example
@@ -16239,7 +16316,31 @@ void FABS (int n)
 
   (exceptions
 {R"(
+<li>FPU Error</li>
+<li>Invalid Operation</li>
 
+<li>Overflow
+<br/>
+Generation of overflow-exception traps
+<br/>
+FPSCR.PR = 0: FRn and FRm have the same sign and the exponent of at least one
+value is 0xFE
+<br/>
+FPSCR.PR = 1: DRn and DRm have the same sign and the exponent of at least one
+value is 0x7FE
+</li>
+
+<li>Underflow
+Generation of underflow-exception traps
+<br/>
+FPSCR.PR = 0: FRn and FRm have different signs and neither has an exponent
+greater than 0x18
+<br/>
+FPSCR.PR = 1: DRn and DRm have different signs and neither has an exponent
+greater than 0x035
+</li>
+
+<li>Inexact</li>
 )"})
 )
 
