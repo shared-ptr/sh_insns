@@ -16766,18 +16766,75 @@ void FLOAT_single (int n)
 
   (description
 {R"(
-
+Converts the single-precision floating-point number in FRm to a 32-bit integer,
+and stores the result in FPUL.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="ftrc.svg" height="128"/>
 )"})
 
   (note
 {R"(
-SH2E and SH3E support only invalid operation (V) and division by zero
-(Z) exception flags.
+The rounding mode is always truncation.
 )"})
 
   (operation
 {R"(
+#define NEG_INT_SINGLE_RANGE 0xCF000000 & 0x7FFFFFFF // -1.000000 * 2^31
+#define POS_INT_SINGLE_RANGE 0x4EFFFFFF              // 1.FFFFFE * 2^30
 
+void FTRC_single (int m)
+{
+  PC += 2;
+  clear_cause ();
+
+  switch (ftrc_single_type_of (m))
+  {
+    case NORM:
+      FPUL = FR[m];  // Convert float to integer
+      break;
+    case PINF:
+      ftrc_invalid (0, &FPUL);
+      break;
+    case NINF:
+      ftrc_invalid (1, &FPUL);
+      break;
+  }
+}
+
+int ftrc_single_type_of (int m)
+{
+  if (sign_of (m) == 0)
+  {
+    if (FR_HEX[m] > 0x7F800000)
+      return NINF;  // NaN
+    else if (FR_HEX[m] > POS_INT_SINGLE_RANGE)
+      return PINF;  // out of range, +INF
+    else
+      return NORM;  // +0, +NORM
+  }
+  else
+  {
+    if ((FR_HEX[m] & 0x7FFFFFFF) > NEG_INT_SINGLE_RANGE)
+      return NINF;  // out of range, +INF, NaN
+    else
+      return NORM;  // -0, -NORM
+  }
+}
+
+void ftrc_invalid (int sign, int* result)
+{
+  set_V ();
+
+  if ((FPSCR & ENABLE_V) == 0)
+  {
+    if (sign == 0)
+      *FPUL = 0x7FFFFFFF;
+    else
+      *FPUL = 0x80000000;
+  }
+  else
+    fpu_exception_trap ();
+}
 )"})
 
   (example
@@ -16787,7 +16844,7 @@ SH2E and SH3E support only invalid operation (V) and division by zero
 
   (exceptions
 {R"(
-
+<li>Invalid operation</li>
 )"})
 )
 
@@ -17965,17 +18022,76 @@ void FLOAT_double (int n)
 
   (description
 {R"(
-
+Converts the double-precision floating-point number in DRm to a 32-bit integer,
+and stores the result in FPUL.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="ftrc.svg" height="128"/>
 )"})
 
   (note
 {R"(
-
+The rounding mode is always truncation.
 )"})
 
   (operation
 {R"(
+#define NEG_INT_DOUBLE_RANGE 0xC1E0000000200000 & 0x7FFFFFFFFFFFFFFF
+#define POS_INT_DOUBLE_RANGE 0x41E0000000000000
 
+void FTRC_double (int m)
+{
+  PC += 2;
+  clear_cause ();
+
+  switch (ftrc_double_type_of (m))
+  {
+    case NORM:
+      FPUL = DR[m];  // Convert double to integer
+      break;
+    case PINF:
+      ftrc_invalid (0, &FPUL);
+      break;
+    case NINF:
+      ftrc_invalid (1, &FPUL);
+      break;
+  }
+}
+
+int ftrc_double_type_of (int m)
+{
+  if (sign_of (m) == 0)
+  {
+    if (FR_HEX[m] > 0x7FF00000
+        || (FR_HEX[m] == 0x7FF00000 && FR_HEX[m+1] != 0x00000000))
+      return NINF;  // NaN
+    else if (DR_HEX[m] >= POS_INT_DOUBLE_RANGE)
+      return PINF;  // out of range, +INF
+    else
+      return NORM;  // +0, +NORM
+  }
+  else
+  {
+    if ((DR_HEX[m] & 0x7FFFFFFFFFFFFFFF) >= NEG_INT_DOUBLE_RANGE)
+      return NINF;  // out of range, +INF, NaN
+    else
+      return NORM;  // -0, -NORM
+  }
+}
+
+void ftrc_invalid (int sign, int* result)
+{
+  set_V ();
+
+  if ((FPSCR & ENABLE_V) == 0)
+  {
+    if (sign == 0)
+      *FPUL = 0x7FFFFFFF;
+    else
+      *FPUL = 0x80000000;
+  }
+  else
+    fpu_exception_trap ();
+}
 )"})
 
   (example
@@ -17985,7 +18101,7 @@ void FLOAT_double (int n)
 
   (exceptions
 {R"(
-
+<li>Invalid operation</li>
 )"})
 )
 
