@@ -18652,18 +18652,18 @@ void LDSFPSCR (int m)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "lds	Rm,FPUL"
+(insn "sts	FPSCR,Rn"
   SH2E SH3E SH4 SH4A SH2A
-  (abstract "Rm -> FPUL")
-  (code "0100mmmm01011010")
+  (abstract "FPSCR -> Rn")
+  (code "0000nnnn01101010")
 
-  (group SH4A "LS" SH4 "LS")
+  (group SH4A "LS" SH4 "CO")
   (issue SH2E "1" SH3E "1" SH4A "1" SH2A "1" SH4 "1")
-  (latency SH2E "1" SH3E "1" SH4A "1" SH2A "1" SH4 "1")
+  (latency SH2E "1" SH3E "1" SH4A "1" SH2A "2" SH4 "3")
 
   (description
 {R"(
-Loads the source operand into FPU system register FPUL.
+Stores FPU system register FPSCR in the destination.
 )"})
 
   (note
@@ -18673,9 +18673,16 @@ Loads the source operand into FPU system register FPUL.
 
   (operation
 {R"(
-void LDSFPUL (int m)
+void STSFPSCR (int n)
 {
-  FPUL = R[m];
+  #if SH2E || SH3E
+  R[n] = FPSCR;
+
+  #elif SH4 || SH4A || SH2A
+  R[n] = FPSCR & 0x003FFFFF;
+
+  #endif
+
   PC += 2;
 }
 )"})
@@ -18743,18 +18750,18 @@ void LDSMFPSCR (int m)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "lds.l	@Rm+,FPUL"
+(insn "sts.l	FPSCR,@-Rn"
   SH2E SH3E SH4 SH4A SH2A
-  (abstract "(Rm) -> FPUL, Rm+4 -> Rm")
-  (code "0100mmmm01010110")
+  (abstract "Rn-4 -> Rn, FPSCR -> (Rn)")
+  (code "0100nnnn01100010")
 
-  (group SH4A "LS" SH4 "LS")
+  (group SH4A "LS" SH4 "CO")
   (issue SH2E "1" SH3E "1" SH4A "1" SH2A "1" SH4 "1")
-  (latency SH2E "1" SH3E "1" SH4A "1" SH2A "2" SH4 "1/2")
+  (latency SH2E "1" SH3E "1" SH4A "1" SH2A "1" SH4 "1/1")
 
   (description
 {R"(
-
+Stores FPU system register FPSCR in the destination.
 )"})
 
   (note
@@ -18764,10 +18771,18 @@ void LDSMFPSCR (int m)
 
   (operation
 {R"(
-void LDSMFPUL (int m)
+void STSMFPSCR (int n)
 {
-  FPUL = Read_32 (R[m]);
-  R[m] += 4;
+  R[n] -= 4;
+
+  #if SH2E || SH3E
+  Write_32 (R[n], FPSCR);
+
+  #elif SH4 || SH4A || SH2A
+  Write_32 (R[n], FPSCR & 0x003FFFFF);
+
+  #endif
+
   PC += 2;
 }
 )"})
@@ -18783,22 +18798,23 @@ void LDSMFPUL (int m)
 <li>Data TLB miss exception</li>
 <li>Data TLB protection violation exception</li>
 <li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "sts	FPSCR,Rn"
+(insn "lds	Rm,FPUL"
   SH2E SH3E SH4 SH4A SH2A
-  (abstract "FPSCR -> Rn")
-  (code "0000nnnn01101010")
+  (abstract "Rm -> FPUL")
+  (code "0100mmmm01011010")
 
-  (group SH4A "LS" SH4 "CO")
+  (group SH4A "LS" SH4 "LS")
   (issue SH2E "1" SH3E "1" SH4A "1" SH2A "1" SH4 "1")
-  (latency SH2E "1" SH3E "1" SH4A "1" SH2A "2" SH4 "3")
+  (latency SH2E "1" SH3E "1" SH4A "1" SH2A "1" SH4 "1")
 
   (description
 {R"(
-Stores FPU system register FPSCR in the destination.
+Loads the source operand into FPU system register FPUL.
 )"})
 
   (note
@@ -18808,16 +18824,9 @@ Stores FPU system register FPSCR in the destination.
 
   (operation
 {R"(
-void STSFPSCR (int n)
+void LDSFPUL (int m)
 {
-  #if SH2E || SH3E
-  R[n] = FPSCR;
-
-  #elif SH4 || SH4A || SH2A
-  R[n] = FPSCR & 0x003FFFFF;
-
-  #endif
-
+  FPUL = R[m];
   PC += 2;
 }
 )"})
@@ -18874,18 +18883,18 @@ void STSFPUL (int n)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "sts.l	FPSCR,@-Rn"
+(insn "lds.l	@Rm+,FPUL"
   SH2E SH3E SH4 SH4A SH2A
-  (abstract "Rn-4 -> Rn, FPSCR -> (Rn)")
-  (code "0100nnnn01100010")
+  (abstract "(Rm) -> FPUL, Rm+4 -> Rm")
+  (code "0100mmmm01010110")
 
-  (group SH4A "LS" SH4 "CO")
+  (group SH4A "LS" SH4 "LS")
   (issue SH2E "1" SH3E "1" SH4A "1" SH2A "1" SH4 "1")
-  (latency SH2E "1" SH3E "1" SH4A "1" SH2A "1" SH4 "1/1")
+  (latency SH2E "1" SH3E "1" SH4A "1" SH2A "2" SH4 "1/2")
 
   (description
 {R"(
-Stores FPU system register FPSCR in the destination.
+
 )"})
 
   (note
@@ -18895,21 +18904,12 @@ Stores FPU system register FPSCR in the destination.
 
   (operation
 {R"(
-void STSMFPSCR (int n)
+void LDSMFPUL (int m)
 {
-  R[n] -= 4;
-
-  #if SH2E || SH3E
-  Write_32 (R[n], FPSCR);
-
-  #elif SH4 || SH4A || SH2A
-  Write_32 (R[n], FPSCR & 0x003FFFFF);
-
-  #endif
-
+  FPUL = Read_32 (R[m]);
+  R[m] += 4;
   PC += 2;
 }
-
 )"})
 
   (example
@@ -18923,7 +18923,6 @@ void STSMFPSCR (int n)
 <li>Data TLB miss exception</li>
 <li>Data TLB protection violation exception</li>
 <li>Data address error</li>
-<li>Initial page write exception</li>
 )"})
 )
 
