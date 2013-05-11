@@ -22780,7 +22780,10 @@ PSUB  A0,M0,A0  PMULS X0,Y0,M0  NOPX  NOPY
 
   (description
 {R"(
-
+Subtracts the contents of the Sy operand and the DC bit from the Sx operand and
+stores the result in the Dz operand. The DC bit of the DSR register is updated
+as the borrow flag. The N, Z, V, and GT bits of the DSR register are also
+updated.
 )"})
 
   (note
@@ -22790,12 +22793,81 @@ PSUB  A0,M0,A0  PMULS X0,Y0,M0  NOPX  NOPY
 
   (operation
 {R"(
+void psubc (void)
+{
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    DSP_ALU_SRC1G = A0G;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    DSP_ALU_SRC1G = A1G;
+    break;
+  }
+
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC2 = Y0;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC2 = Y1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC2 = M0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC2 = M1;
+    break;
+  }
+
+  if (DSP_ALU_SRC2_MSB)
+    DSP_ALU_SRC2G = 0xFF;
+  else
+    DSP_ALU_SRC2G = 0x0;
+
+  DSP_ALU_DST = DSP_ALU_SRC1 - DSP_ALU_SRC2 - DSPDCBIT;
+  carry_bit = ((DSP_ALU_SRC1_MSB | ! DSP_ALU_SRC2_MSB) && ! DSP_ALU_DST_MSB)
+              | (DSP_ALU_SRC1_MSB & ! DSP_ALU_SRC2_MSB);
+  borrow_bit = ! carry_bit;
+  DSP_ALU_DSTG_LSB8 = DSP_ALU_SRC1G_LSB8 - DSP_ALU_SRC2G_LSB8 - borrow_bit;
+  overflow_bit = MINUS_OP_G_OV || ! (POS_NOT_OV || NEG_NOT_OV);
+
+  #include "fixed_pt_overflow_protection.c"
+  #include "fixed_pt_unconditional_update.c"
+  #include "fixed_pt_dc_always_borrow.c"
+}
 )"})
 
   (example
 {R"(
+PSUBC X0,Y0,M0  NOPX  NOPY  ! Before execution: X0 = 0x33333333, Y0 = 0x55555555 M0 = 0x0012345678, DC = 0
+                            ! After execution: X0 = 0x33333333, Y0 = 0x55555555 M0 = 0xFFDDDDDDDE, DC = 1
 
+PSUBC X0,Y0,M0  NOPX  NOPY  ! Before execution: X0 = 0x33333333, Y0 = 0x55555555 M0 = 0x0012345678, DC = 1
+                            ! After execution: X0 = 0x33333333, Y0 = 0x55555555 M0 = 0xFFDDDDDDDD, DC = 1
 )"})
 
   (exceptions
