@@ -17292,7 +17292,7 @@ not necessary to adjust the FPSRC.PR setting before this instruction.
 {R"(
 void FABS (int n)
 {
-  FR[n << 1] = FR[n << 1] & 0x7FFFFFFFF;
+  FR[n] = FR[n] & 0x7FFFFFFFF;
   PC += 2;
 }
 )"})
@@ -17339,7 +17339,7 @@ not necessary to adjust the FPSRC.PR setting before this instruction.
 {R"(
 void FNEG (int n)
 {
-  FR[n << 1] = -FR[n << 1];
+  FR[n] = -FR[n];
   PC += 2;
 }
 )"})
@@ -17878,10 +17878,10 @@ void normal_fdiv_double (int m, int n)
     int l[4];
   } tmpx;
 
-  tmpd.d = DR[n];   // save destination value
-  dstd.d /= DR[m];  // round toward nearest or even
-  tmpx.x = dstd.d;  // convert double to int double
-  tmpx.x *= DR[m];
+  tmpd.d = DR[n >> 1];   // save destination value
+  dstd.d /= DR[m >> 1];  // round toward nearest or even
+  tmpx.x = dstd.d;       // convert double to int double
+  tmpx.x *= DR[m >> 1];
 
   if (tmpd.d != tmpx.x)
     set_I ();
@@ -17892,7 +17892,7 @@ void normal_fdiv_double (int m, int n)
       dstd.l[0] -= 1;
   }
 
-  check_double_exception (&DR[n], dstd.d);
+  check_double_exception (&DR[n >> 1], dstd.d);
 }
 )"})
 
@@ -18008,9 +18008,9 @@ void normal_fsqrt_double (int n)
     int l[4];
   } tmpx;
 
-  tmpd.d = DR[n];         // save destination value
-  dstd.d = sqrt (DR[n]);  // round toward nearest or even
-  tmpx.x = dstd.d;        // convert double to int double
+  tmpd.d = DR[n >> 1];         // save destination value
+  dstd.d = sqrt (DR[n >> 1]);  // round toward nearest or even
+  tmpx.x = dstd.d;             // convert double to int double
   tmpx.x *= dstd.d;
 
   if (tmpd.d != tmpx.x)
@@ -18024,7 +18024,7 @@ void normal_fsqrt_double (int n)
   if (FPSCR & ENABLE_I)
     fpu_exception_trap();
   else
-    DR[n] = dstd.d;
+    DR[n >> 1] = dstd.d;
 }
 )"})
 
@@ -18130,9 +18130,9 @@ int fcmp_chk_double (int m, int n)
       }
     }
 
-  if (DR[n] == DR[m])
+  if (DR[n >> 1] == DR[m >> 1])
     return EQ;
-  else if (DR[n] > DR[m])
+  else if (DR[n >> 1] > DR[m >> 1])
     return GT;
   else
     return LT;
@@ -18255,7 +18255,7 @@ void FLOAT_double (int n)
   PC += 2;
   clear_cause ();
 
-  DR[n] = FPUL; // convert from integer to double
+  DR[n >> 1] = FPUL; // convert from integer to double
 }
 )"})
 
@@ -18306,7 +18306,7 @@ void FTRC_double (int m)
   switch (ftrc_double_type_of (m))
   {
     case NORM:
-      FPUL = DR[m];  // Convert double to integer
+      FPUL = DR[m >> 1];  // Convert double to integer
       break;
     case PINF:
       ftrc_invalid (0, &FPUL);
@@ -18324,14 +18324,14 @@ int ftrc_double_type_of (int m)
     if (FR_HEX[m] > 0x7FF00000
         || (FR_HEX[m] == 0x7FF00000 && FR_HEX[m+1] != 0x00000000))
       return NINF;  // NaN
-    else if (DR_HEX[m] >= POS_INT_DOUBLE_RANGE)
+    else if (DR_HEX[m >> 1] >= POS_INT_DOUBLE_RANGE)
       return PINF;  // out of range, +INF
     else
       return NORM;  // +0, +NORM
   }
   else
   {
-    if ((DR_HEX[m] & 0x7FFFFFFFFFFFFFFF) >= NEG_INT_DOUBLE_RANGE)
+    if ((DR_HEX[m >> 1] & 0x7FFFFFFFFFFFFFFF) >= NEG_INT_DOUBLE_RANGE)
       return NINF;  // out of range, +INF, NaN
     else
       return NORM;  // -0, -NORM
