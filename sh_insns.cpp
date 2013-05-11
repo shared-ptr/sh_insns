@@ -22888,17 +22888,65 @@ PSUBC X0,Y0,M0  NOPX  NOPY  ! Before execution: X0 = 0x33333333, Y0 = 0x55555555
 
   (description
 {R"(
-
+Subtracts 1 from the top word of the Sx operand, stores the result in the upper
+word of the Dz operand, and clears the bottom word of the Dz operand with zeros.
+The DC bit of the DSR register is updated according to the specifications for
+the CS bits. The N, Z, V, and GT bits of the DSR register are also updated.
 )"})
 
   (note
 {R"(
-
+The bottom word of the destination register is ignored when the DC bit is
+updated.
 )"})
 
   (operation
 {R"(
+void pdec_sx (void)
+{
+  DSP_ALU_SRC2 = 0x1;
+  DSP_ALU_SRC2G = 0x0;
 
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    DSP_ALU_SRC1G = A0G;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    DSP_ALU_SRC1G = A1G;
+    break;
+  }
+
+  DSP_ALU_DST_HW = DSP_ALU_SRC1_HW - 1;
+  carry_bit = ((DSP_ALU_SRC1_MSB | ! DSP_ALU_SRC2_MSB) && ! DSP_ALU_DST_MSB)
+              | (DSP_ALU_SRC1_MSB & ! DSP_ALU_SRC2_MSB);
+  borrow_bit = ! carry_bit;
+  DSP_ALU_DSTG_LSB8 = DSP_ALU_SRC1G_LSB8 - DSP_ALU_SRC2G_LSB8 - borrow_bit;
+  overflow_bit = PLUS_OP_G_OV || ! (POS_NOT_OV || NEG_NOT_OV);
+
+  #include "integer_overflow_protection.c"
+  #include "integer_unconditional_update.c"
+  #include "integer_minus_dc_bit.c"
+}
 )"})
 
   (example
@@ -22924,17 +22972,60 @@ PSUBC X0,Y0,M0  NOPX  NOPY  ! Before execution: X0 = 0x33333333, Y0 = 0x55555555
 
   (description
 {R"(
-
+Subtracts 1 from the top word of the Sy operand, stores the result in the upper
+word of the Dz operand, and clears the bottom word of the Dz operand with zeros.
+The DC bit of the DSR register is updated according to the specifications for
+the CS bits. The N, Z, V, and GT bits of the DSR register are also updated.
 )"})
 
   (note
 {R"(
-
+The bottom word of the destination register is ignored when the DC bit is
+updated.
 )"})
 
   (operation
 {R"(
+void pdec_sy (void)
+{
+  DSP_ALU_SRC2 = 0x1;
+  DSP_ALU_SRC2G = 0x0;
 
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = Y0;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC1 = Y1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = M0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = M1;
+    break;
+  }
+
+  if (DSP_ALU_SRC1_MSB)
+    DSP_ALU_SRC1G = 0xFF;
+  else
+    DSP_ALU_SRC1G = 0x0;
+
+  DSP_ALU_DST_HW = DSP_ALU_SRC1_HW - 1;
+  carry_bit = ((DSP_ALU_SRC1_MSB | ! DSP_ALU_SRC2_MSB) && ! DSP_ALU_DST_MSB)
+              | (DSP_ALU_SRC1_MSB & ! DSP_ALU_SRC2_MSB);
+  borrow_bit = ! carry_bit;
+  DSP_ALU_DSTG_LSB8 = DSP_ALU_SRC1G_LSB8 - DSP_ALU_SRC2G_LSB8 - borrow_bit;
+  overflow_bit = PLUS_OP_G_OV || ! (POS_NOT_OV || NEG_NOT_OV);
+
+  #include "integer_overflow_protection.c"
+  #include "integer_unconditional_update.c"
+  #include "integer_minus_dc_bit.c"
+}
 )"})
 
   (example
@@ -22959,7 +23050,10 @@ PSUBC X0,Y0,M0  NOPX  NOPY  ! Before execution: X0 = 0x33333333, Y0 = 0x55555555
 
   (description
 {R"(
-
+Conditionally subtracts 1 from the top word of the Sx operand, stores the result
+in the upper word of the Dz operand, and clears the bottom word of the Dz
+operand with zeros.  The instruction is executed if the DC bit is set to 1.
+The DC, N, Z, V, and GT bits are not updated.
 )"})
 
   (note
@@ -22969,7 +23063,67 @@ PSUBC X0,Y0,M0  NOPX  NOPY  ! Before execution: X0 = 0x33333333, Y0 = 0x55555555
 
   (operation
 {R"(
+void pdec_sx_dct (void)
+{
+  DSP_ALU_SRC2 = 0x1;
+  DSP_ALU_SRC2G = 0x0;
 
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    DSP_ALU_SRC1G = A0G;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    DSP_ALU_SRC1G = A1G;
+    break;
+  }
+
+  DSP_ALU_DST_HW = DSP_ALU_SRC1_HW - 1;
+  carry_bit = ((DSP_ALU_SRC1_MSB | ! DSP_ALU_SRC2_MSB) && ! DSP_ALU_DST_MSB)
+              | (DSP_ALU_SRC1_MSB & ! DSP_ALU_SRC2_MSB);
+  borrow_bit = ! carry_bit;
+  DSP_ALU_DSTG_LSB8 = DSP_ALU_SRC1G_LSB8 - DSP_ALU_SRC2G_LSB8 - borrow_bit;
+  overflow_bit = PLUS_OP_G_OV || ! (POS_NOT_OV || NEG_NOT_OV);
+
+  #include "integer_overflow_protection.c"
+
+  if (DC == 1)
+  {
+    DSP_REG_WD[ex2_dz_no*2] = DSP_ALU_DST_HW;
+    DSP_REG_WD[ex2_dz_no*2+1] = 0x0;  // clear LSW
+    if (ex2_dz_no == 0)
+    {
+      A0G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A0G = A0G | MASKFFFFFF00;
+    }
+    else if (ex2_dz_no == 1)
+    {
+      A1G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A1G = A1G | MASKFFFFFF00;
+    }
+  }
+}
 )"})
 
   (example
@@ -22994,7 +23148,10 @@ PSUBC X0,Y0,M0  NOPX  NOPY  ! Before execution: X0 = 0x33333333, Y0 = 0x55555555
 
   (description
 {R"(
-
+Conditionally subtracts 1 from the top word of the Sy operand, stores the result
+in the upper word of the Dz operand, and clears the bottom word of the Dz
+operand with zeros.  The instruction is executed if the DC bit is set to 1.
+The DC, N, Z, V, and GT bits are not updated.
 )"})
 
   (note
@@ -23004,7 +23161,62 @@ PSUBC X0,Y0,M0  NOPX  NOPY  ! Before execution: X0 = 0x33333333, Y0 = 0x55555555
 
   (operation
 {R"(
+void pdec_sy_dct (void)
+{
+  DSP_ALU_SRC2 = 0x1;
+  DSP_ALU_SRC2G = 0x0;
 
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = Y0;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC1 = Y1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = M0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = M1;
+    break;
+  }
+
+  if (DSP_ALU_SRC1_MSB)
+    DSP_ALU_SRC1G = 0xFF;
+  else
+    DSP_ALU_SRC1G = 0x0;
+
+  DSP_ALU_DST_HW = DSP_ALU_SRC1_HW - 1;
+  carry_bit = ((DSP_ALU_SRC1_MSB | ! DSP_ALU_SRC2_MSB) && ! DSP_ALU_DST_MSB)
+              | (DSP_ALU_SRC1_MSB & ! DSP_ALU_SRC2_MSB);
+  borrow_bit = ! carry_bit;
+  DSP_ALU_DSTG_LSB8 = DSP_ALU_SRC1G_LSB8 - DSP_ALU_SRC2G_LSB8 - borrow_bit;
+  overflow_bit = PLUS_OP_G_OV || ! (POS_NOT_OV || NEG_NOT_OV);
+
+  #include "integer_overflow_protection.c"
+
+  if (DC == 1)
+  {
+    DSP_REG_WD[ex2_dz_no*2] = DSP_ALU_DST_HW;
+    DSP_REG_WD[ex2_dz_no*2+1] = 0x0;  // clear LSW
+    if (ex2_dz_no == 0)
+    {
+      A0G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A0G = A0G | MASKFFFFFF00;
+    }
+    else if (ex2_dz_no == 1)
+    {
+      A1G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A1G = A1G | MASKFFFFFF00;
+    }
+  }
+}
 )"})
 
   (example
@@ -23029,7 +23241,10 @@ PSUBC X0,Y0,M0  NOPX  NOPY  ! Before execution: X0 = 0x33333333, Y0 = 0x55555555
 
   (description
 {R"(
-
+Conditionally subtracts 1 from the top word of the Sx operand, stores the result
+in the upper word of the Dz operand, and clears the bottom word of the Dz
+operand with zeros.  The instruction is executed if the DC bit is set to 0.
+The DC, N, Z, V, and GT bits are not updated.
 )"})
 
   (note
@@ -23039,7 +23254,67 @@ PSUBC X0,Y0,M0  NOPX  NOPY  ! Before execution: X0 = 0x33333333, Y0 = 0x55555555
 
   (operation
 {R"(
+void pdec_sx_dcf (void)
+{
+  DSP_ALU_SRC2 = 0x1;
+  DSP_ALU_SRC2G = 0x0;
 
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    DSP_ALU_SRC1G = A0G;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    DSP_ALU_SRC1G = A1G;
+    break;
+  }
+
+  DSP_ALU_DST_HW = DSP_ALU_SRC1_HW - 1;
+  carry_bit = ((DSP_ALU_SRC1_MSB | ! DSP_ALU_SRC2_MSB) && ! DSP_ALU_DST_MSB)
+              | (DSP_ALU_SRC1_MSB & ! DSP_ALU_SRC2_MSB);
+  borrow_bit = ! carry_bit;
+  DSP_ALU_DSTG_LSB8 = DSP_ALU_SRC1G_LSB8 - DSP_ALU_SRC2G_LSB8 - borrow_bit;
+  overflow_bit = PLUS_OP_G_OV || ! (POS_NOT_OV || NEG_NOT_OV);
+
+  #include "integer_overflow_protection.c"
+
+  if (DC == 0)
+  {
+    DSP_REG_WD[ex2_dz_no*2] = DSP_ALU_DST_HW;
+    DSP_REG_WD[ex2_dz_no*2+1] = 0x0;  // clear LSW
+    if (ex2_dz_no == 0)
+    {
+      A0G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A0G = A0G | MASKFFFFFF00;
+    }
+    else if (ex2_dz_no == 1)
+    {
+      A1G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A1G = A1G | MASKFFFFFF00;
+    }
+  }
+}
 )"})
 
   (example
@@ -23064,7 +23339,10 @@ PSUBC X0,Y0,M0  NOPX  NOPY  ! Before execution: X0 = 0x33333333, Y0 = 0x55555555
 
   (description
 {R"(
-
+Conditionally subtracts 1 from the top word of the Sy operand, stores the result
+in the upper word of the Dz operand, and clears the bottom word of the Dz
+operand with zeros.  The instruction is executed if the DC bit is set to 0.
+The DC, N, Z, V, and GT bits are not updated.
 )"})
 
   (note
@@ -23074,7 +23352,62 @@ PSUBC X0,Y0,M0  NOPX  NOPY  ! Before execution: X0 = 0x33333333, Y0 = 0x55555555
 
   (operation
 {R"(
+void pdec_sy_dcf (void)
+{
+  DSP_ALU_SRC2 = 0x1;
+  DSP_ALU_SRC2G = 0x0;
 
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = Y0;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC1 = Y1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = M0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = M1;
+    break;
+  }
+
+  if (DSP_ALU_SRC1_MSB)
+    DSP_ALU_SRC1G = 0xFF;
+  else
+    DSP_ALU_SRC1G = 0x0;
+
+  DSP_ALU_DST_HW = DSP_ALU_SRC1_HW - 1;
+  carry_bit = ((DSP_ALU_SRC1_MSB | ! DSP_ALU_SRC2_MSB) && ! DSP_ALU_DST_MSB)
+              | (DSP_ALU_SRC1_MSB & ! DSP_ALU_SRC2_MSB);
+  borrow_bit = ! carry_bit;
+  DSP_ALU_DSTG_LSB8 = DSP_ALU_SRC1G_LSB8 - DSP_ALU_SRC2G_LSB8 - borrow_bit;
+  overflow_bit = PLUS_OP_G_OV || ! (POS_NOT_OV || NEG_NOT_OV);
+
+  #include "integer_overflow_protection.c"
+
+  if (DC == 0)
+  {
+    DSP_REG_WD[ex2_dz_no*2] = DSP_ALU_DST_HW;
+    DSP_REG_WD[ex2_dz_no*2+1] = 0x0;  // clear LSW
+    if (ex2_dz_no == 0)
+    {
+      A0G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A0G = A0G | MASKFFFFFF00;
+    }
+    else if (ex2_dz_no == 1)
+    {
+      A1G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A1G = A1G | MASKFFFFFF00;
+    }
+  }
+}
 )"})
 
   (example
