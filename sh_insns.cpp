@@ -22351,7 +22351,10 @@ void pneg_sy_dcf (void)
 
   (description
 {R"(
-
+Subtracts the contents of the Sy operand from the Sx operand and stores the
+result in the Dz operand.  The DC bit of the DSR register is updated according
+to the specifications for the CS bits. The N, Z, V, and GT bits of the DSR
+register are updated.
 )"})
 
   (note
@@ -22361,12 +22364,78 @@ void pneg_sy_dcf (void)
 
   (operation
 {R"(
+void psub (void)
+{
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    DSP_ALU_SRC1G = A0G;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    DSP_ALU_SRC1G = A1G;
+    break;
+  }
+
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC2 = Y0;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC2 = Y1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC2 = M0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC2 = M1;
+    break;
+  }
+
+  if (DSP_ALU_SRC2_MSB)
+    DSP_ALU_SRC2G = 0xFF;
+  else
+    DSP_ALU_SRC2G = 0x0;
+
+  DSP_ALU_DST = DSP_ALU_SRC1 - DSP_ALU_SRC2;
+  carry_bit = ((DSP_ALU_SRC1_MSB | ! DSP_ALU_SRC2_MSB) && ! DSP_ALU_DST_MSB)
+              | (DSP_ALU_SRC1_MSB & ! DSP_ALU_SRC2_MSB);
+  borrow_bit = ! carry_bit;
+  DSP_ALU_DSTG_LSB8 = DSP_ALU_SRC1G_LSB8 - DSP_ALU_SRC2G_LSB8 - borrow_bit;
+  overflow_bit = MINUS_OP_G_OV || ! (POS_NOT_OV || NEG_NOT_OV);
+
+  #include "fixed_pt_overflow_protection.c"
+  #include "fixed_pt_unconditional_update.c"
+  #include "fixed_pt_minus_dc_bit.c"
+}
 )"})
 
   (example
 {R"(
-
+PSUB  X0,Y0,A0  NOPX  NOPY  ! Before execution: X0 = 0x55555555, Y0 = 0x33333333, A0 = 0x123456789A
+                            ! After execution: X0 = 0x55555555, Y0 = 0x33333333, A0 = 0x0022222222
 )"})
 
   (exceptions
@@ -22386,7 +22455,9 @@ void pneg_sy_dcf (void)
 
   (description
 {R"(
-
+Conditionally subtracts the contents of the Sy operand from the Sx operand and
+stores the result in the Dz operand.  The instruction is executed if the DC bit
+is set to 1.  The DC, N, Z, V, and GT bits are not updated.
 )"})
 
   (note
@@ -22396,7 +22467,87 @@ void pneg_sy_dcf (void)
 
   (operation
 {R"(
+void psub_dct (void)
+{
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    DSP_ALU_SRC1G = A0G;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    DSP_ALU_SRC1G = A1G;
+    break;
+  }
+
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC2 = Y0;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC2 = Y1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC2 = M0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC2 = M1;
+    break;
+  }
+
+  if (DSP_ALU_SRC2_MSB)
+    DSP_ALU_SRC2G = 0xFF;
+  else
+    DSP_ALU_SRC2G = 0x0;
+
+  DSP_ALU_DST = DSP_ALU_SRC1 - DSP_ALU_SRC2;
+  carry_bit = ((DSP_ALU_SRC1_MSB | ! DSP_ALU_SRC2_MSB) && ! DSP_ALU_DST_MSB)
+              | (DSP_ALU_SRC1_MSB & ! DSP_ALU_SRC2_MSB);
+  borrow_bit = ! carry_bit;
+  DSP_ALU_DSTG_LSB8 = DSP_ALU_SRC1G_LSB8 - DSP_ALU_SRC2G_LSB8 - borrow_bit;
+  overflow_bit = MINUS_OP_G_OV || ! (POS_NOT_OV || NEG_NOT_OV);
+
+  #include "fixed_pt_overflow_protection.c"
+
+  if (DC == 1)
+  {
+    DSP_REG[ex2_dz_no] = DSP_ALU_DST;
+    if (ex2_dz_no == 0)
+    {
+      A0G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A0G = A0G | MASKFFFFFF00;
+    }
+    else if (ex2_dz_no == 1)
+    {
+      A1G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A1G = A1G | MASKFFFFFF00;
+    }
+  }
+}
 )"})
 
   (example
@@ -22421,7 +22572,9 @@ void pneg_sy_dcf (void)
 
   (description
 {R"(
-
+Conditionally subtracts the contents of the Sy operand from the Sx operand and
+stores the result in the Dz operand.  The instruction is executed if the DC bit
+is set to 0.  The DC, N, Z, V, and GT bits are not updated.
 )"})
 
   (note
@@ -22431,7 +22584,87 @@ void pneg_sy_dcf (void)
 
   (operation
 {R"(
+void psub_dct (void)
+{
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    DSP_ALU_SRC1G = A0G;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    DSP_ALU_SRC1G = A1G;
+    break;
+  }
+
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC2 = Y0;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC2 = Y1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC2 = M0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC2 = M1;
+    break;
+  }
+
+  if (DSP_ALU_SRC2_MSB)
+    DSP_ALU_SRC2G = 0xFF;
+  else
+    DSP_ALU_SRC2G = 0x0;
+
+  DSP_ALU_DST = DSP_ALU_SRC1 - DSP_ALU_SRC2;
+  carry_bit = ((DSP_ALU_SRC1_MSB | ! DSP_ALU_SRC2_MSB) && ! DSP_ALU_DST_MSB)
+              | (DSP_ALU_SRC1_MSB & ! DSP_ALU_SRC2_MSB);
+  borrow_bit = ! carry_bit;
+  DSP_ALU_DSTG_LSB8 = DSP_ALU_SRC1G_LSB8 - DSP_ALU_SRC2G_LSB8 - borrow_bit;
+  overflow_bit = MINUS_OP_G_OV || ! (POS_NOT_OV || NEG_NOT_OV);
+
+  #include "fixed_pt_overflow_protection.c"
+
+  if (DC == 0)
+  {
+    DSP_REG[ex2_dz_no] = DSP_ALU_DST;
+    if (ex2_dz_no == 0)
+    {
+      A0G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A0G = A0G | MASKFFFFFF00;
+    }
+    else if (ex2_dz_no == 1)
+    {
+      A1G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A1G = A1G | MASKFFFFFF00;
+    }
+  }
+}
 )"})
 
   (example
