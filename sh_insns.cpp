@@ -16832,9 +16832,9 @@ void ftrc_invalid (int sign, int* result)
   if ((FPSCR & ENABLE_V) == 0)
   {
     if (sign == 0)
-      *FPUL = 0x7FFFFFFF;
+      *result = 0x7FFFFFFF;
     else
-      *FPUL = 0x80000000;
+      *result = 0x80000000;
   }
   else
     fpu_exception_trap ();
@@ -18344,9 +18344,9 @@ void ftrc_invalid (int sign, int* result)
   if ((FPSCR & ENABLE_V) == 0)
   {
     if (sign == 0)
-      *FPUL = 0x7FFFFFFF;
+      *result = 0x7FFFFFFF;
     else
-      *FPUL = 0x80000000;
+      *result = 0x80000000;
   }
   else
     fpu_exception_trap ();
@@ -18376,7 +18376,18 @@ void ftrc_invalid (int sign, int* result)
 
   (description
 {R"(
-
+Converts the double-precision floating-point number in DRm to a single-precision
+floating-point number, and stores the result in FPUL.
+<br/><br/>
+When FPSCR.enable. I is set, an FPU exception trap is generated regardless of
+whether or not an exception has occurred. When FPSCR.enable.O/U is set, FPU
+exception traps are generated on actual generation by the FPU exception source
+and on the satisfaction of certain special conditions that apply to this the
+instruction. When an exception occurs, correct exception information is
+reflected in FPSCR.cause and FPSCR.flag, and FPUL is not updated. Appropriate
+processing should therefore be performed by software.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="fcnvds.svg" height="128"/>
 )"})
 
   (note
@@ -18386,7 +18397,77 @@ void ftrc_invalid (int sign, int* result)
 
   (operation
 {R"(
+void FCNVDS (int m)
+{
+  if (FPSCR_PR != 1)
+    undefined_operation ();
+  else
+  {
+    PC += 2;
+    clear_cause ();
 
+    switch (data_type_of (m))
+    {
+    case NORM:
+    case PZERO:
+    case NZERO:
+      normal_fcnvds (m, &FPUL);
+      break;
+
+    case DENORM:
+      set_E ();
+
+    case PINF:
+      FPUL = 0x7F800000;
+      break;
+
+    case NINF:
+      FPUL = 0xFF800000;
+      break;
+
+    case qNaN:
+      FPUL = 0x7FBFFFFF;
+      break;
+
+    case sNaN:
+      set_V ();
+      if ((FPSCR & ENABLE_V) == 0)
+        FPUL = 0x7FBFFFFF;
+      else
+        fpu_exception_trap ();
+      break;
+    }
+  }
+}
+
+void normal_fcnvds (int m, float* result)
+{
+  int sign;
+  float abs;
+
+  union
+  {
+    float f;
+    int l;
+  } dstf, tmpf;
+
+  union
+  {
+    double d;
+    int l[2];
+  } dstd;
+
+  dstd.d = DR [m >> 1];
+
+  if (dstd.l[1] & 0x1FFFFFFF))
+    set_I ();
+
+  if (FPSCR_RM == 1)
+    dstd.l[1] &= 0xE0000000;  // round toward zero
+
+  dstf.f = dstd.d;
+  check_single_exception (result, dstf.f);
+}
 )"})
 
   (example
@@ -18396,7 +18477,23 @@ void ftrc_invalid (int sign, int* result)
 
   (exceptions
 {R"(
+<li>FPU error</li>
+<li>Invalid operation</li>
+<li>Overflow
+</br>
+Generation of overflow exception traps
+</br>
+The exponent of DRn is not less than 0x47E
+</li>
 
+<li>Underflow
+</br>
+Generation of underflow exception traps
+</br>
+The exponent of DRn is not more than 0x380
+</li>
+
+<li>Inexact</li>
 )"})
 )
 
