@@ -16525,17 +16525,100 @@ void normal_fsqrt_single (int n)
 
   (description
 {R"(
-
+Arithmetically compares the two single-precision floating-point numbers in FRn
+and FRm, and stores 1 in the T bit if they are equal, or 0 otherwise.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="fcmpeq.svg" height="300"/>
 )"})
 
   (note
 {R"(
-SH2E and SH3E support only invalid operation (V) and division by zero
-(Z) exception flags.
 )"})
 
   (operation
 {R"(
+void FCMP_EQ (int m, int n)
+{
+  PC += 2;
+  clear_cause ();
+
+  if (fcmp_chk_single (m, n) == INVALID)
+    fcmp_invalid ();
+  else if (fcmp_chk_single (m, n) == EQ)
+    T = 1;
+  else
+    T = 0;
+}
+
+int fcmp_chk_single (int m, int n)
+{
+  if (data_type_of (m) == sNaN || data_type_of (n) == sNaN)
+    return INVALID;
+  else if (data_type_of (m) == qNaN || data_type_of (n) == qNaN)
+    return UO;
+  else
+    switch (data_type_of (m))
+    {
+    case NORM:
+      switch (data_type_of (n))
+      {
+      case PINF:
+        return GT;
+      case NINF:
+        return LT;
+      default:
+        break;
+      }
+      break;
+
+    case PZERO:
+    case NZERO:
+      switch (data_type_of (n))
+      {
+      case PZERO:
+      case NZERO:
+        return EQ;
+      default:
+        break;
+      }
+      break;
+
+    case PINF:
+      switch (data_type_of (n))
+      {
+        case PINF:
+          return EQ;
+        default:
+          return LT;
+      }
+
+    case NINF:
+      switch (data_type_of (n))
+      {
+      case NINF:
+        return EQ;
+      default:
+        return GT;
+      }
+    }
+
+  if (FR[n] == FR[m])
+    return EQ;
+  else if (FR[n] > FR[m])
+    return GT;
+  else
+    return LT;
+}
+
+void fcmp_invalid (void)
+{
+  set_V ();
+
+  if ((FPSCR & ENABLE_V) == 0)
+    T = 0;
+  else
+    fpu_exception_trap ();
+}
 
 )"})
 
@@ -16546,7 +16629,7 @@ SH2E and SH3E support only invalid operation (V) and division by zero
 
   (exceptions
 {R"(
-
+<li>Invalid operation</li>
 )"})
 )
 
@@ -16563,17 +16646,42 @@ SH2E and SH3E support only invalid operation (V) and division by zero
 
   (description
 {R"(
-
+Arithmetically compares the two single-precision floating-point numbers in FRn
+and FRm, and stores 1 in the T bit if FRn > FRm, or 0 otherwise.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="fcmpgt.svg" height="300"/>
 )"})
 
   (note
 {R"(
-SH2E and SH3E support only invalid operation (V) and division by zero
-(Z) exception flags.
+For IEEE 754 conform less-than-or-equal comparison it is not sufficient to swap
+the operands.  The FCMP/EQ must be used as well.
 )"})
 
   (operation
 {R"(
+void FCMP_GT (int m, int n)
+{
+  PC += 2;
+  clear_cause ();
+
+  if (fcmp_chk_single (m, n) == INVALID || fcmp_chk_single (m, n) == UO)
+    fcmp_invalid ();
+  else if (fcmp_chk_single (m, n) == GT)
+    T = 1;
+  else
+    T = 0;
+}
+
+int fcmp_chk_single (int m, int n)
+{
+  // see description of FCMP/EQ instruction.
+}
+
+void fcmp_invalid (void)
+{
+  // see description of FCMP/EQ instruction.
+}
 
 )"})
 
@@ -16584,7 +16692,7 @@ SH2E and SH3E support only invalid operation (V) and division by zero
 
   (exceptions
 {R"(
-
+<li>Invalid operation</li>
 )"})
 )
 
@@ -17607,17 +17715,100 @@ void normal_fsqrt_double (int n)
 
   (description
 {R"(
-
+Arithmetically compares the two double-precision floating-point numbers in DRn
+and DRm, and stores 1 in the T bit if they are equal, or 0 otherwise.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="fcmpeq.svg" height="300"/>
 )"})
 
   (note
 {R"(
-
 )"})
 
   (operation
 {R"(
+void FCMP_EQ (int m, int n)
+{
+  PC += 2;
+  clear_cause ();
 
+  if (fcmp_chk_double (m, n) == INVALID)
+    fcmp_invalid ();
+  else if (fcmp_chk_double (m, n) == EQ)
+    T = 1;
+  else
+    T = 0;
+}
+
+int fcmp_chk_double (int m, int n)
+{
+  if (data_type_of (m) == sNaN || data_type_of (n) == sNaN)
+    return INVALID;
+  else if (data_type_of (m) == qNaN || data_type_of (n) == qNaN)
+    return UO;
+  else
+    switch (data_type_of (m))
+    {
+    case NORM:
+      switch (data_type_of (n))
+      {
+      case PINF:
+        return GT;
+      case NINF:
+        return LT;
+      default:
+        break;
+      }
+      break;
+
+    case PZERO:
+    case NZERO:
+      switch (data_type_of (n))
+      {
+      case PZERO:
+      case NZERO:
+        return EQ;
+      default:
+        break;
+      }
+      break;
+
+    case PINF:
+      switch (data_type_of (n))
+      {
+        case PINF:
+          return EQ;
+        default:
+          return LT;
+      }
+
+    case NINF:
+      switch (data_type_of (n))
+      {
+      case NINF:
+        return EQ;
+      default:
+        return GT;
+      }
+    }
+
+  if (DR[n] == DR[m])
+    return EQ;
+  else if (DR[n] > DR[m])
+    return GT;
+  else
+    return LT;
+}
+
+void fcmp_invalid (void)
+{
+  set_V ();
+
+  if ((FPSCR & ENABLE_V) == 0)
+    T = 0;
+  else
+    fpu_exception_trap ();
+}
 )"})
 
   (example
@@ -17627,7 +17818,7 @@ void normal_fsqrt_double (int n)
 
   (exceptions
 {R"(
-
+<li>Invalid operation</li>
 )"})
 )
 
@@ -17643,17 +17834,42 @@ void normal_fsqrt_double (int n)
 
   (description
 {R"(
-
+Arithmetically compares the two double-precision floating-point numbers in DRn
+and DRm, and stores 1 in the T bit if DRn > DRm, or 0 otherwise.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="fcmpgt.svg" height="300"/>
 )"})
 
   (note
 {R"(
-
+For IEEE 754 conform less-than-or-equal comparison it is not sufficient to swap
+the operands.  The FCMP/EQ must be used as well.
 )"})
 
   (operation
 {R"(
+void FCMP_GT (int m, int n)
+{
+  PC += 2;
+  clear_cause ();
 
+  if (fcmp_chk_double (m, n) == INVALID || fcmp_chk_double (m, n) == UO)
+    fcmp_invalid ();
+  else if (fcmp_chk_double (m, n) == GT)
+    T = 1;
+  else
+    T = 0;
+}
+
+int fcmp_chk_double (int m, int n)
+{
+  // see description of FCMP/EQ instruction.
+}
+
+void fcmp_invalid (void)
+{
+  // see description of FCMP/EQ instruction.
+}
 )"})
 
   (example
@@ -17663,7 +17879,7 @@ void normal_fsqrt_double (int n)
 
   (exceptions
 {R"(
-
+<li>Invalid operation</li>
 )"})
 )
 
