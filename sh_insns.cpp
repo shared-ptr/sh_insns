@@ -25273,17 +25273,78 @@ void por_dcf (void)
 
   (description
 {R"(
-
+Takes the exclusive OR of the top word of the Sx operand and the top word of the
+Sy operand, stores the result in the top word of the Dz operand, and clears the
+bottom word of Dz with zeros. When Dz is a register that has guard bits, the
+guard bits are also zeroed.  The DC bit of the DSR register is updated according
+to the specifications for the CS bits. The N, Z, V, and GT bits of the DSR
+register are also updated. 
 )"})
 
   (note
 {R"(
-
+The bottom word of the destination register and the guard bits are ignored when
+the DC bit is updated.
 )"})
 
   (operation
 {R"(
+void pxor (void)
+{
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    break;
+  }
+
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC2 = Y0;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC2 = Y1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC2 = M0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC2 = M1;
+    break;
+  }
+
+  DSP_ALU_DST_HW = DSP_ALU_SRC1_HW ^ DSP_ALU_SRC2_HW;
+
+  DSP_REG_WD[ex2_dz_no*2] = DSP_ALU_DST_HW;
+  DSP_REG_WD[ex2_dz_no*2+1] = 0x0;  // clear LSW
+  if (ex2_dz_no == 0)
+    A0G = 0x0;  // clear Guard bits
+  else if (ex2_dz_no == 1)
+    A1G = 0x0;
+
+  carry_bit = 0x0;
+  negative_bit = DSP_ALU_DST_MSB;
+  zero_bit = (DSP_ALU_DST_HW == 0);
+  overflow_bit = 0x0;
+
+  #include "logical_dc_bit.c"
+}
 )"})
 
   (example
@@ -25308,7 +25369,12 @@ void por_dcf (void)
 
   (description
 {R"(
-
+Conditionally takes the exclusive OR of the top word of the Sx operand and the
+top word of the Sy operand, stores the result in the top word of the Dz operand,
+and clears the bottom word of Dz with zeros. When Dz is a register that has
+guard bits, the guard bits are also zeroed.
+The instruction is executed if the DC bit is set to 1.
+The DC, N, Z, V, and GT bits are not updated.
 )"})
 
   (note
@@ -25318,7 +25384,58 @@ void por_dcf (void)
 
   (operation
 {R"(
+void pxor_dct (void)
+{
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    break;
+  }
+
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC2 = Y0;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC2 = Y1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC2 = M0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC2 = M1;
+    break;
+  }
+
+  DSP_ALU_DST_HW = DSP_ALU_SRC1_HW ^ DSP_ALU_SRC2_HW;
+
+  if (DC == 1)
+  {
+    DSP_REG_WD[ex2_dz_no*2] = DSP_ALU_DST_HW;
+    DSP_REG_WD[ex2_dz_no*2+1] = 0x0;  // clear LSW
+    if (ex2_dz_no == 0)
+      A0G = 0x0;  // clear Guard bits
+    else if (ex2_dz_no == 1)
+      A1G = 0x0;
+  }
+}
 )"})
 
   (example
@@ -25343,7 +25460,12 @@ void por_dcf (void)
 
   (description
 {R"(
-
+Conditionally takes the exclusive OR of the top word of the Sx operand and the
+top word of the Sy operand, stores the result in the top word of the Dz operand,
+and clears the bottom word of Dz with zeros. When Dz is a register that has
+guard bits, the guard bits are also zeroed.
+The instruction is executed if the DC bit is set to 0.
+The DC, N, Z, V, and GT bits are not updated.
 )"})
 
   (note
@@ -25353,7 +25475,58 @@ void por_dcf (void)
 
   (operation
 {R"(
+void pxor_dcf (void)
+{
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    break;
+  }
+
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC2 = Y0;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC2 = Y1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC2 = M0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC2 = M1;
+    break;
+  }
+
+  DSP_ALU_DST_HW = DSP_ALU_SRC1_HW ^ DSP_ALU_SRC2_HW;
+
+  if (DC == 0)
+  {
+    DSP_REG_WD[ex2_dz_no*2] = DSP_ALU_DST_HW;
+    DSP_REG_WD[ex2_dz_no*2+1] = 0x0;  // clear LSW
+    if (ex2_dz_no == 0)
+      A0G = 0x0;  // clear Guard bits
+    else if (ex2_dz_no == 1)
+      A1G = 0x0;
+  }
+}
 )"})
 
   (example
