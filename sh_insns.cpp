@@ -15481,6 +15481,12 @@ to 0, and stores the result in FRn.
   (note
 {R"(
 The cause and flag fields in FPSCR are not updated.
+<br/><br/>
+A double-precision floating-point register DRn consists of a single-precision
+floating-point register pair FRn:FRn+1, where FRn is the high part and FRn+1 is
+the low part.  This instruction operates only on the high part and thus the
+operation performed for double and single precision setting is the same.  It is
+not necessary to adjust the FPSRC.PR setting before this instruction.
 )"})
 
   (operation
@@ -15488,6 +15494,53 @@ The cause and flag fields in FPSCR are not updated.
 void FABS (int n)
 {
   FR[n] = FR[n] & 0x7FFFFFFFF;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fneg	FRn"
+  SH2E SH3E SH4 SH4A SH2A
+  (abstract "FRn ^ 0x80000000 -> FRn")
+  (code "1111nnnn01001101")
+
+  (group SH4A "LS" SH4 "LS")
+  (issue SH2E "1" SH3E "1" SH4A "1" SH2A "1" SH4 "1")
+  (latency SH2E "1" SH3E "1" SH4A "1" SH2A "0" SH4 "0")
+
+  (description
+{R"(
+Inverts the most significant bit (sign bit) of the contents of floating-point
+register FRn, and stores the result in FRn.
+)"})
+
+  (note
+{R"(
+The cause and flag fields in FPSCR are not updated.
+<br/><br/>
+A double-precision floating-point register DRn consists of a single-precision
+floating-point register pair FRn:FRn+1, where FRn is the high part and FRn+1 is
+the low part.  This instruction operates only on the high part and thus the
+operation performed for double and single precision setting is the same.  It is
+not necessary to adjust the FPSRC.PR setting before this instruction.
+)"})
+
+  (operation
+{R"(
+void FNEG (int n)
+{
+  FR[n] = -FR[n];
   PC += 2;
 }
 )"})
@@ -15643,6 +15696,191 @@ greater than 0x035
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fsub	FRm,FRn"
+  SH2E SH3E SH4 SH4A SH2A
+  (abstract "FRn - FRm -> FRn")
+  (code "1111nnnnmmmm0001")
+
+  (group SH4A "FE" SH4 "FE")
+  (issue SH2E "1" SH3E "1" SH4A "1" SH2A "1" SH4 "1")
+  (latency SH2E "1" SH3E "1" SH4A "1" SH2A "3" SH4 "3/4")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+SH2E and SH3E support only invalid operation (V) and division by zero
+(Z) exception flags.
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fmul	FRm,FRn"
+  SH2E SH3E SH4 SH4A SH2A
+  (abstract "FRn * FRm -> FRn")
+  (code "1111nnnnmmmm0010")
+
+  (group SH4A "FE" SH4 "FE")
+  (issue SH2E "1" SH3E "1" SH4A "1" SH2A "1" SH4 "1")
+  (latency SH2E "1" SH3E "1" SH4A "1" SH2A "3" SH4 "3/4")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+SH2E and SH3E support only invalid operation (V) and division by zero
+(Z) exception flags.
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fmac	FR0,FRm,FRn"
+  SH2E SH3E SH4 SH4A SH2A
+  (abstract "FR0 * FRm + FRn -> FRn")
+  (code "1111nnnnmmmm1110")
+
+  (group SH4A "FE" SH4 "FE")
+  (issue SH2E "1" SH3E "1" SH4A "1" SH2A "1" SH4 "1")
+  (latency SH2E "1" SH3E "1" SH4A "1" SH2A "3" SH4 "3/4")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+SH2E and SH3E support only invalid operation (V) and division by zero
+(Z) exception flags.
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fdiv	FRm,FRn"
+  SH2E SH3E SH4 SH4A SH2A
+  (abstract "FRn / FRm -> FRn")
+  (code "1111nnnnmmmm0011")
+
+  (group SH4A "FE" SH4 "FE")
+  (issue SH2E "1" SH3E "1" SH4A "1" SH2A "1" SH4 "1")
+  (latency SH2E "13" SH3E "13" SH4A "14" SH2A "12" SH4 "12/13")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+SH2E and SH3E support only invalid operation (V) and division by zero
+(Z) exception flags.
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fsqrt	FRn"
+  SH3E SH4 SH4A SH2A
+  (abstract "sqrt (FRn) -> FRn")
+  (code "1111nnnn01101101")
+
+  (group SH4A "FE" SH4 "FE")
+  (issue SH3E "1" SH4A "1" SH2A "1" SH4 "1")
+  (latency SH3E "13" SH4A "30" SH2A "11" SH4 "11/12")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+SH3E supports only invalid operation (V) and division by zero
+(Z) exception flags.
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "fcmp/eq	FRm,FRn"
   SH2E SH3E SH4 SH4A SH2A
   (abstract "If FRn = FRm: 1 -> T\nElse: 0 -> T")
@@ -15719,230 +15957,10 @@ SH2E and SH3E support only invalid operation (V) and division by zero
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fdiv	FRm,FRn"
-  SH2E SH3E SH4 SH4A SH2A
-  (abstract "FRn / FRm -> FRn")
-  (code "1111nnnnmmmm0011")
-
-  (group SH4A "FE" SH4 "FE")
-  (issue SH2E "1" SH3E "1" SH4A "1" SH2A "1" SH4 "1")
-  (latency SH2E "13" SH3E "13" SH4A "14" SH2A "12" SH4 "12/13")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-SH2E and SH3E support only invalid operation (V) and division by zero
-(Z) exception flags.
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "float	FPUL,FRn"
   SH2E SH3E SH4 SH4A SH2A
   (abstract "(float)FPUL -> FRn")
   (code "1111nnnn00101101")
-
-  (group SH4A "FE" SH4 "FE")
-  (issue SH2E "1" SH3E "1" SH4A "1" SH2A "1" SH4 "1")
-  (latency SH2E "1" SH3E "1" SH4A "1" SH2A "3" SH4 "3/4")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-SH2E and SH3E support only invalid operation (V) and division by zero
-(Z) exception flags.
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fmac	FR0,FRm,FRn"
-  SH2E SH3E SH4 SH4A SH2A
-  (abstract "FR0 * FRm + FRn -> FRn")
-  (code "1111nnnnmmmm1110")
-
-  (group SH4A "FE" SH4 "FE")
-  (issue SH2E "1" SH3E "1" SH4A "1" SH2A "1" SH4 "1")
-  (latency SH2E "1" SH3E "1" SH4A "1" SH2A "3" SH4 "3/4")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-SH2E and SH3E support only invalid operation (V) and division by zero
-(Z) exception flags.
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fmul	FRm,FRn"
-  SH2E SH3E SH4 SH4A SH2A
-  (abstract "FRn * FRm -> FRn")
-  (code "1111nnnnmmmm0010")
-
-  (group SH4A "FE" SH4 "FE")
-  (issue SH2E "1" SH3E "1" SH4A "1" SH2A "1" SH4 "1")
-  (latency SH2E "1" SH3E "1" SH4A "1" SH2A "3" SH4 "3/4")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-SH2E and SH3E support only invalid operation (V) and division by zero
-(Z) exception flags.
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fneg	FRn"
-  SH2E SH3E SH4 SH4A SH2A
-  (abstract "FRn ^ 0x80000000 -> FRn")
-  (code "1111nnnn01001101")
-
-  (group SH4A "LS" SH4 "LS")
-  (issue SH2E "1" SH3E "1" SH4A "1" SH2A "1" SH4 "1")
-  (latency SH2E "1" SH3E "1" SH4A "1" SH2A "0" SH4 "0")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fsqrt	FRn"
-  SH3E SH4 SH4A SH2A
-  (abstract "sqrt (FRn) -> FRn")
-  (code "1111nnnn01101101")
-
-  (group SH4A "FE" SH4 "FE")
-  (issue SH3E "1" SH4A "1" SH2A "1" SH4 "1")
-  (latency SH3E "13" SH4A "30" SH2A "11" SH4 "11/12")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-SH3E supports only invalid operation (V) and division by zero
-(Z) exception flags.
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fsub	FRm,FRn"
-  SH2E SH3E SH4 SH4A SH2A
-  (abstract "FRn - FRm -> FRn")
-  (code "1111nnnnmmmm0001")
 
   (group SH4A "FE" SH4 "FE")
   (issue SH2E "1" SH3E "1" SH4A "1" SH2A "1" SH4 "1")
@@ -16184,6 +16202,12 @@ to 0, and stores the result in DRn.
   (note
 {R"(
 The cause and flag fields in FPSCR are not updated.
+<br/><br/>
+A double-precision floating-point register DRn consists of a single-precision
+floating-point register pair FRn:FRn+1, where FRn is the high part and FRn+1 is
+the low part.  This instruction operates only on the high part and thus the
+operation performed for double and single precision setting is the same.  It is
+not necessary to adjust the FPSRC.PR setting before this instruction.
 )"})
 
   (operation
@@ -16191,6 +16215,53 @@ The cause and flag fields in FPSCR are not updated.
 void FABS (int n)
 {
   FR[n << 1] = FR[n << 1] & 0x7FFFFFFFF;
+  PC += 2;
+}
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fneg	DRn"
+  SH4 SH4A SH2A
+  (abstract "DRn ^ 0x8000000000000000 -> DRn")
+  (code "1111nnn001001101")
+
+  (group SH4A "LS" SH4 "FS")
+  (issue SH4A "1" SH2A "1" SH4 "1")
+  (latency SH4A "1" SH2A "0" SH4 "0")
+
+  (description
+{R"(
+Inverts the most significant bit (sign bit) of the contents of floating-point
+register DRn, and stores the result in DRn.
+)"})
+
+  (note
+{R"(
+The cause and flag fields in FPSCR are not updated.
+<br/><br/>
+A double-precision floating-point register DRn consists of a single-precision
+floating-point register pair FRn:FRn+1, where FRn is the high part and FRn+1 is
+the low part.  This instruction operates only on the high part and thus the
+operation performed for double and single precision setting is the same.  It is
+not necessary to adjust the FPSRC.PR setting before this instruction.
+)"})
+
+  (operation
+{R"(
+void FNEG (int n)
+{
+  FR[n << 1] = -FR[n << 1];
   PC += 2;
 }
 )"})
@@ -16343,6 +16414,79 @@ greater than 0x035
 <li>Inexact</li>
 )"})
 )
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fsub	DRm,DRn"
+  SH4 SH4A SH2A
+  (abstract "DRn - DRm -> DRn")
+  (code "1111nnn0mmm00001")
+
+  (group SH4A "FE" SH4 "FE")
+  (issue SH4A "1" SH2A "1" SH4 "1")
+  (latency SH4A "1" SH2A "0/8" SH4 "7/9")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fmul	DRm,DRn"
+  SH4 SH4A SH2A
+  (abstract "DRn * DRm -> DRn")
+  (code "1111nnn0mmm00010")
+
+  (group SH4A "FE" SH4 "FE")
+  (issue SH4A "1" SH2A "1" SH4 "1")
+  (latency SH4A "3" SH2A "0/8" SH4 "7/9")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "fcmp/eq	DRm,DRn"
@@ -16561,78 +16705,6 @@ greater than 0x035
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fmul	DRm,DRn"
-  SH4 SH4A SH2A
-  (abstract "DRn * DRm -> DRn")
-  (code "1111nnn0mmm00010")
-
-  (group SH4A "FE" SH4 "FE")
-  (issue SH4A "1" SH2A "1" SH4 "1")
-  (latency SH4A "3" SH2A "0/8" SH4 "7/9")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fneg	DRn"
-  SH4 SH4A SH2A
-  (abstract "DRn ^ 0x8000000000000000 -> DRn")
-  (code "1111nnn001001101")
-
-  (group SH4A "LS" SH4 "FS")
-  (issue SH4A "1" SH2A "1" SH4 "1")
-  (latency SH4A "1" SH2A "0" SH4 "0")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "fsqrt	DRn"
   SH4 SH4A SH2A
   (abstract "sqrt (DRn) -> DRn")
@@ -16641,42 +16713,6 @@ greater than 0x035
   (group SH4A "FE" SH4 "FE")
   (issue SH4A "1" SH2A "1" SH4 "1")
   (latency SH4A "30" SH2A "0/24" SH4 "23/25")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fsub	DRm,DRn"
-  SH4 SH4A SH2A
-  (abstract "DRn - DRm -> DRn")
-  (code "1111nnn0mmm00001")
-
-  (group SH4A "FE" SH4 "FE")
-  (issue SH4A "1" SH2A "1" SH4 "1")
-  (latency SH4A "1" SH2A "0/8" SH4 "7/9")
 
   (description
 {R"(
