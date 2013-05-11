@@ -16230,7 +16230,18 @@ At least one of the following results is not more than 0x2E:
 
   (description
 {R"(
-
+Arithmetically divides the single-precision floating-point number in FRn by the
+single-precision floating-point number in FRm, and stores the result in FRn.
+<br/><br/>
+When FPSCR.enable.I is set, an FPU exception trap is generated regardless of
+whether or not an exception has occurred. When FPSCR.enable.O/U is set, FPU
+exception traps are generated on actual generation by the FPU exception source
+and on the satisfaction of certain special conditions that apply to this the
+instruction. When an exception occurs, correct exception information is
+reflected in FPSCR.cause and FPSCR.flag and FRn is not updated. Appropriate
+processing should therefore be performed by software.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="fdiv.svg" height="300"/>
 )"})
 
   (note
@@ -16241,7 +16252,122 @@ SH2E and SH3E support only invalid operation (V) and division by zero
 
   (operation
 {R"(
+void FDIV (int m, int n)
+{
+  PC += 2;
+  clear_cause ();
 
+  if (data_type_of (m) == sNaN || data_type_of (n) == sNaN)
+    invalid (n);
+  else if (data_type_of (m) == qNaN || data_type_of (n) == qNaN)
+    qnan (n);
+  else
+    switch (data_type_of (m))
+    {
+    case NORM:
+      switch (data_type_of (n))
+      {
+      case PINF:
+      case NINF:
+        inf (n, sign_of (m) ^ sign_of (n));
+        break;
+      case PZERO:
+      case NZERO:
+        zero (n, sign_of (m) ^ sign_of (n));
+        break;
+      case DENORM:
+        set_E ();
+        break;
+      default:
+        normal_fdiv_single (m, n);
+        break;
+      }
+      break;
+
+    case PZERO:
+      switch (data_type_of (n))
+      {
+      case PZERO:
+      case NZERO:
+        invalid (n);
+        break;
+      case PINF:
+      case NINF:
+        break;
+      default:
+        dz (n, sign_of (m) ^ sign_of (n));
+        break;
+      }
+      break;
+
+    case NZERO:
+      switch (data_type_of (n))
+      {
+      case PZERO:
+      case NZERO:
+        invalid (n);
+        break;
+      case PINF:
+        inf (n, 1);
+        break;
+      case NINF:
+        inf (n, 0);
+        break;
+      default:
+        dz (FR[n], sign_of (m) ^ sign_of (n));
+        break;
+      }
+      break;
+
+    case DENORM:
+      set_E ();
+      break;
+
+    case PINF:
+    case NINF:
+      switch (data_type_of (n))
+      {
+      case DENORM:
+        set_E ();
+        break;
+      case PINF:
+      case NINF:
+        invalid (n);
+        break;
+      default:
+        zero (n, sign_of (m) ^ sign_of (n));
+        break;
+      }
+      break;
+    }
+}
+
+void normal_fdiv_single (int m, int n)
+{
+  union
+  {
+    float f;
+    int l;
+  } dstf, tmpf;
+
+  union
+  {
+    double d;
+    int l[2];
+  } tmpd;
+
+  tmpf.f = FR[n];   // save destination value
+  dstf.f /= FR[m];  // round toward nearest or even
+  tmpd.d = dstf.f;  // convert single to double
+  tmpd.d *= FR[m];
+
+  if (tmpf.f != tmpd.d)
+    set_I ();
+  if (tmpf.f < tmpd.d && FPSCR_RM == 1)
+    dstf.l -= 1; // round toward zero
+
+  check_single_exception (&FR[n], dstf.f);
+}
 )"})
 
   (example
@@ -16251,7 +16377,24 @@ SH2E and SH3E support only invalid operation (V) and division by zero
 
   (exceptions
 {R"(
+<li>FPU Error</li>
+<li>Invalid Operation</li>
+<li>Division by zero</li>
+<li>Overflow
+<br/>
+Generation of overflow-exception traps
+<br/>
+(exponent of FRn) - (exponent of FRm) + 0x7F is not less than 0xFF
+</li>
 
+<li>Underflow
+<br/>
+Generation of underflow-exception traps
+<br/>
+(exponent of FRn) - (exponent of FRm) + 0x7F is not more than 0x01
+</li>
+
+<li>Inexact</li>
 )"})
 )
 
@@ -17087,7 +17230,18 @@ Generation of underflow-exception traps
 
   (description
 {R"(
-
+Arithmetically divides the double-precision floating-point number in DRn by the
+double-precision floating-point number in DRm, and stores the result in DRn.
+<br/><br/>
+When FPSCR.enable.I is set, an FPU exception trap is generated regardless of
+whether or not an exception has occurred. When FPSCR.enable.O/U is set, FPU
+exception traps are generated on actual generation by the FPU exception source
+and on the satisfaction of certain special conditions that apply to this the
+instruction. When an exception occurs, correct exception information is
+reflected in FPSCR.cause and FPSCR.flag and DRn is not updated. Appropriate
+processing should therefore be performed by software.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="fdiv.svg" height="300"/>
 )"})
 
   (note
@@ -17097,7 +17251,126 @@ Generation of underflow-exception traps
 
   (operation
 {R"(
+void FDIV (int m, int n)
+{
+  PC += 2;
+  clear_cause ();
 
+  if (data_type_of (m) == sNaN || data_type_of (n) == sNaN)
+    invalid (n);
+  else if (data_type_of (m) == qNaN || data_type_of (n) == qNaN)
+    qnan (n);
+  else
+    switch (data_type_of (m))
+    {
+    case NORM:
+      switch (data_type_of (n))
+      {
+      case PINF:
+      case NINF:
+        inf (n, sign_of (m) ^ sign_of (n));
+        break;
+      case PZERO:
+      case NZERO:
+        zero (n, sign_of (m) ^ sign_of (n));
+        break;
+      case DENORM:
+        set_E ();
+        break;
+      default:
+        normal_fdiv_double (m, n);
+        break;
+      }
+      break;
+
+    case PZERO:
+      switch (data_type_of (n))
+      {
+      case PZERO:
+      case NZERO:
+        invalid (n);
+        break;
+      case PINF:
+      case NINF:
+        break;
+      default:
+        dz (n, sign_of (m) ^ sign_of (n));
+        break;
+      }
+      break;
+
+    case NZERO:
+      switch (data_type_of (n))
+      {
+      case PZERO:
+      case NZERO:
+        invalid (n);
+        break;
+      case PINF:
+        inf (n, 1);
+        break;
+      case NINF:
+        inf (n, 0);
+        break;
+      default:
+        dz (FR[n], sign_of (m) ^ sign_of (n));
+        break;
+      }
+      break;
+
+    case DENORM:
+      set_E ();
+      break;
+
+    case PINF:
+    case NINF:
+      switch (data_type_of (n))
+      {
+      case DENORM:
+        set_E ();
+        break;
+      case PINF:
+      case NINF:
+        invalid (n);
+        break;
+      default:
+        zero (n, sign_of (m) ^ sign_of (n));
+        break;
+      }
+      break;
+    }
+}
+
+void normal_fdiv_double (int m, int n)
+{
+  union
+  {
+    double d;
+    int l[2];
+  } dstd, tmpd;
+
+  union
+  {
+    int double x;
+    int l[4];
+  } tmpx;
+
+  tmpd.d = DR[n];   // save destination value
+  dstd.d /= DR[m];  // round toward nearest or even
+  tmpx.x = dstd.d;  // convert double to int double
+  tmpx.x *= DR[m];
+
+  if (tmpd.d != tmpx.x)
+    set_I ();
+  if (tmpd.d < tmpx.x && FPSCR_RM == 1)
+  {
+    dstd.l[1] -= 1;  // round toward zero
+    if (dstd.l[1] == 0xFFFFFFFF)
+      dstd.l[0] -= 1;
+  }
+
+  check_double_exception (&DR[n], dstd.d);
+}
 )"})
 
   (example
@@ -17107,7 +17380,24 @@ Generation of underflow-exception traps
 
   (exceptions
 {R"(
+<li>FPU Error</li>
+<li>Invalid Operation</li>
+<li>Division by zero</li>
+<li>Overflow
+<br/>
+Generation of overflow-exception traps
+<br/>
+(exponent of DRn) - (exponent of DRm) + 0x3FF is not less than 0x7FF
+</li>
 
+<li>Underflow
+<br/>
+Generation of underflow-exception traps
+<br/>
+(exponent of DRn) - (exponent of DRm) + 0x3FF is not more than 0x001
+</li>
+
+<li>Inexact</li>
 )"})
 )
 
