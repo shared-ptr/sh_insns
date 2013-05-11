@@ -16860,17 +16860,70 @@ void ftrc_invalid (int sign, int* result)
 
   (description
 {R"(
+Calculates the inner products of the 4-dimensional single-precision
+floating-point vector indicated by FVn and FVm, and stores the results in
+FR[n + 3].
+<br/><br/>
+The FIPR instruction is intended for speed rather than accuracy, and therefore
+the results will differ from those obtained by using a combination of FADD and
+FMUL instructions. The FIPR execution sequence is as follows:
+<ol type="1">
+<li> Multiplies all terms.  The results are 28 bits long.</li>
+<li> Aligns these results, rounding them to fit within 30 bits.</li>
+<li> Adds the aligned values.</li>
+<li> Performs normalization and rounding.</li>
+</ol>
 
+Special processing is performed in the following cases:
+<ol type="1">
+<li>If an input value is an sNaN, an invalid exception is generated.</li>
+
+<li>If the input values to be multiplied include a combination of 0 and
+infinity, an invalid exception is generated.</li>
+
+<li>In cases other than the above, if the input values include a qNaN, the
+result will be a qNaN.</li>
+
+<li>In cases other than the above, if the input values include infinity:
+  <ol type="a">
+  <li>If multiplication results in two or more infinities and the signs are
+  different, an invalid exception will be generated.</li>
+  <li>Otherwise, correct infinities will be stored.</li>
+  </ol>
+
+<li>If the input values do not include an sNaN, qNaN, or infinity, processing
+is performed in the normal way.</li>
+</ol>
+When FPSCR.enable.U/I is set, an FPU exception trap is generated regardless of
+whether or not an exception has occurred. When FPSCR.enable.O is set, FPU
+exception traps are generated on actual generation by the FPU exception source
+and on the satisfaction of certain special conditions that apply to this the
+instruction. When an exception occurs, correct exception information is
+reflected in FPSCR.cause and FPSCR.flag, and FR[n+3] is not updated. Appropriate
+processing should therefore be performed by software.
 )"})
 
   (note
 {R"(
-
+FV0 = { FR0, FR1, FR2, FR3 }<br/>
+FV4 = { FR4, FR5, FR6, FR7 }<br/>
+FV8 = { FR8, FR9, FR10, FR11 }<br/>
+FV12 = { FR12, FR13, FR14, FR15 }<br/>
 )"})
 
   (operation
 {R"(
-
+void FIPR (int m, int n)
+{
+  if (FPSCR_PR == 0)
+  {
+    PC += 2;
+    clear_cause ();
+    fipr (m,n);
+  }
+  else
+    undefined_operation ();
+}
 )"})
 
   (example
@@ -16880,7 +16933,20 @@ void ftrc_invalid (int sign, int* result)
 
   (exceptions
 {R"(
-
+<li>Invalid operation</li>
+<li>Overflow
+<br/>
+Generation of overflow exception traps
+<br/>
+At least one of the following results is not less than 0xFC
+<br/>
+(exponent of FRn) + (exponent of FRm)<br/>
+(exponent of FR(n + 1)) + (exponent of FR(m + 1))<br/>
+(exponent of FR(n + 2)) + (exponent of FR(m + 2))<br/>
+(exponent of FR(n + 3)) + (exponent of FR(m + 3))<br/>
+</li>
+<li>Underflow</li>
+<li>Inexact</li>
 )"})
 )
 
