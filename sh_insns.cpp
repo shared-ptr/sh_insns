@@ -16708,7 +16708,13 @@ void fcmp_invalid (void)
 
   (description
 {R"(
-
+Taking the contents of FPUL as a 32-bit integer, converts this integer to a
+single-precision floating-point number and stores the result in FRn.
+<br/><br/>
+When FPSCR.enable.I = 1 an FPU exception trap is generated regardless of whether
+or not an exception has occurred. When an exception occurs, correct exception
+information is reflected in FPSCR.cause and FPSCR.flag, and FRn is not updated.
+Appropriate processing should therefore be performed by software.
 )"})
 
   (note
@@ -16719,7 +16725,22 @@ SH2E and SH3E support only invalid operation (V) and division by zero
 
   (operation
 {R"(
+void FLOAT_single (int n)
+{
+  union
+  {
+    double d;
+    int l[2];
+  } tmp;
 
+  PC += 2;
+  clear_cause ();
+
+  FR[n] = FPUL; // convert from integer to float
+  tmp.d = FPUL;
+  if (tmp.l[1] & 0x1FFFFFFF)
+    inexact();
+}
 )"})
 
   (example
@@ -16729,7 +16750,7 @@ SH2E and SH3E support only invalid operation (V) and division by zero
 
   (exceptions
 {R"(
-
+<li>Inexact</li>
 )"})
 )
 
@@ -17895,7 +17916,8 @@ void fcmp_invalid (void)
 
   (description
 {R"(
-
+Taking the contents of FPUL as a 32-bit integer, converts this integer to a
+double-precision floating-point number and stores the result in DRn.
 )"})
 
   (note
@@ -17905,7 +17927,19 @@ void fcmp_invalid (void)
 
   (operation
 {R"(
+void FLOAT_double (int n)
+{
+  union
+  {
+    double d;
+    int l[2];
+  } tmp;
 
+  PC += 2;
+  clear_cause ();
+
+  DR[n] = FPUL; // convert from integer to double
+}
 )"})
 
   (example
