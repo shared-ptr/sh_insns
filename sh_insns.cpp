@@ -16487,6 +16487,77 @@ greater than 0x035
 )"})
 )
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fdiv	DRm,DRn"
+  SH4 SH4A SH2A
+  (abstract "DRn / DRm -> DRn")
+  (code "1111nnn0mmm00011")
+
+  (group SH4A "FE" SH4 "FE")
+  (issue SH4A "1" SH2A "1" SH4 "1")
+  (latency SH4A "14" SH2A "0/24" SH4 "24/26")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "fsqrt	DRn"
+  SH4 SH4A SH2A
+  (abstract "sqrt (DRn) -> DRn")
+  (code "1111nnn001101101")
+
+  (group SH4A "FE" SH4 "FE")
+  (issue SH4A "1" SH2A "1" SH4 "1")
+  (latency SH4A "30" SH2A "0/24" SH4 "23/25")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "fcmp/eq	DRm,DRn"
@@ -16533,6 +16604,78 @@ greater than 0x035
   (group SH4A "FE" SH4 "CO")
   (issue SH4A "1" SH2A "2" SH4 "2")
   (latency SH4A "1" SH2A "3" SH4 "3/5")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "float	FPUL,DRn"
+  SH4 SH4A SH2A
+  (abstract "(double)FPUL -> DRn")
+  (code "1111nnn000101101")
+
+  (group SH4A "FE" SH4 "FE")
+  (issue SH4A "1" SH2A "1" SH4 "1")
+  (latency SH4A "1" SH2A "0/4" SH4 "3/5")
+
+  (description
+{R"(
+
+)"})
+
+  (note
+{R"(
+
+)"})
+
+  (operation
+{R"(
+
+)"})
+
+  (example
+{R"(
+
+)"})
+
+  (exceptions
+{R"(
+
+)"})
+)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(insn "ftrc	DRm,FPUL"
+  SH4 SH4A SH2A
+  (abstract "(long)DRm -> FPUL")
+  (code "1111mmm000111101")
+
+  (group SH4A "FE" SH4 "FE")
+  (issue SH4A "1" SH2A "1" SH4 "1")
+  (latency SH4A "1" SH2A "0/4" SH4 "4/5")
 
   (description
 {R"(
@@ -16632,149 +16775,6 @@ greater than 0x035
 )"})
 )
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fdiv	DRm,DRn"
-  SH4 SH4A SH2A
-  (abstract "DRn / DRm -> DRn")
-  (code "1111nnn0mmm00011")
-
-  (group SH4A "FE" SH4 "FE")
-  (issue SH4A "1" SH2A "1" SH4 "1")
-  (latency SH4A "14" SH2A "0/24" SH4 "24/26")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "float	FPUL,DRn"
-  SH4 SH4A SH2A
-  (abstract "(double)FPUL -> DRn")
-  (code "1111nnn000101101")
-
-  (group SH4A "FE" SH4 "FE")
-  (issue SH4A "1" SH2A "1" SH4 "1")
-  (latency SH4A "1" SH2A "0/4" SH4 "3/5")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "fsqrt	DRn"
-  SH4 SH4A SH2A
-  (abstract "sqrt (DRn) -> DRn")
-  (code "1111nnn001101101")
-
-  (group SH4A "FE" SH4 "FE")
-  (issue SH4A "1" SH2A "1" SH4 "1")
-  (latency SH4A "30" SH2A "0/24" SH4 "23/25")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "ftrc	DRm,FPUL"
-  SH4 SH4A SH2A
-  (abstract "(long)DRm -> FPUL")
-  (code "1111mmm000111101")
-
-  (group SH4A "FE" SH4 "FE")
-  (issue SH4A "1" SH2A "1" SH4 "1")
-  (latency SH4A "1" SH2A "0/4" SH4 "4/5")
-
-  (description
-{R"(
-
-)"})
-
-  (note
-{R"(
-
-)"})
-
-  (operation
-{R"(
-
-)"})
-
-  (example
-{R"(
-
-)"})
-
-  (exceptions
-{R"(
-
-)"})
-)
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ));
