@@ -15674,21 +15674,14 @@ void FADD (int m, int n)
 <br/>
 Generation of overflow-exception traps
 <br/>
-FPSCR.PR = 0: FRn and FRm have the same sign and the exponent of at least one
-value is 0xFE
-<br/>
-FPSCR.PR = 1: DRn and DRm have the same sign and the exponent of at least one
-value is 0x7FE
+FRn and FRm have the same sign and the exponent of at least one value is 0xFE
 </li>
 
 <li>Underflow
+<br/>
 Generation of underflow-exception traps
 <br/>
-FPSCR.PR = 0: FRn and FRm have different signs and neither has an exponent
-greater than 0x18
-<br/>
-FPSCR.PR = 1: DRn and DRm have different signs and neither has an exponent
-greater than 0x035
+FRn and FRm have different signs and neither has an exponent greater than 0x18
 </li>
 
 <li>Inexact</li>
@@ -15707,7 +15700,18 @@ greater than 0x035
 
   (description
 {R"(
-
+Arithmetically subtracts the single-precision floating-point number in FRm from
+the single-precision floating-point number in FRn, and stores the result in FRn.
+<br/><br/>
+When FPSCR.enable.I is set, an FPU exception trap is generated regardless of
+whether or not an exception has occurred. When FPSCR.enable.O/U is set, FPU
+exception traps are generated on actual generation by the FPU exception source
+and on the satisfaction of certain special conditions that apply to this the
+instruction.  When an exception occurs, correct exception information is
+reflected in FPSCR.cause and FPSCR.flag and FRn is not updated. Appropriate
+processing should therefore be performed by software.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="fsub.svg" height="300"/>
 )"})
 
   (note
@@ -15718,7 +15722,75 @@ SH2E and SH3E support only invalid operation (V) and division by zero
 
   (operation
 {R"(
+void FSUB (int m, int n)
+{
+  PC += 2;
+  clear_cause ();
 
+  if (data_type_of (m) == sNaN || data_type_of (n) == sNaN)
+    invalid (n);
+  else if (data_type_of (m) == qNaN || data_type_of (n) == qNaN)
+    qnan (n);
+  else if (data_type_of (m) == DENORM || data_type_of (n) == DENORM)
+    set_E ();
+  else
+    switch (data_type_of (m))
+    {
+    case NORM:
+      switch (data_type_of (n))
+      {
+      case NORM:
+        normal_faddsub (m, n, SUB);
+        break;
+      case PZERO:
+      case NZERO:
+        register_copy (m, n);
+        FR[n] = -FR[n];
+        break;
+      default:
+        break;
+      }
+      break;
+
+    case PZERO:
+      break;
+
+    case NZERO:
+      switch (data_type_of (n))
+      {
+      case NZERO:
+        zero (n, 0);
+        break;
+      default:
+        break;
+      }
+      break;
+
+    case PINF:
+      switch (data_type_of (n))
+      {
+      case PINF:
+        invalid (n);
+        break;
+      default:
+        inf (n, 1);
+        break;
+      }
+      break;
+
+    case NINF:
+      switch (data_type_of (n))
+      {
+      case NINF:
+        invalid (n);
+        break;
+      default:
+        inf (n, 0);
+        break;
+      }
+      break;
+    }
+}
 )"})
 
   (example
@@ -15728,7 +15800,24 @@ SH2E and SH3E support only invalid operation (V) and division by zero
 
   (exceptions
 {R"(
+<li>FPU Error</li>
+<li>Invalid Operation</li>
 
+<li>Overflow
+<br/>
+Generation of overflow-exception traps
+<br/>
+FRn and FRm have the same sign and the exponent of at least one value is 0xFE
+</li>
+
+<li>Underflow
+<br/>
+Generation of underflow-exception traps
+<br/>
+FRn and FRm have different signs and neither has an exponent greater than 0x18
+</li>
+
+<li>Inexact</li>
 )"})
 )
 
@@ -15744,7 +15833,18 @@ SH2E and SH3E support only invalid operation (V) and division by zero
 
   (description
 {R"(
-
+Arithmetically multiplies the two single-precision floating-point numbers in
+FRn and FRm, and stores the result in FRn.
+<br/><br/>
+When FPSCR.enable.I is set, an FPU exception trap is generated regardless of
+whether or not an exception has occurred. When FPSCR.enable.O/U is set, FPU
+exception traps are generated on actual generation by the FPU exception source
+and on the satisfaction of certain special conditions that apply to this the
+instruction. When an exception occurs, correct exception information is
+reflected in FPSCR.cause and FPSCR.flag and FRn is not updated. Appropriate
+processing should therefore be performed by software.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="fmul.svg" height="300"/>
 )"})
 
   (note
@@ -15755,7 +15855,66 @@ SH2E and SH3E support only invalid operation (V) and division by zero
 
   (operation
 {R"(
+void FMUL (int m, int n)
+{
+  PC += 2;
+  clear_cause ();
 
+  if (data_type_of (m) == sNaN || data_type_of (n) == sNaN)
+    invalid (n);
+  else if (data_type_of (m) == qNaN || data_type_of (n) == qNaN)
+    qnan (n);
+  else if (data_type_of (m) == DENORM || data_type_of (n) == DENORM)
+    set_E ();
+  else
+    switch (data_type_of (m))
+    {
+    case NORM:
+      switch (data_type_of (n))
+      {
+      case PZERO:
+      case NZERO:
+        zero (n, sign_of (m) ^ sign_of (n));
+        break;
+      case PINF:
+      case NINF:
+        inf (n, sign_of (m) ^ sign_of (n));
+        break;
+      default:
+        normal_fmul (m, n);
+        break;
+      }
+      break;
+
+    case PZERO:
+    case NZERO:
+      switch (data_type_of (n))
+      {
+      case PINF:
+      case NINF:
+        invalid (n);
+        break;
+      default: 
+        zero (n,sign_of (m) ^ sign_of (n));
+        break;
+      }
+      break;
+
+    case PINF:
+    case NINF:
+      switch (data_type_of (n))
+      {
+      case PZERO:
+      case NZERO:
+        invalid (n);
+        break;
+      default:
+        inf (n, sign_of (m) ^ sign_of (n));
+        break
+      }
+      break;
+    }
+}
 )"})
 
   (example
@@ -15765,6 +15924,28 @@ SH2E and SH3E support only invalid operation (V) and division by zero
 
   (exceptions
 {R"(
+<li>FPU Error</li>
+<li>Invalid Operation</li>
+
+<li>Overflow
+<br/>
+Generation of overflow-exception traps
+<br/>
+(exponent of FRn) + (exponent of FRm) - 0x7F is not less than 0xFE
+</li>
+
+<li>Underflow
+<br/>
+Generation of underflow-exception traps
+<br/>
+When both FRn and FRm are normalized numbers:
+(exponent of FRn) + (exponent of FRm) - 0x7F is not more than 0x00
+<br/>
+When at least FRn or FRm is not a normalized number:
+(exponent of FRn) + (exponent of FRm) - 0x7F is not more than 0x18
+</li>
+
+<li>Inexact</li>
 
 )"})
 )
@@ -16394,21 +16575,14 @@ void FADD (int m, int n)
 <br/>
 Generation of overflow-exception traps
 <br/>
-FPSCR.PR = 0: FRn and FRm have the same sign and the exponent of at least one
-value is 0xFE
-<br/>
-FPSCR.PR = 1: DRn and DRm have the same sign and the exponent of at least one
-value is 0x7FE
+DRn and DRm have the same sign and the exponent of at least one value is 0x7FE
 </li>
 
 <li>Underflow
+<br/>
 Generation of underflow-exception traps
 <br/>
-FPSCR.PR = 0: FRn and FRm have different signs and neither has an exponent
-greater than 0x18
-<br/>
-FPSCR.PR = 1: DRn and DRm have different signs and neither has an exponent
-greater than 0x035
+DRn and DRm have different signs and neither has an exponent greater than 0x035
 </li>
 
 <li>Inexact</li>
@@ -16427,7 +16601,18 @@ greater than 0x035
 
   (description
 {R"(
-
+Arithmetically subtracts the double-precision floating-point number in DRm from
+the double-precision floating-point number in DRn, and stores the result in DRn.
+<br/><br/>
+When FPSCR.enable.I is set, an FPU exception trap is generated regardless of
+whether or not an exception has occurred. When FPSCR.enable.O/U is set, FPU
+exception traps are generated on actual generation by the FPU exception source
+and on the satisfaction of certain special conditions that apply to this the
+instruction.  When an exception occurs, correct exception information is
+reflected in FPSCR.cause and FPSCR.flag and DRn is not updated. Appropriate
+processing should therefore be performed by software.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="fsub.svg" height="300"/>
 )"})
 
   (note
@@ -16437,7 +16622,74 @@ greater than 0x035
 
   (operation
 {R"(
+void FSUB (int m, int n)
+{
+  PC += 2;
+  clear_cause ();
 
+  if (data_type_of (m) == sNaN || data_type_of (n) == sNaN)
+    invalid (n);
+  else if (data_type_of (m) == qNaN || data_type_of (n) == qNaN)
+    qnan (n);
+  else if (data_type_of (m) == DENORM || data_type_of (n) == DENORM)
+    set_E ();
+  else
+    switch (data_type_of (m))
+    {
+    case NORM:
+      switch (data_type_of (n))
+      {
+      case NORM:
+        normal_faddsub (m, n, SUB);
+        break;
+      case PZERO:
+      case NZERO:
+        register_copy (m, n);
+        FR[n] = -FR[n];
+        break;
+      default:
+        break;
+      }
+      break;
+
+    case PZERO:
+      break;
+      case NZERO:
+        switch (data_type_of (n))
+        {
+        case NZERO:
+          zero (n, 0);
+          break;
+        default:
+          break;
+        }
+        break;
+
+    case PINF:
+      switch (data_type_of (n))
+      {
+      case PINF:
+        invalid (n);
+        break;
+      default:
+        inf (n, 1);
+        break;
+      }
+      break;
+
+    case NINF:
+      switch (data_type_of (n))
+      {
+      case NINF:
+        invalid (n);
+        break;
+      default:
+        inf (n, 0);
+        break;
+      }
+      break;
+    }
+}
 )"})
 
   (example
@@ -16447,7 +16699,24 @@ greater than 0x035
 
   (exceptions
 {R"(
+<li>FPU Error</li>
+<li>Invalid Operation</li>
 
+<li>Overflow
+<br/>
+Generation of overflow-exception traps
+<br/>
+DRn and DRm have the same sign and the exponent of at least one value is 0x7FE
+</li>
+
+<li>Underflow
+<br/>
+Generation of underflow-exception traps
+<br/>
+DRn and DRm have different signs and neither has an exponent greater than 0x035
+</li>
+
+<li>Inexact</li>
 )"})
 )
 
@@ -16463,7 +16732,18 @@ greater than 0x035
 
   (description
 {R"(
-
+Arithmetically multiplies the two double-precision floating-point numbers in
+DRn and DRm, and stores the result in FRn.
+<br/><br/>
+When FPSCR.enable.I is set, an FPU exception trap is generated regardless of
+whether or not an exception has occurred. When FPSCR.enable.O/U is set, FPU
+exception traps are generated on actual generation by the FPU exception source
+and on the satisfaction of certain special conditions that apply to this the
+instruction. When an exception occurs, correct exception information is
+reflected in FPSCR.cause and FPSCR.flag and DRn is not updated. Appropriate
+processing should therefore be performed by software.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="fmuld.svg" height="300"/>
 )"})
 
   (note
@@ -16473,7 +16753,66 @@ greater than 0x035
 
   (operation
 {R"(
+void FMUL (int m, int n)
+{
+  PC += 2;
+  clear_cause ();
 
+  if (data_type_of (m) == sNaN || data_type_of (n) == sNaN)
+    invalid (n);
+  else if (data_type_of (m) == qNaN || data_type_of (n) == qNaN)
+    qnan (n);
+  else if (data_type_of (m) == DENORM || data_type_of (n) == DENORM)
+    set_E ();
+  else
+    switch (data_type_of (m))
+    {
+    case NORM:
+      switch (data_type_of (n))
+      {
+      case PZERO:
+      case NZERO:
+        zero (n, sign_of (m) ^ sign_of (n));
+        break;
+      case PINF:
+      case NINF:
+        inf (n, sign_of (m) ^ sign_of (n));
+        break;
+      default:
+        normal_fmul (m, n);
+        break;
+      }
+      break;
+
+    case PZERO:
+    case NZERO:
+      switch (data_type_of (n))
+      {
+      case PINF:
+      case NINF:
+        invalid (n);
+        break;
+      default: 
+        zero (n,sign_of (m) ^ sign_of (n));
+        break;
+      }
+      break;
+
+    case PINF:
+    case NINF:
+      switch (data_type_of (n))
+      {
+      case PZERO:
+      case NZERO:
+        invalid (n);
+        break;
+      default:
+        inf (n, sign_of (m) ^ sign_of (n));
+        break
+      }
+      break;
+    }
+}
 )"})
 
   (example
@@ -16483,6 +16822,24 @@ greater than 0x035
 
   (exceptions
 {R"(
+<li>FPU Error</li>
+<li>Invalid Operation</li>
+
+<li>Overflow
+<br/>
+Generation of overflow-exception traps
+<br/>
+(exponent of DRn) + (exponent of DRm) - 0x3FF is not less than 0x7FE
+</li>
+
+<li>Underflow
+<br/>
+Generation of underflow-exception traps
+<br/>
+(exponent of DRn) + (exponent of DRm) - 0x3FF is not more than 0x000
+</li>
+
+<li>Inexact</li>
 
 )"})
 )
