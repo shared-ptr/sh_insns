@@ -18509,7 +18509,10 @@ The exponent of DRn is not more than 0x380
 
   (description
 {R"(
-
+Converts the single-precision floating-point number in FPUL to a
+double-precision floating-point number, and stores the result in DRn.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="fcnvsd.svg" height="128"/>
 )"})
 
   (note
@@ -18519,7 +18522,66 @@ The exponent of DRn is not more than 0x380
 
   (operation
 {R"(
+void FCNVSD (int n)
+{
+  if (FPSCR_PR != 1)
+    undefined_operation ();
+  else
+  {
+    switch (fpul_type ())
+    {
+    case PZERO:
+    case NZERO:
+    case PINF:
+    case NINF:
+    case NORM:
+      DR[n >> 1] = FPUL;  // convert float to double
+      break;
 
+    case DENORM:
+      set_E ();
+      break;
+
+    case qNaN:
+      qnan (n);
+      break;
+
+    case sNaN:
+      invalid (n);
+      break;
+    }
+  }
+}
+
+int fpul_type ()
+{
+  int abs = FPUL & 0x7FFFFFFF;
+  if (abs < 0x00800000)
+  {
+    if (FPSCR_DN == 1 || abs == 0x00000000)
+    {
+      if (sign_of (FPUL) == 0)
+        return PZERO;
+      else
+        return NZERO;
+    }
+    else
+      return DENORM;
+  }
+  else if (abs < 0x7F800000)
+    return NORM;
+  else if (abs == 0x7F800000)
+  {
+    if (sign_of (FPUL) == 0)
+      return PINF;
+    else
+      return NINF;
+  }
+  else if (abs < 0x7FC00000)
+    return qNaN;
+  else
+    return sNaN;
+}
 )"})
 
   (example
@@ -18529,7 +18591,8 @@ The exponent of DRn is not more than 0x380
 
   (exceptions
 {R"(
-
+<li>FPU error</li>
+<li>Invalid operation</li>
 )"})
 )
 
