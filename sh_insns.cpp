@@ -11619,7 +11619,7 @@ miss or an access to a non-cache area.
 void OCBP (int n)
 {
   if (is_dirty_block (R[n]))
-    write_back(R[n])
+    write_back (R[n])
 
   invalidate_operand_cache_block (R[n]);
   PC += 2;
@@ -11671,7 +11671,7 @@ performed.
 void OCBWB (int n)
 {
   if (is_dirty_block (R[n]))
-    write_back(R[n]);
+    write_back (R[n]);
 
   PC += 2;
 }
@@ -12312,7 +12312,7 @@ user mode will cause an illegal instruction exception.
 void STCMSR (int n)
 {
   R[n] -= 4;
-  Write_32 (R[n],SR);
+  Write_32 (R[n], SR);
   PC += 2;
 }
 )"})
@@ -12438,7 +12438,7 @@ This instruction can also be issued in user mode.
 void STCMGBR (int n)
 {
   R[n] -= 4;
-  Write_32 (R[n],GBR);
+  Write_32 (R[n], GBR);
   PC += 2;
 }
 )"})
@@ -14119,6 +14119,8 @@ void TRAPA (int i)
 ));
 
 
+#endif
+
 __sexpr (insn_blocks.push_back
 (insns "32 Bit Floating-Point Data Transfer Instructions (FPSCR.SZ = 0)"
 
@@ -14186,7 +14188,7 @@ Transfers contents of memory at address indicated by Rm to FRn.
 {R"(
 void FMOV_LOAD (int m, int n)
 {
-  Read_32 (R[m], FR[n]);
+  FR[n] = Read_32 (R[m]);
   PC += 2;
 }
 )"})
@@ -14229,7 +14231,7 @@ Transfers FRm contents to memory at address indicated by Rn.
 {R"(
 void FMOV_STORE (int m, int n)
 {
-  Write_32 (FR[m], R[n]);
+  Write_32 (R[n], FR[m]);
   PC += 2;
 }
 )"})
@@ -14274,7 +14276,7 @@ Rm.
 {R"(
 void FMOV_RESTORE (int m, int n)
 {
-  Read_32 (R[m], FR[n]);
+  FR[n] = Read_32 (R[m]);
   R[m] += 4;
   PC += 2;
 }
@@ -14319,7 +14321,7 @@ by resulting Rn value.
 {R"(
 void FMOV_SAVE (int m, int n)
 {
-  Write_32 (FR[m], R[n] - 4);
+  Write_32 (R[n] - 4, FR[m]);
   R[n] -= 4;
   PC += 2;
 }
@@ -14364,7 +14366,7 @@ Transfers contents of memory at address indicated by (R0 + Rm) to FRn.
 {R"(
 void FMOV_INDEX_LOAD (int m, int n)
 {
-  Read_32 (R[0] + R[m], FR[n]);
+  FR[n] = Read_32 (R[0] + R[m]);
   PC += 2;
 }
 )"})
@@ -14407,7 +14409,7 @@ Transfers FRm contents to memory at address indicated by (R0 + Rn).
 {R"(
 void FMOV_INDEX_STORE (int m, int n)
 {
-  Write_32 (FR[m], R[0] + R[n]);
+  Write_32 (R[0] + R[n], FR[m]);
   PC += 2;
 }
 )"})
@@ -14698,7 +14700,7 @@ Transfers contents of memory at address indicated by Rm to DRn.
 {R"(
 void FMOV_LOAD_DR (int m, int n)
 {
-  Read_64 (R[m], DR[n >> 1]);
+  DR[n >> 1] = Read_64 (R[m]);
   PC += 2;
 }
 )"})
@@ -14741,7 +14743,7 @@ Transfers contents of memory at address indicated by Rm to XDn.
 {R"(
 void FMOV_LOAD_XD (int m, int n)
 {
-  Read_64 (R[m], XD[n >> 1]);
+  XD[n >> 1] = Read_64 (R[m]);
   PC += 2;
 }
 )"})
@@ -14784,7 +14786,7 @@ Transfers DRm contents to memory at address indicated by Rn.
 {R"(
 void FMOV_STORE_DR (int m, int n)
 {
-  Write_64 (DR[m >> 1], R[n]);
+  Write_64 (R[n], DR[m >> 1]);
   PC += 2;
 }
 )"})
@@ -14826,16 +14828,16 @@ Transfers contents of memory at address indicated by (R0 + Rm) to XDn.
 
   (operation
 {R"(
-
+void FMOV_STORE_XD (int m, int n)
+{
+  Write_64 (R[n], XD[m >> 1]);
+  PC += 2;
+}
 )"})
 
   (example
 {R"(
-void FMOV_STORE_XD (int m, int n)
-{
-  Write_64 (XD[m >> 1], R[n]);
-  PC += 2;
-}
+
 )"})
 
   (exceptions
@@ -14874,7 +14876,7 @@ Rm.
 {R"(
 void FMOV_RESTORE_DR (int m, int n)
 {
-  Read_64 (R[m], DR[n >> 1]);
+  DR[n >> 1] = Read_64 (R[m]);
   R[m] += 8;
   PC += 2;
 }
@@ -14919,7 +14921,7 @@ Rm.
 {R"(
 void FMOV_RESTORE_XD (int m, int n)
 {
-  Read_64 (R[m], XD[n >> 1]);
+  XD[n >> 1] = Read_64 (R[m]);
   R[m] += 8;
   PC += 2;
 }
@@ -14964,7 +14966,7 @@ by resulting Rn value.
 {R"(
 void FMOV_SAVE_DR (int m, int n)
 {
-  Write_64 (DR[m >> 1], R[n] - 8);
+  Write_64 (R[n] - 8, DR[m >> 1]);
   R[n] -= 8;
   PC += 2;
 }
@@ -15010,7 +15012,7 @@ by resulting Rn value.
 {R"(
 void FMOV_SAVE_XD (int m, int n)
 {
-  Write_64 (XD[m >> 1], R[n] - 8);
+  Write_64 (R[n] - 8, XD[m >> 1]);
   R[n] -= 8;
   PC += 2;
 }
@@ -15055,7 +15057,7 @@ Transfers contents of memory at address indicated by (R0 + Rm) to DRn.
 {R"(
 void FMOV_INDEX_LOAD_DR (int m, int n)
 {
-  Read_64 (R[0] + R[m], DR[n >> 1]);
+  DR[n >> 1] = Read_64 (R[0] + R[m]);
   PC += 2;
 }
 )"})
@@ -15098,7 +15100,7 @@ Transfers contents of memory at address indicated by (R0 + Rm) to XDn.
 {R"(
 void FMOV_INDEX_LOAD_XD (int m, int n)
 {
-  Read_64 (R[0] + R[m], XD[n >> 1]);
+  XD[n >> 1] = Read_64 (R[0] + R[m]);
   PC += 2;
 }
 )"})
@@ -15141,7 +15143,7 @@ Transfers DRm contents to memory at address indicated by (R0 + Rn).
 {R"(
 void FMOV_INDEX_STORE_DR (int m, int n)
 {
-  Write_64 (DR[m >> 1], R[0] + R[n]);
+  Write_64 (R[0] + R[n], DR[m >> 1]);
   PC += 2;
 }
 )"})
@@ -15185,7 +15187,7 @@ Transfers XDm contents to memory at address indicated by (R0 + Rn).
 {R"(
 void FMOV_INDEX_STORE_XD (int m, int n)
 {
-  Write_64 (XD[m >> 1], R[0] + R[n]);
+  Write_64 (R[0] + R[n], XD[m >> 1]);
   PC += 2;
 }
 )"})
@@ -15291,9 +15293,6 @@ void FMOV_INDEX_DISP12_STORE_DR (int m, int n, int d)
 
 
 ));
-
-
-#endif
 
 __sexpr (insn_blocks.push_back
 (insns "Floating-Point Single-Precision Instructions (FPSCR.PR = 0)"
