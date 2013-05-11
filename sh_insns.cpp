@@ -20988,7 +20988,9 @@ PADDC X0,Y0,M0  NOPX  NOPY   ! Before execution: X0 = 0x33333333, Y0 = 0x5555555
 
   (description
 {R"(
-
+Clears the Dz operand.  The DC bit of the DSR register is updated according to
+the specifications for the CS bits. The Z bit of the DSR register is set to 1.
+The N, V, and GT bits are cleared to 0.
 )"})
 
   (note
@@ -20998,12 +21000,28 @@ PADDC X0,Y0,M0  NOPX  NOPY   ! Before execution: X0 = 0x33333333, Y0 = 0x5555555
 
   (operation
 {R"(
+void pclr (void)
+{
+  DSP_REG[ex2_dz_no] = 0x0;
 
+  if (ex2_dz_no == 0)
+    A0G = 0x0;
+  else if (ex2_dz_no == 1)
+    A1G = 0x0;
+
+  carry_bit = 0;
+  negative_bit = 0;
+  zero_bit = 1;
+  overflow_bit = 0;
+
+  #include "fixed_pt_plus_dc_bit.c"
+}
 )"})
 
   (example
 {R"(
-
+PCLR  A0  NOPX  NOPY   ! Before execution: A0 = 0xFF87654321
+                       ! After execution: A0 = 0x0000000000
 )"})
 
   (exceptions
@@ -21023,7 +21041,8 @@ PADDC X0,Y0,M0  NOPX  NOPY   ! Before execution: X0 = 0x33333333, Y0 = 0x5555555
 
   (description
 {R"(
-
+Conditionally clears the Dz operand.  The instruction is executed when the DC
+bit is set to 1.  The DC, N, Z, V, and GT bits are not updated.
 )"})
 
   (note
@@ -21033,7 +21052,11 @@ PADDC X0,Y0,M0  NOPX  NOPY   ! Before execution: X0 = 0x33333333, Y0 = 0x5555555
 
   (operation
 {R"(
-
+void pclr_dct (void)
+{
+  if (DC == 1)
+    DSP_REG[ex2_dz_no] = 0x0;
+}
 )"})
 
   (example
@@ -21058,7 +21081,8 @@ PADDC X0,Y0,M0  NOPX  NOPY   ! Before execution: X0 = 0x33333333, Y0 = 0x5555555
 
   (description
 {R"(
-
+Conditionally clears the Dz operand.  The instruction is executed when the DC
+bit is set to 0.  The DC, N, Z, V, and GT bits are not updated.
 )"})
 
   (note
@@ -21068,7 +21092,11 @@ PADDC X0,Y0,M0  NOPX  NOPY   ! Before execution: X0 = 0x33333333, Y0 = 0x5555555
 
   (operation
 {R"(
-
+void pclr_dcf (void)
+{
+  if (DC == 0)
+    DSP_REG[ex2_dz_no] = 0x0;
+}
 )"})
 
   (example
