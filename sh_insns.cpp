@@ -20301,7 +20301,12 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Finds absolute values. When the Sx operand is positive, the contents of the
+operand are transferred to the Dz operand. If the value is negative, the value
+of the Sx operand is subtracted from 0 and stored in the Dz operand.
+<br/><br/>
+The DC bit of the DSR register are updated according to the specifications of
+the CS bits. The N, Z, V, and GT bits of the DSR register are updated.
 )"})
 
   (note
@@ -20311,7 +20316,69 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+void pabs_sx (void)
+{
+  DSP_ALU_SRC1 = 0;
+  DSP_ALU_SRC1G = 0;
 
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC2 = X0;
+    if (DSP_ALU_SRC2_MSB)
+      DSP_ALU_SRC2G = 0xFF;
+    else
+      DSP_ALU_SRC2G = 0x0;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC2 = X1;
+    if (DSP_ALU_SRC2_MSB)
+      DSP_ALU_SRC2G = 0xFF;
+    else
+      DSP_ALU_SRC2G = 0x0;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC2 = A0;
+    DSP_ALU_SRC2G = A0G;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC2 = A1;
+    DSP_ALU_SRC2G = A1G;
+    break;
+  }
+
+  if (DSP_ALU_SRC2G_BIT7 == 0)
+  {
+    // positive value
+    DSP_ALU_DST = 0x0 + DSP_ALU_SRC2;
+    carry_bit = 0;
+    DSP_ALU_DSTG_LSB8 = 0x0 + DSP_ALU_SRC2G_LSB8 + carry_bit;
+  }
+  else
+  {
+    // negative value
+    DSP_ALU_DST = 0x0 - DSP_ALU_SRC2;
+    borrow_bit = 1;
+    DSP_ALU_DSTG_LSB8 = 0x0 - DSP_ALU_SRC2G_LSB8 - borrow_bit;
+  }
+
+  overflow_bit = PLUS_OP_G_OV || ! (POS_NOT_OV || NEG_NOT_OV);
+  #include "fixed_pt_overflow_protection.c"
+  #include "fixed_pt_unconditional_update.c"
+
+  if (DSP_ALU_SRC2G_BIT7 == 0)
+  {
+    #include "fixed_pt_plus_dc_bit.c"
+  }
+  else
+  {
+    overflow_bit = MINUS_OP_G_OV || ! (POS_NOT_OV || NEG_NOT_OV);
+    #include "fixed_pt_minus_dc_bit.c"
+  }
+}
 )"})
 
   (example
@@ -20337,7 +20404,12 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Finds absolute values. When the Sy operand is positive, the contents of the
+operand are transferred to the Dz operand. If the value is negative, the value
+of the Sy operand is subtracted from 0 and stored in the Dz operand.
+<br/><br/>
+The DC bit of the DSR register are updated according to the specifications of
+the CS bits. The N, Z, V, and GT bits of the DSR register are updated.
 )"})
 
   (note
@@ -20347,7 +20419,64 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+void pabs_sy (void)
+{
+  DSP_ALU_SRC1 = 0;
+  DSP_ALU_SRC1G = 0;
 
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC2 = Y0;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC2 = Y1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC2 = M0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC2 = M1;
+    break;
+  }
+
+  if (DSP_ALU_SRC2_MSB)
+    DSP_ALU_SRC2G = 0xFF;
+  else
+    DSP_ALU_SRC2G = 0x0;
+
+  if (DSP_ALU_SRC2G_BIT7 == 0)
+  {
+    // positive value
+    DSP_ALU_DST = 0x0 + DSP_ALU_SRC2;
+    carry_bit = 0;
+    DSP_ALU_DSTG_LSB8 = 0x0 + DSP_ALU_SRC2G_LSB8 + carry_bit;
+  }
+  else
+  {
+    // negative value
+    DSP_ALU_DST = 0x0 - DSP_ALU_SRC2;
+    borrow_bit = 1;
+    DSP_ALU_DSTG_LSB8 = 0x0 - DSP_ALU_SRC2G_LSB8 - borrow_bit;
+  }
+
+  overflow_bit = PLUS_OP_G_OV || ! (POS_NOT_OV || NEG_NOT_OV);
+  #include "fixed_pt_overflow_protection.c"
+  #include "fixed_pt_unconditional_update.c"
+
+  if (DSP_ALU_SRC2G_BIT7 == 0)
+  {
+    #include "fixed_pt_plus_dc_bit.c"
+  }
+  else
+  {
+    overflow_bit = MINUS_OP_G_OV || ! (POS_NOT_OV || NEG_NOT_OV);
+    #include "fixed_pt_minus_dc_bit.c"
+  }
+}
 )"})
 
   (example
