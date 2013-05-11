@@ -15981,6 +15981,11 @@ processing should therefore be performed by software.
 {R"(
 SH2E and SH3E support only invalid operation (V) and division by zero
 (Z) exception flags.
+<br/><br/>
+This instruction rounds only the final result and does not round the
+intermediate result of the multiplication.  Thus, for IEEE 754 compliant code,
+this instruction cannot be used as a replacement for individual FADD and FMUL
+instructions.
 )"})
 
   (operation
@@ -16962,17 +16967,107 @@ At least one of the following results is not less than 0xFC
 
   (description
 {R"(
+Takes the contents of floating-point registers XF0 to XF15 indicated by XMTRX
+as a 4-row x 4-column matrix, takes the contents of floating-point registers
+FR[n] to FR[n + 3] indicated by FVn as a 4-dimensional vector, multiplies the
+array by the vector, and stores the results in FV[n].
 
+<br/><img src="ftrv.svg" height="128"/><br/>
+
+The FTRV instruction is intended for speed rather than accuracy, and therefore
+the results will differ from those obtained by using a combination of FADD and
+FMUL instructions. The FTRV execution sequence is as follows:
+<ol type="1">
+<li>Multiplies all terms. The results are 28 bits long.</li>
+<li>Aligns these results, rounding them to fit within 30 bits.</li>
+<li>Adds the aligned values.</li>
+<li>Performs normalization and rounding.</li>
+</ol>
+
+Special processing is performed in the following cases:
+<ol type="1">
+<li>If an input value is an sNaN, an invalid exception is generated.</li>
+
+<li>If the input values to be multiplied include a combination of 0 and
+infinity, an invalid operation exception is generated.</li>
+
+<li>In cases other than the above, if the input values include a qNaN, the
+result will be a qNaN.</li>
+
+<li>In cases other than the above, if the input values include infinity:
+  <ol type="a">
+  <li>If multiplication results in two or more infinities and the signs are
+  different, an invalid exception will be generated.</li>
+
+  <li>Otherwise, correct infinities will be stored.</li>
+  </ol>
+</li>
+
+<li>If the input values do not include an sNaN, qNaN, or infinity, processing
+is performed in the normal way.</li>
+
+</ol>
+
+When FPSCR.enable.V/O/U/I is set, an FPU exception trap is generated regardless
+of whether or not an exception has occurred. When an exception occurs, correct
+exception information is reflected in FPSCR.cause and FPSCR.flag, and FVn is not
+updated. Appropriate processing should therefore be performed by software.
 )"})
 
   (note
 {R"(
-
+A 4-dimensional matrix x matrix transformation can be realized by four FTRV
+instructions, where every FTRV calculates a column of the result matrix.  The
+resulting matrix can be set to the XMTRX registers by toggling the FPSCR.FR bit
+to switch register banks without copying them.
 )"})
 
   (operation
 {R"(
+void FTRV (int n)
+{
+  if (FPSCR_PR != 0)
+    undefined_operation ();
 
+  else
+  {
+    float saved_vec[4];
+    float result_vec[4];
+    int saved_fpscr;
+    int dst;
+
+    PC += 2;
+    clear_cause ();
+
+    saved_fpscr = FPSCR;
+    FPSCR &= ~ENABLE_VOUI;  // mask VOUI enable
+    dst = 12 - n;           // select other vector than FVn
+
+    for (int i = 0; i < 4; i++)
+      saved_vec[i] = FR[dst+i];
+
+    for (int i = 0; i < 4; i++)
+    {
+      for (int j = 0; j < 4; j++)
+        FR[dst+j] = XF[i+4j];
+
+      fipr (n, dst);
+      saved_fpscr |= FPSCR & (CAUSE | FLAG);
+      result_vec[i] = FR[dst+3];
+    }
+
+    for (int i = 0; i < 4; i++)
+      FR[dst+i] = saved_vec[i];
+
+    FPSCR = saved_fpscr;
+
+    if (FPSCR & ENABLE_VOUI)
+      fpu_exception_trap();
+    else
+      for (int i = 0; i < 4; i++)
+        FR[n+i] = result_vec[i];
+  }
+}
 )"})
 
   (example
@@ -16982,7 +17077,10 @@ At least one of the following results is not less than 0xFC
 
   (exceptions
 {R"(
-
+<li>Invalid operation</li>
+<li>Overflow</li>
+<li>Underflow</li>
+<li>Inexact</li>
 )"})
 )
 
