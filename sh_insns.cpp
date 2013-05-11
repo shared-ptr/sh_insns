@@ -15962,7 +15962,19 @@ When at least FRn or FRm is not a normalized number:
 
   (description
 {R"(
-
+Arithmetically multiplies the two single-precision floating-point numbers in
+FR0 and FRm, arithmetically adds the contents of FRn, and stores the result in
+FRn.
+<br/><br/>
+When FPSCR.enable.I is set, an FPU exception trap is generated regardless of
+whether or not an exception has occurred. When FPSCR.enable.O/U is set, FPU
+exception traps are generated on actual generation by the FPU exception source
+and on the satisfaction of certain special conditions that apply to this the
+instruction.  When an exception occurs, correct exception information is
+reflected in FPSCR.cause and FPSCR.flag and FRn is not updated. Appropriate
+processing should therefore be performed by software.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="fmac.svg" height="942"/>
 )"})
 
   (note
@@ -15973,7 +15985,200 @@ SH2E and SH3E support only invalid operation (V) and division by zero
 
   (operation
 {R"(
+void FMAC (int m, int n)
+{
+  PC += 2;
+  clear_cause ();
 
+  if (FPSCR_PR == 1)
+    undefined_operation ();
+
+  else if (data_type_of (0) == sNaN
+           || data_type_of (m) == sNaN
+           || data_type_of (n) == sNaN)
+    invalid (n);
+
+  else if (data_type_of (0) == qNaN || data_type_of (m) == qNaN)
+    qnan (n);
+
+  else if (data_type_of (0) == DENORM || data_type_of (m) == DENORM)
+    set_E ();
+
+  else
+    switch (data_type_of (0))
+    {
+    case NORM:
+      switch (data_type_of (m))
+      {
+      case PZERO:
+      case NZERO:
+        switch (data_type_of (n))
+        {
+        case DENORM:
+          set_E ();
+          break;
+        case qNaN:
+          qnan (n);
+          break;
+        case PZERO:
+        case NZERO:
+          zero (n, sign_of (0) ^ sign_of (m) ^ sign_of (n));
+          break;
+        default:
+          break;
+        }
+
+      case PINF:
+      case NINF:
+        switch (data_type_of (n))
+        {
+        case DENORM:
+          set_E ();
+          break;
+        case qNaN:
+          qnan (n);
+          break;
+        case PINF:
+        case NINF:
+          if (sign_of (0) ^ sign_of (m) ^ sign_of (n))
+            invalid (n);
+          else
+            inf (n, sign_of (0) ^ sign_of (m));
+          break;
+        default:
+          inf (n, sign_of (0) ^ sign_of (m));
+          break;
+        }
+
+      case NORM:
+        switch (data_type_of (n))
+        {
+        case DENORM:
+          set_E ();
+          break;
+        case qNaN:
+          qnan (n);
+          break;
+        case PINF:
+        case NINF:
+          inf (n, sign_of (n));
+          break;
+        case PZERO:
+        case NZERO:
+        case NORM:
+          normal_fmac (m, n);
+          break;
+        }
+        break;
+
+      case PZERO:
+      case NZERO:
+        switch (data_type_of (m))
+        {
+        case PINF:
+        case NINF:
+          invalid (n);
+          break;
+        case PZERO:
+        case NZERO:
+        case NORM:
+          switch (data_type_of (n))
+          {
+          case DENORM:
+            set_E ();
+            break;
+          case qNaN:
+            qnan (n);
+            break;
+          case PZERO:
+          case NZERO:
+            zero (n, sign_of (0) ^ sign_of (m) ^ sign_of (n));
+            break;
+          default:
+            break;
+          }
+          break;
+        }
+        break;
+
+      case PINF:
+      case NINF:
+        switch (data_type_of (m))
+        {
+        case PZERO:
+        case NZERO:
+          invalid (n);
+          break;
+        default:
+          switch (data_type_of (n))
+          {
+          case DENORM:
+            set_E ();
+            break;
+          case qNaN:
+            qnan(n);
+            break;
+          default:
+            inf (n, sign_of (0) ^ sign_of (m) ^ sign_of (n));
+            break
+          }
+          break;
+        }
+        break;
+      }
+    }
+}
+
+void normal_fmac (int m, int n)
+{
+  union
+  {
+    int double x;
+    int l[4];
+  } dstx, tmpx;
+
+  float dstf, srcf;
+
+  if (data_type_of (n) == PZERO || data_type_of (n) == NZERO)
+    srcf = 0.0; // flush denormalized value
+  else
+    srcf = FR[n];
+
+  tmpx.x = FR[0]; // convert single to int double
+  tmpx.x *= FR[m]; //exact product
+  dstx.x = tmpx.x + srcf;
+
+  if ((dstx.x == srcf && tmpx.x != 0.0)
+      || (dstx.x == tmpx.x && srcf != 0.0))
+  {
+    set_I ();
+    if (sign_of (0) ^ sign_of (m) ^ sign_of (n))
+    {
+      dstx.l[3] -= 1; // correct result
+      if (dstx.l[3] == 0xFFFFFFFF)
+        dstx.l[2] -= 1;
+      if (dstx.l[2] == 0xFFFFFFFF)
+        dstx.l[1] -= 1;
+      if (dstx.l[1] == 0xFFFFFFFF)
+        dstx.l[0] -= 1;
+    }
+    else
+      dstx.l[3] |= 1
+  }
+
+  if ((dstx.l[1] & 0x01FFFFFF) || dstx.l[2] || dstx.l[3])
+    set_I();
+
+  if(FPSCR_RM == 1)
+  {
+    dstx.l[1] &= 0xFE000000; // round toward zero
+    dstx.l[2] = 0x00000000;
+    dstx.l[3] = 0x00000000;
+  }
+
+  dstf = dstx.x;
+  check_single_exception (&FR[n], dstf);
+}
 )"})
 
   (example
@@ -15983,6 +16188,32 @@ SH2E and SH3E support only invalid operation (V) and division by zero
 
   (exceptions
 {R"(
+<li>FPU Error</li>
+<li>Invalid Operation</li>
+
+<li>Overflow
+<br/>
+Generation of overflow-exception traps
+<br/>
+At least one of the following results is not less than 0xFD:
+<br/>
+(exponent of FR0) + (exponent of FRm)
+<br/>
+(exponent of FRn)
+</li>
+
+<li>Underflow
+<br/>
+Generation of underflow-exception traps
+<br/>
+At least one of the following results is not more than 0x2E:
+<br/>
+(exponent of FR0) + (exponent of FRm)
+<br/>
+(exponent of FRn)
+</li>
+
+<li>Inexact</li>
 
 )"})
 )
