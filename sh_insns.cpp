@@ -18983,7 +18983,13 @@ void STSMFPUL (int n)
 
   (description
 {R"(
-
+Inverts the FR bit in floating-point register FPSCR. When the FR bit in FPSCR is
+changed, FR0 to FR15 in FPR0_BANK0 to FPR15_BANK0 and FPR0_BANK1 to FPR15_BANK1
+become XR0 to XR15, and XR0 to XR15 become FR0 to FR15. When FPSCR.FR = 0,
+FPR0_BANK0 to FPR15_BANK0 correspond to FR0 to FR15, and FPR0_BANK1 to
+FPR15_BANK1 correspond to XR0 to XR15. When FPSCR.FR = 1, FPR0_BANK1 to
+FPR15_BANK1 correspond to FR0 to FR15, and FPR0_BANK0 to FPR15_BANK0 correspond
+to XR0 to XR15.
 )"})
 
   (note
@@ -18993,7 +18999,16 @@ void STSMFPUL (int n)
 
   (operation
 {R"(
-
+void FRCHG (void)
+{
+  if (FPSCR_PR == 0)
+  {
+    FPSCR ^= 0x00200000;  // toggle bit 21
+    PC += 2;
+  }
+  else
+    undefined_operation ();
+}
 )"})
 
   (example
@@ -19019,7 +19034,12 @@ void STSMFPUL (int n)
 
   (description
 {R"(
-
+Inverts the SZ bit of the floating-point status register FPSCR. Changing the
+value of the SZ bit in FPSCR switches the amount of data for transfer by the
+FMOV instruction between one single-precision data and a pair of
+single-precision data. When FPSCR.SZ = 0, an FMOV instruction transfers a
+single-precision number. When FPSCR.SZ = 1, the FMOV instruction transfers a
+pair of single-precision numbers.
 )"})
 
   (note
@@ -19029,7 +19049,16 @@ void STSMFPUL (int n)
 
   (operation
 {R"(
-
+void FSCHG (void)
+{
+  if (FPSCR_PR == 0)
+  {
+    FPSCR ^= 0x00100000;  // toggle bit 20
+    PC += 2;
+  }
+  else
+    undefined_operation ();
+}
 )"})
 
   (example
@@ -19055,7 +19084,8 @@ void STSMFPUL (int n)
 
   (description
 {R"(
-
+Inverts the PR bit of the floating-point status register FPSCR. The value of
+this bit selects single-precision or double-precision operation.
 )"})
 
   (note
@@ -19065,7 +19095,11 @@ void STSMFPUL (int n)
 
   (operation
 {R"(
-
+void FPCHG (void)
+{
+  FPSCR ^= 0x00080000;  // toggle bit 19
+  PC += 2;
+}
 )"})
 
   (example
