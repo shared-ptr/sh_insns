@@ -20873,22 +20873,101 @@ void padd_dct (void)
 
   (description
 {R"(
+Adds the contents of the Sx and Sy operands to the DC bit and stores the result
+in the Dz operand. The DC bit of the DSR register is updated as the carry flag.
+The N, Z, V, and GT bits of the DSR register are also updated.
 
 )"})
 
   (note
 {R"(
-
+The DC bit is updated as the carry flag after execution of the PADDC instruction
+regardless of the CS bits.
+<br/><br/>
+CS[2:0] = ***: Always operate as Carry or Borrow mode, regardless of the status
+of the DC bit.
 )"})
 
   (operation
 {R"(
+void paddc (void)
+{
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    DSP_ALU_SRC1G = A0G;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    DSP_ALU_SRC1G = A1G;
+    break;
+  }
+
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC2 = Y0;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC2 = Y1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC2 = M0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC2 = M1;
+    break;
+  }
+
+  if (DSP_ALU_SRC2_MSB)
+    DSP_ALU_SRC2G = 0xFF;
+  else
+    DSP_ALU_SRC2G = 0x0;
+
+  DSP_ALU_DST = DSP_ALU_SRC1 + DSP_ALU_SRC2 + DSPDCBIT;
+
+  carry_bit = ((DSP_ALU_SRC1_MSB | DSP_ALU_SRC2_MSB) & ! DSP_ALU_DST_MSB)
+              | (DSP_ALU_SRC1_MSB & DSP_ALU_SRC2_MSB);
+
+  DSP_ALU_DSTG_LSB8 = DSP_ALU_SRC1G_LSB8 + DSP_ALU_SRC2G_LSB8 + carry_bit;
+
+  overflow_bit = PLUS_OP_G_OV || ! (POS_NOT_OV || NEG_NOT_OV);
+
+  #include "fixed_pt_overflow_protection.c"
+  #include "fixed_pt_unconditional_update.c"
+  #include "fixed_pt_dc_always_carry.c"
+}
 )"})
 
   (example
 {R"(
+PADDC X0,Y0,M0  NOPX  NOPY   ! Before execution: X0 = 0xB3333333, Y0 = 0x55555555 M0 = 0x12345678, DC = 0
+                             ! After execution: X0 = 0xB3333333, Y0 = 0x55555555 M0 = 0x08888888, DC = 1
 
+
+PADDC X0,Y0,M0  NOPX  NOPY   ! Before execution: X0 = 0x33333333, Y0 = 0x55555555 M0 = 0x12345678, DC = 1
+                             ! After execution: X0 = 0x33333333, Y0 = 0x55555555 M0 = 0x88888889, DC = 0
 )"})
 
   (exceptions
