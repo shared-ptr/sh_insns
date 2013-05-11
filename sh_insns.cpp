@@ -18616,7 +18616,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Loads the source operand into FPU system register FPSCR.
 )"})
 
   (note
@@ -18626,7 +18626,18 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+void LDSFPSCR (int m)
+{
+  #if SH2E || SH3E
+  FPSCR = R[m] & 0x00018C60;
 
+  #elif SH4 || SH4A || SH2A
+  FPSCR = R[m] & 0x003FFFFF;
+
+  #endif
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -18652,7 +18663,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Loads the source operand into FPU system register FPUL.
 )"})
 
   (note
@@ -18662,7 +18673,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void LDSFPUL (int m)
+{
+  FPUL = R[m];
+  PC += 2;
+}
 )"})
 
   (example
@@ -18688,7 +18703,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Loads the source operand into FPU system register FPSCR.
 )"})
 
   (note
@@ -18698,7 +18713,19 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+void LDSMFPSCR (int m)
+{
+  #if SH2E || SH3E
+  FPSCR = Read_32 (R[m]) & 0x00018C60;
 
+  #elif SH4 || SH4A || SH2A
+  FPSCR = Read_32 (R[m]) & 0x003FFFFF;
+
+  #endif
+
+  R[m] += 4;
+  PC += 2;
+}
 )"})
 
   (example
@@ -18708,7 +18735,10 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -18734,7 +18764,12 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void LDSMFPUL (int m)
+{
+  FPUL = Read_32 (R[m]);
+  R[m] += 4;
+  PC += 2;
+}
 )"})
 
   (example
@@ -18744,7 +18779,10 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
 )"})
 )
 
@@ -18760,7 +18798,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Stores FPU system register FPSCR in the destination.
 )"})
 
   (note
@@ -18770,7 +18808,18 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+void STSFPSCR (int n)
+{
+  #if SH2E || SH3E
+  R[n] = FPSCR;
 
+  #elif SH4 || SH4A || SH2A
+  R[n] = FPSCR & 0x003FFFFF;
+
+  #endif
+
+  PC += 2;
+}
 )"})
 
   (example
@@ -18796,7 +18845,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Stores FPU system register FPUL in the destination.
 )"})
 
   (note
@@ -18806,7 +18855,11 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void STSFPUL (int n)
+{
+  R[n] = FPUL;
+  PC += 2;
+}
 )"})
 
   (example
@@ -18832,7 +18885,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Stores FPU system register FPSCR in the destination.
 )"})
 
   (note
@@ -18842,6 +18895,20 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
+void STSMFPSCR (int n)
+{
+  R[n] -= 4;
+
+  #if SH2E || SH3E
+  Write_32 (R[n], FPSCR);
+
+  #elif SH4 || SH4A || SH2A
+  Write_32 (R[n], FPSCR & 0x003FFFFF);
+
+  #endif
+
+  PC += 2;
+}
 
 )"})
 
@@ -18852,7 +18919,11 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
@@ -18868,7 +18939,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Stores FPU system register FPUL in the destination.
 )"})
 
   (note
@@ -18878,7 +18949,12 @@ __sexpr (insn_blocks.push_back
 
   (operation
 {R"(
-
+void STSMFPUL (int n)
+{
+  R[n] -= 4;
+  Write_32 (R[n], FPUL);
+  PC += 2;
+}
 )"})
 
   (example
@@ -18888,7 +18964,11 @@ __sexpr (insn_blocks.push_back
 
   (exceptions
 {R"(
-
+<li>Data TLB multiple-hit exception</li>
+<li>Data TLB miss exception</li>
+<li>Data TLB protection violation exception</li>
+<li>Data address error</li>
+<li>Initial page write exception</li>
 )"})
 )
 
