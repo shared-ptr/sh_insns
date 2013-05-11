@@ -20837,22 +20837,76 @@ void padd_dct (void)
 
   (description
 {R"(
-
+Adds the contents of the Sx and Sy operands and stores the result in the Du
+operand. The contents of the top word of the Se and Sf operands are multiplied
+as signed and the result stored in the Dg operand. These two processes are
+executed simultaneously in parallel.
+<br/><br/>
+The DC bit of the DSR register is updated according to the results of the ALU
+operation and the specifications for the CS bits. The N, Z, V, and GT bits of
+the DSR register are also updated according to the results of the ALU operation.
 )"})
 
   (note
 {R"(
-
+Since the PMULS is fixed decimal point multiplication, the operation result is
+different from that of MULS even though the source data is the same.
 )"})
 
   (operation
 {R"(
+void padd_pmuls (void)
+{
+  DSP_ALU_DST = DSP_ALU_SRC1 + DSP_ALU_SRC2;
+  carry_bit = ((DSP_ALU_SRC1_MSB | DSP_ALU_SRC2_MSB) & ! DSP_ALU_DST_MSB)
+              | (DSP_ALU_SRC1_MSB & DSP_ALU_SRC2_MSB);
+  DSP_ALU_DSTG_LSB8 = DSP_ALU_SRC1G_LSB8 + DSP_ALU_SRC2G_LSB8 + carry_bit;
+  overflow_bit = PLUS_OP_G_OV || ! (POS_NOT_OV || NEG_NOT_OV);
 
+  #include "fixed_pt_overflow_protection.c"
+
+  switch (EX2_DU)
+  {
+  case 0x0:
+    X0 = DSP_ALU_DST;
+    negative_bit = DSP_ALU_DSTG_BIT7;
+    zero_bit = (DSP_ALU_DST == 0) & (DSP_ALU_DSTG_LSB8 == 0);
+    break;
+
+  case 0x1:
+    Y0 = DSP_ALU_DST;
+    negative_bit = DSP_ALU_DSTG_BIT7;
+    zero_bit = (DSP_ALU_DST == 0) & (DSP_ALU_DSTG_LSB8 == 0);
+    break;
+
+  case 0x2:
+    A0 = DSP_ALU_DST;
+    A0G = DSP_ALU_DSTG & MASK000000FF;
+    if (DSP_ALU_DSTG_BIT7)
+      A0G = A0G | MASKFFFFFF00;
+    negative_bit = DSP_ALU_DSTG_BIT7;
+    zero_bit = (DSP_ALU_DST == 0) & (DSP_ALU_DSTG_LSB8 == 0);
+    break;
+
+  case 0x3:
+    A1 = DSP_ALU_DST;
+    A1G = DSP_ALU_DSTG & MASK000000FF;
+    if (DSP_ALU_DSTG_BIT7)
+      A1G = A1G | MASKFFFFFF00;
+    negative_bit = DSP_ALU_DSTG_BIT7;
+    zero_bit = (DSP_ALU_DST == 0) & (DSP_ALU_DSTG_LSB8 == 0);
+    break;
+  }
+
+  #include "fixed_pt_plus_dc_bit.c"
+}
 )"})
 
   (example
 {R"(
-
+PADD  A0,M0,A0  PMULS X0,YO,MO  NOPX  NOPY
+                ! Before execution:  X0 = 0x00020000, Y0 = 0x00030000, M0 = 0x22222222, A0 = 0x0055555555
+                ! After execution: X0 = 0x00020000, Y0 = 0x00030000, M0 = 0x0000000C, A0 = 0x0077777777
 )"})
 
   (exceptions
