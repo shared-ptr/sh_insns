@@ -14119,8 +14119,6 @@ void TRAPA (int i)
 ));
 
 
-#endif
-
 __sexpr (insn_blocks.push_back
 (insns "32 Bit Floating-Point Data Transfer Instructions (FPSCR.SZ = 0)"
 
@@ -19116,6 +19114,7 @@ void FPCHG (void)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ));
 
+#endif
 
 
 __sexpr (insn_blocks.push_back
@@ -19132,7 +19131,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+No access operation for X memory.
 )"})
 
   (note
@@ -19167,12 +19166,19 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the memory source operand data to the destination register operand.
+The transferred data can only be word length for X memory. The word data is
+loaded to the top word of the register and the bottom word is cleared with
+zeros.
 )"})
 
   (note
 {R"(
-
+"*" of the instruction code is MOVY instruction designation area.
+<br/>
+MSW = High-order word of operand.
+<br/>
+LSW = Low-order word of operand.
 )"})
 
   (operation
@@ -19182,7 +19188,8 @@ __sexpr (insn_blocks.push_back
 
   (example
 {R"(
-
+MOVX.W  @R4,X0   ! Before execution: R4 = 0x08010000, @R4 = 0x5555, X0 = 0x12345678
+                 ! After execution:  R4 = 0x08010000, X0 = 0x55550000
 )"})
 
   (exceptions
@@ -19202,12 +19209,19 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the memory source operand data to the destination register operand.
+The transferred data can only be word length for X memory. The word data is
+loaded to the top word of the register and the bottom word is cleared with
+zeros.
 )"})
 
   (note
 {R"(
-
+"*" of the instruction code is MOVY instruction designation area.
+<br/>
+MSW = High-order word of operand.
+<br/>
+LSW = Low-order word of operand.
 )"})
 
   (operation
@@ -19217,7 +19231,8 @@ __sexpr (insn_blocks.push_back
 
   (example
 {R"(
-
+MOVX.W  @R4+,X0  ! Before execution: R4 = 0x08010000, @R4 = 0x5555, X0 = 0x12345678
+                 ! After execution:  R4 = 0x08010002, X0 = 0x55550000
 )"})
 
   (exceptions
@@ -19237,12 +19252,19 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the memory source operand data to the destination register operand.
+The transferred data can only be word length for X memory. The word data is
+loaded to the top word of the register and the bottom word is cleared with
+zeros.
 )"})
 
   (note
 {R"(
-
+"*" of the instruction code is MOVY instruction designation area.
+<br/>
+MSW = High-order word of operand.
+<br/>
+LSW = Low-order word of operand.
 )"})
 
   (operation
@@ -19262,7 +19284,7 @@ __sexpr (insn_blocks.push_back
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "movx.w	Da,@Ax+"
+(insn "movx.w	Da,@Ax"
   SH_DSP
   (abstract "MSW of Da -> (Ax)")
   (code "111100A*D*1*01**")
@@ -19272,12 +19294,16 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the register source operand data to the destination memory operand.
+The transferred data can only be word length for X memory. The source word data
+is the top word of the register.
 )"})
 
   (note
 {R"(
-
+"*" of the instruction code is MOVY instruction designation area.
+<br/>
+MSW = High-order word of operand.
 )"})
 
   (operation
@@ -19307,12 +19333,16 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the register source operand data to the destination memory operand.
+The transferred data can only be word length for X memory. The source word data
+is the top word of the register.
 )"})
 
   (note
 {R"(
-
+"*" of the instruction code is MOVY instruction designation area.
+<br/>
+MSW = High-order word of operand.
 )"})
 
   (operation
@@ -19342,12 +19372,16 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the register source operand data to the destination memory operand.
+The transferred data can only be word length for X memory. The source word data
+is the top word of the register.
 )"})
 
   (note
 {R"(
-
+"*" of the instruction code is MOVY instruction designation area.
+<br/>
+MSW = High-order word of operand.
 )"})
 
   (operation
@@ -19377,7 +19411,7 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+No access operation for Y memory.
 )"})
 
   (note
@@ -19412,12 +19446,19 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the memory source operand data to the destination register operand.
+The transferred data can only be word length for Y memory. The word data is
+loaded to the top word of the register and the bottom word is cleared with
+zeros.
 )"})
 
   (note
 {R"(
-
+"*" of the instruction code is MOVX instruction designation area.
+<br/>
+MSW = High-order word of operand.
+<br/>
+LSW = Low-order word of operand.
 )"})
 
   (operation
@@ -19447,12 +19488,19 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the memory source operand data to the destination register operand.
+The transferred data can only be word length for Y memory. The word data is
+loaded to the top word of the register and the bottom word is cleared with
+zeros.
 )"})
 
   (note
 {R"(
-
+"*" of the instruction code is MOVX instruction designation area.
+<br/>
+MSW = High-order word of operand.
+<br/>
+LSW = Low-order word of operand.
 )"})
 
   (operation
@@ -19482,12 +19530,19 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the memory source operand data to the destination register operand.
+The transferred data can only be word length for Y memory. The word data is
+loaded to the top word of the register and the bottom word is cleared with
+zeros.
 )"})
 
   (note
 {R"(
-
+"*" of the instruction code is MOVX instruction designation area.
+<br/>
+MSW = High-order word of operand.
+<br/>
+LSW = Low-order word of operand.
 )"})
 
   (operation
@@ -19517,12 +19572,16 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the register source operand data to the destination memory operand.
+The transferred data can only be word length for Y memory. The source word data
+is the top word of the register.
 )"})
 
   (note
 {R"(
-
+"*" of the instruction code is MOVX instruction designation area.
+<br/>
+MSW = High-order word of operand.
 )"})
 
   (operation
@@ -19552,12 +19611,16 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the register source operand data to the destination memory operand.
+The transferred data can only be word length for Y memory. The source word data
+is the top word of the register.
 )"})
 
   (note
 {R"(
-
+"*" of the instruction code is MOVX instruction designation area.
+<br/>
+MSW = High-order word of operand.
 )"})
 
   (operation
@@ -19587,12 +19650,16 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the register source operand data to the destination memory operand.
+The transferred data can only be word length for Y memory. The source word data
+is the top word of the register.
 )"})
 
   (note
 {R"(
-
+"*" of the instruction code is MOVX instruction designation area.
+<br/>
+MSW = High-order word of operand.
 )"})
 
   (operation
@@ -19622,7 +19689,10 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the source operand data to the destination. The transferred data is a
+word, the word data is loaded to the top word of the register and the bottom
+word is cleared with zeros.  When the destination operand is a register with
+guard bits, the sign is extended and stored in the guard bits.
 )"})
 
   (note
@@ -19657,7 +19727,10 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the source operand data to the destination. The transferred data is a
+word, the word data is loaded to the top word of the register and the bottom
+word is cleared with zeros.  When the destination operand is a register with
+guard bits, the sign is extended and stored in the guard bits.
 )"})
 
   (note
@@ -19692,7 +19765,10 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the source operand data to the destination. The transferred data is a
+word, the word data is loaded to the top word of the register and the bottom
+word is cleared with zeros.  When the destination operand is a register with
+guard bits, the sign is extended and stored in the guard bits.
 )"})
 
   (note
@@ -19727,7 +19803,10 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the source operand data to the destination. The transferred data is a
+word, the word data is loaded to the top word of the register and the bottom
+word is cleared with zeros.  When the destination operand is a register with
+guard bits, the sign is extended and stored in the guard bits.
 )"})
 
   (note
@@ -19762,12 +19841,15 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the source operand data to the destination. The transferred data is a
+word, the top word of the register is stored as the word data.
 )"})
 
   (note
 {R"(
-
+When one of the guard bit registers A0G and A1G is the source operand for store
+processing, the data is output to the bottom 8 bits (bits 0-7) and the top 24
+bits (bits 31-8) become undefined.
 )"})
 
   (operation
@@ -19797,12 +19879,15 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the source operand data to the destination. The transferred data is a
+word, the top word of the register is stored as the word data.
 )"})
 
   (note
 {R"(
-
+When one of the guard bit registers A0G and A1G is the source operand for store
+processing, the data is output to the bottom 8 bits (bits 0-7) and the top 24
+bits (bits 31-8) become undefined.
 )"})
 
   (operation
@@ -19832,12 +19917,15 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the source operand data to the destination. The transferred data is a
+word, the top word of the register is stored as the word data.
 )"})
 
   (note
 {R"(
-
+When one of the guard bit registers A0G and A1G is the source operand for store
+processing, the data is output to the bottom 8 bits (bits 0-7) and the top 24
+bits (bits 31-8) become undefined.
 )"})
 
   (operation
@@ -19867,12 +19955,15 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the source operand data to the destination. The transferred data is a
+word, the top word of the register is stored as the word data.
 )"})
 
   (note
 {R"(
-
+When one of the guard bit registers A0G and A1G is the source operand for store
+processing, the data is output to the bottom 8 bits (bits 0-7) and the top 24
+bits (bits 31-8) become undefined.
 )"})
 
   (operation
@@ -19902,7 +19993,9 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the source operand data to the destination. The transferred data is a
+longword.  When the destination operand is a register with guard bits, the sign
+is extended and stored in the guard bits.
 )"})
 
   (note
@@ -19937,7 +20030,9 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the source operand data to the destination. The transferred data is a
+longword.  When the destination operand is a register with guard bits, the sign
+is extended and stored in the guard bits.
 )"})
 
   (note
@@ -19972,7 +20067,9 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the source operand data to the destination. The transferred data is a
+longword.  When the destination operand is a register with guard bits, the sign
+is extended and stored in the guard bits.
 )"})
 
   (note
@@ -20007,7 +20104,9 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the source operand data to the destination. The transferred data is a
+longword.  When the destination operand is a register with guard bits, the sign
+is extended and stored in the guard bits.
 )"})
 
   (note
@@ -20042,12 +20141,15 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the source operand data to the destination. The transferred data is a
+longword.
 )"})
 
   (note
 {R"(
-
+When one of the guard bit registers A0G and A1G is the source operand for store
+processing, the data is output to the bottom 8 bits (bits 0-7) and the top 24
+bits (bits 31-8) become undefined.
 )"})
 
   (operation
@@ -20077,12 +20179,15 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the source operand data to the destination. The transferred data is a
+longword.
 )"})
 
   (note
 {R"(
-
+When one of the guard bit registers A0G and A1G is the source operand for store
+processing, the data is output to the bottom 8 bits (bits 0-7) and the top 24
+bits (bits 31-8) become undefined.
 )"})
 
   (operation
@@ -20112,12 +20217,15 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the source operand data to the destination. The transferred data is a
+longword.
 )"})
 
   (note
 {R"(
-
+When one of the guard bit registers A0G and A1G is the source operand for store
+processing, the data is output to the bottom 8 bits (bits 0-7) and the top 24
+bits (bits 31-8) become undefined.
 )"})
 
   (operation
@@ -20147,12 +20255,15 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+Transfers the source operand data to the destination. The transferred data is a
+longword.
 )"})
 
   (note
 {R"(
-
+When one of the guard bit registers A0G and A1G is the source operand for store
+processing, the data is output to the bottom 8 bits (bits 0-7) and the top 24
+bits (bits 31-8) become undefined.
 )"})
 
   (operation
