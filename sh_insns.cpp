@@ -26233,7 +26233,14 @@ void psha_imm (void)
 
   (description
 {R"(
-
+Logically shifts the top word contents of the Sx operand, stores the result in
+the top word of the Dz operand, and clears the bottom word of the Dz operand
+with zeros. When Dz is a register that has guard bits, the guard bits are also
+zeroed. The amount of the shift is specified by the Sy operand. When the shift
+amount is positive, it shifts left. When the shift amount is negative, it
+shifts right.
+The DC bit of the DSR register is updated according to the specifications for
+the CS bits. The N, Z, V, and GT bits of the DSR register are also updated. 
 )"})
 
   (note
@@ -26243,7 +26250,85 @@ void psha_imm (void)
 
   (operation
 {R"(
+void pshl (void)
+{
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    break;
+  }
+
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC2 = Y0 & MASK003F0000;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC2 = Y1 & MASK003F0000;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC2 = M0 & MASK003F0000;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC2  = M1 & MASK003F0000;
+    break;
+  }
+
+  if ((DSP_ALU_SRC2_HW & MASK0020) == 0)
+  {
+    // Left Shift 0 <= cnt <= 16
+    char cnt = DSP_ALU_SRC2_HW & MASK001F;
+    if (cnt > 16)
+    {
+      printf ("\nPSHL Sx,Sy,Dz Error! Shift %2X exceed range.\n", cnt);
+      exit ();
+    }
+    DSP_ALU_DST_HW = DSP_ALU_SRC1_HW << cnt--;
+    carry_bit = ((DSP_ALU_SRC1_HW << cnt) & MASK8000) == 0x8000;
+  }
+  else
+  {
+    // Right Shift 0 < cnt <= 16
+    char cnt = (~DSP_ALU_SRC2_HW & MASK000F) + 1;
+    if (cnt > 16)
+    {
+      printf ("\nPSHL Sx,Sy,Dz Error! Shift -%2X exceed range.\n", cnt);
+      exit ();
+    }
+
+    DSP_ALU_DST_HW = DSP_ALU_SRC1_HW >> cnt--;
+    carry_bit = ((DSP_ALU_SRC1_HW >> cnt) & MASK0001) == 0x1;
+  }
+
+  DSP_REG_WD[ex2_dz_no*2] = DSP_ALU_DST_HW;
+  DSP_REG_WD[ex2_dz_no*2+1] = 0x0;  // clear LSW
+  if (ex2_dz_no == 0)
+    A0G = 0x0;  // clear Guard bits
+  else if (ex2_dz_no == 1)
+    A1G = 0x0;
+
+  negative_bit = DSP_ALU_DST_MSB;
+  zero_bit = DSP_ALU_DST_HW == 0;
+  overflow_bit = 0x0;
+
+  #include "shift_dc_bit.c"
+}
 )"})
 
   (example
@@ -26268,7 +26353,14 @@ void psha_imm (void)
 
   (description
 {R"(
-
+Conditionally logically shifts the top word contents of the Sx operand, stores
+the result in the top word of the Dz operand, and clears the bottom word of the
+Dz operand with zeros. When Dz is a register that has guard bits, the guard bits
+are also zeroed. The amount of the shift is specified by the Sy operand. When
+the shift amount is positive, it shifts left. When the shift amount is negative,
+it shifts right.
+The instruction is executed if the DC bit is set to 1.
+The DC, N, Z, V, and GT bits are not updated.
 )"})
 
   (note
@@ -26278,7 +26370,82 @@ void psha_imm (void)
 
   (operation
 {R"(
+void pshl_dct
+{
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    break;
+  }
+
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC2 = Y0 & MASK003F0000;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC2 = Y1 & MASK003F0000;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC2 = M0 & MASK003F0000;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC2  = M1 & MASK003F0000;
+    break;
+  }
+
+  if ((DSP_ALU_SRC2_HW & MASK0020) == 0)
+  {
+    // Left Shift 0 <= cnt <= 16
+    char cnt = DSP_ALU_SRC2_HW & MASK001F;
+    if (cnt > 16)
+    {
+      printf ("\nPSHL Sx,Sy,Dz Error! Shift %2X exceed range.\n", cnt);
+      exit ();
+    }
+    DSP_ALU_DST_HW = DSP_ALU_SRC1_HW << cnt--;
+    carry_bit = ((DSP_ALU_SRC1_HW << cnt) & MASK8000) == 0x8000;
+  }
+  else
+  {
+    // Right Shift 0 < cnt <= 16
+    char cnt = (~DSP_ALU_SRC2_HW & MASK000F) + 1;
+    if (cnt > 16)
+    {
+      printf ("\nPSHL Sx,Sy,Dz Error! Shift -%2X exceed range.\n", cnt);
+      exit ();
+    }
+
+    DSP_ALU_DST_HW = DSP_ALU_SRC1_HW >> cnt--;
+    carry_bit = ((DSP_ALU_SRC1_HW >> cnt) & MASK0001) == 0x1;
+  }
+
+  if (DC == 1)
+  {
+    DSP_REG_WD[ex2_dz_no*2] = DSP_ALU_DST_HW;
+    DSP_REG_WD[ex2_dz_no*2+1] = 0x0;  // clear LSW
+    if (ex2_dz_no == 0)
+      A0G = 0x0;  // clear Guard bits
+    else if (ex2_dz_no == 1)
+      A1G = 0x0;
+  }
+}
 )"})
 
   (example
@@ -26303,6 +26470,14 @@ void psha_imm (void)
 
   (description
 {R"(
+Conditionally logically shifts the top word contents of the Sx operand, stores
+the result in the top word of the Dz operand, and clears the bottom word of the
+Dz operand with zeros. When Dz is a register that has guard bits, the guard bits
+are also zeroed. The amount of the shift is specified by the Sy operand. When
+the shift amount is positive, it shifts left. When the shift amount is negative,
+it shifts right.
+The instruction is executed if the DC bit is set to 0.
+The DC, N, Z, V, and GT bits are not updated.
 
 )"})
 
@@ -26313,7 +26488,82 @@ void psha_imm (void)
 
   (operation
 {R"(
+void pshl_dcf (void)
+{
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    break;
+  }
+
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC2 = Y0 & MASK003F0000;
+    break;
+
+  case 0x1:
+    DSP_ALU_SRC2 = Y1 & MASK003F0000;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC2 = M0 & MASK003F0000;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC2  = M1 & MASK003F0000;
+    break;
+  }
+
+  if ((DSP_ALU_SRC2_HW & MASK0020) == 0)
+  {
+    // Left Shift 0 <= cnt <= 16
+    char cnt = DSP_ALU_SRC2_HW & MASK001F;
+    if (cnt > 16)
+    {
+      printf ("\nPSHL Sx,Sy,Dz Error! Shift %2X exceed range.\n", cnt);
+      exit ();
+    }
+    DSP_ALU_DST_HW = DSP_ALU_SRC1_HW << cnt--;
+    carry_bit = ((DSP_ALU_SRC1_HW << cnt) & MASK8000) == 0x8000;
+  }
+  else
+  {
+    // Right Shift 0 < cnt <= 16
+    char cnt = (~DSP_ALU_SRC2_HW & MASK000F) + 1;
+    if (cnt > 16)
+    {
+      printf ("\nPSHL Sx,Sy,Dz Error! Shift -%2X exceed range.\n", cnt);
+      exit ();
+    }
+
+    DSP_ALU_DST_HW = DSP_ALU_SRC1_HW >> cnt--;
+    carry_bit = ((DSP_ALU_SRC1_HW >> cnt) & MASK0001) == 0x1;
+  }
+
+  if (DC == 0)
+  {
+    DSP_REG_WD[ex2_dz_no*2] = DSP_ALU_DST_HW;
+    DSP_REG_WD[ex2_dz_no*2+1] = 0x0;  // clear LSW
+    if (ex2_dz_no == 0)
+      A0G = 0x0;  // clear Guard bits
+    else if (ex2_dz_no == 1)
+      A1G = 0x0;
+  }
+}
 )"})
 
   (example
@@ -26339,7 +26589,14 @@ void psha_imm (void)
 
   (description
 {R"(
-
+Logically shifts the top word contents of the Dz operand, stores the result in
+the top word of the Dz operand, and clears the bottom word of the Dz operand
+with zeros. When Dz is a register that has guard bits, the guard bits
+are also zeroed. The amount of the shift is specified by the immediate value.
+When the shift amount is positive, it shifts left. When the shift amount is
+negative, it shifts right.
+The DC bit of the DSR register is updated according to the specifications for
+the CS bits. The N, Z, V, and GT bits of the DSR register are also updated.
 )"})
 
   (note
@@ -26349,7 +26606,66 @@ void psha_imm (void)
 
   (operation
 {R"(
+void pshl_imm (void)
+{
+  unsigned short tmp_imm;
+  DSP_ALU_SRC1 = DSP_REG[ex2_dz_no];
+  switch (ex2_dz_no)
+  {
+  case 0x0:
+    DSP_ALU_SRC1G = A0G;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1G = A1G;
+    break;
+
+  default:
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+  }
+
+  tmp_imm = ((EX2_LW >> 4) & MASK0000003F); // bit[9:4]
+  if ((tmp_imm & MASK0020) == 0)
+  {
+    // Left Shift 0 <= cnt < 16
+    char cnt = tmp_imm & MASK001F;
+    if (cnt > 16)
+    {
+      printf ("\nPSHL Dz,#Imm,Dz Error! #Imm=%6X exceed range.\n", tmp_imm);
+      exit ();
+    }
+    DSP_ALU_DST_HW = DSP_ALU_SRC1_HW << cnt--;
+    carry_bit = ((DSP_ALU_SRC1_HW << cnt) & MASK8000) == 0x8000;
+  }
+  else
+  {
+    // Right Shift 0 < cnt <= 16
+    char cnt = (~tmp_imm & MASK001F) + 1;
+    if (cnt > 16)
+    {
+      printf ("\nPSHL Dz,#Imm,Dz Error! #Imm=%6X exceed range.\n", tmp_imm);
+      exit ();
+    }
+    DSP_ALU_DST_HW = DSP_ALU_SRC1_HW >> cnt--;
+    carry_bit = ((DSP_ALU_SRC1_HW >> cnt) & MASK0001) == 0x1;
+  }
+
+  DSP_REG_WD[ex2_dz_no*2] = DSP_ALU_DST_HW;
+  DSP_REG_WD[ex2_dz_no*2+1] = 0x0;  // clear LSW
+  if (ex2_dz_no == 0)
+    A0G = 0x0;  // clear Guard bits
+  else if (ex2_dz_no == 1)
+    A1G = 0x0;
+
+  negative_bit = DSP_ALU_DST_MSB;
+  zero_bit = DSP_ALU_DST_HW == 0;
+  overflow_bit = 0x0;
+
+  #include "shift_dc_bit.c"
+}
 )"})
 
   (example
