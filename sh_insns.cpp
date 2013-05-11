@@ -25558,17 +25558,96 @@ __sexpr (insn_blocks.push_back
 
   (description
 {R"(
-
+The contents of the top word of the Se and Sf operands are multiplied as signed
+and the result stored in the Dg operand. The DC, N, Z, V, and GT bits of the
+DSR register are not updated.
 )"})
 
   (note
 {R"(
-
+Since PMULS is fixed decimal point multiplication, the operation result is
+different from that of MULS even though the source data is the same.
 )"})
 
   (operation
 {R"(
+void pmuls (void)
+{
+  switch (ee)  // Se Operand selection bit (ee)
+  {
+  case 0x0:
+    DSP_M_SRC1 = X0;
+    break;
+  
+  case 0x1:
+    DSP_M_SRC1 = X1;
+    break;
 
+  case 0x2:
+    DSP_M_SRC1 = Y0;
+    break;
+
+  case 0x3:
+    DSP_M_SRC1 = A1;
+    break;
+  }
+
+  switch (ff)  // Sf Operand selection bit (ff)
+  {
+  case 0x0:
+    DSP_M_SRC2 = Y0;
+    break;
+
+  case 0x1:
+    DSP_M_SRC2 = Y1;
+    break;
+
+  case 0x2:
+    DSP_M_SRC2 = X0;
+    break;
+
+  case 0x3:
+    DSP_M_SRC2 = A1;
+    break;
+  }
+
+  if ((SBIT == 1) && (DSP_M_SRC1 == 0x8000) && (DSP_M_SRC2 == 0x8000))
+    DSP_M_DST = 0x7FFFFFFF;  // overflow protection
+  else
+    DSP_M_DST= ((long)(short)DSP_M_SRC1 * (long)(short)DSP_M_SRC2) << 1;
+
+  if (DSP_M_DST_MSB)
+    DSP_M_DSTG_LSB8 = 0xFF;
+  else
+    DSP_M_DSTG_LSB8 = 0x0;
+
+  switch (gg)  // Dg Operand selection bit (gg)
+  {
+  case 0x0:
+    M0 = DSP_M_DST;
+    break;
+
+  case 0x1:
+    M1 = DSP_M_DST;
+    break;
+
+  case 0x2:
+    A0 = DSP_M_DST;
+    if (DSP_M_DSTG_LSB8 == 0x0)
+      A0G=0x0;
+    else
+      A0G = 0xFFFFFFFF;
+    break;
+
+  case 0x3:
+    A1 = DSP_M_DST;
+    if (DSP_M_DSTG_LSB8 == 0x0)
+      A1G = 0x0;
+    else
+      A1G = 0xFFFFFFFF;
+    break;
+  }
+}
 )"})
 
   (example
