@@ -16410,7 +16410,15 @@ Generation of underflow-exception traps
 
   (description
 {R"(
-
+Finds the arithmetical square root of the single-precision floating-point number
+in FRn, and stores the result in FRn.
+<br/><br/>
+When FPSCR.enable.I is set, an FPU exception trap is generated regardless of
+whether or not an exception has occurred. When an exception occurs, correct
+exception information is reflected in FPSCR.cause and FPSCR.flag and FRn is not
+updated. Appropriate processing should therefore be performed by software.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="fsqrt.svg" height="128"/>
 )"})
 
   (note
@@ -16421,7 +16429,74 @@ SH3E supports only invalid operation (V) and division by zero
 
   (operation
 {R"(
+void FSQRT (int n)
+{
+  PC += 2;
+  clear_cause ();
 
+  switch (data_type_of (n))
+  {
+  case NORM:
+    if (sign_of (n) == 0)
+      normal_fsqrt_single (n);
+    else
+      invalid (n);
+    break;
+
+  case DENORM:
+    if (sign_of (n) == 0)
+      set_E ();
+    else
+      invalid (n);
+    break;
+
+  case PZERO:
+  case NZERO:
+  case PINF:
+    break;
+
+  case NINF:
+    invalid (n);
+    break;
+
+  case qNAN:
+    qnan (n);
+    break;
+
+  case sNAN:
+    invalid (n);
+    break;
+  }
+}
+
+void normal_fsqrt_single (int n)
+{
+  union
+  {
+    float f;
+    int l;
+  } dstf, tmpf;
+
+  union
+  {
+    double d;
+    int l[2];
+  } tmpd;
+
+  tmpf.f = FR[n];         // save destination value
+  dstf.f = sqrt (FR[n]);  // round toward nearest or even
+  tmpd.d = dstf.f;        // convert single to double
+  tmpd.d *= dstf.f;
+
+  if (tmpf.f != tmpd.d)
+    set_I ();
+  if (tmpf.f < tmpd.d && FPSCR_RM == 1)
+    dstf.l -= 1;  // round toward zero
+  if (FPSCR & ENABLE_I)
+    fpu_exception_trap ();
+  else
+    FR[n] = dstf.f;
+}
 )"})
 
   (example
@@ -16431,7 +16506,9 @@ SH3E supports only invalid operation (V) and division by zero
 
   (exceptions
 {R"(
-
+<li>FPU Error</li>
+<li>Invalid Operation</li>
+<li>Inexact</li>
 )"})
 )
 
@@ -17413,7 +17490,15 @@ Generation of underflow-exception traps
 
   (description
 {R"(
-
+Finds the arithmetical square root of the double-precision floating-point number
+in DRn, and stores the result in DRn.
+<br/><br/>
+When FPSCR.enable.I is set, an FPU exception trap is generated regardless of
+whether or not an exception has occurred. When an exception occurs, correct
+exception information is reflected in FPSCR.cause and FPSCR.flag and DRn is not
+updated. Appropriate processing should therefore be performed by software.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="fsqrt.svg" height="128"/>
 )"})
 
   (note
@@ -17423,7 +17508,78 @@ Generation of underflow-exception traps
 
   (operation
 {R"(
+void FSQRT (int n)
+{
+  PC += 2;
+  clear_cause ();
 
+  switch (data_type_of (n))
+  {
+  case NORM:
+    if (sign_of (n) == 0)
+      normal_fsqrt_double (n);
+    else
+      invalid (n);
+    break;
+
+  case DENORM:
+    if (sign_of (n) == 0)
+      set_E ();
+    else
+      invalid (n);
+    break;
+
+  case PZERO:
+  case NZERO:
+  case PINF:
+    break;
+
+  case NINF:
+    invalid (n);
+    break;
+
+  case qNAN:
+    qnan (n);
+    break;
+
+  case sNAN:
+    invalid (n);
+    break;
+  }
+}
+
+void normal_fsqrt_double (int n)
+{
+  union
+  {
+    double d;
+    int l[2];
+  } dstd, tmpd;
+
+  union
+  {
+    int double x;
+    int l[4];
+  } tmpx;
+
+  tmpd.d = DR[n];         // save destination value
+  dstd.d = sqrt (DR[n]);  // round toward nearest or even
+  tmpx.x = dstd.d;        // convert double to int double
+  tmpx.x *= dstd.d;
+
+  if (tmpd.d != tmpx.x)
+    set_I ();
+  if (tmpd.d < tmpx.x && FPSCR_RM == 1)
+  {
+    dstd.l[1] -= 1;  // round toward zero
+    if (dstd.l[1] == 0xFFFFFFFF)
+      dstd.l[0] -= 1;
+  }
+  if (FPSCR & ENABLE_I)
+    fpu_exception_trap();
+  else
+    DR[n] = dstd.d;
+}
 )"})
 
   (example
@@ -17433,7 +17589,9 @@ Generation of underflow-exception traps
 
   (exceptions
 {R"(
-
+<li>FPU Error</li>
+<li>Invalid Operation</li>
+<li>Inexact</li>
 )"})
 )
 
