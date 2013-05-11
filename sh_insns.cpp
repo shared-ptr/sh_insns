@@ -23952,7 +23952,10 @@ void pinc_sy_dcf (void)
 
   (description
 {R"(
-
+Finds the first position to change in the lineup of Sx operand bits and stores
+the bit position in the Dz operand.  The DC bit of the DSR register is updated
+according to the specifications for the CS bits. The N, Z, V, and GT bits of the
+DSR register are also updated. 
 )"})
 
   (note
@@ -23962,7 +23965,62 @@ void pinc_sy_dcf (void)
 
   (operation
 {R"(
+void pdmsb_sx (void)
+{
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    DSP_ALU_SRC1G = A0G;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    DSP_ALU_SRC1G = A1G;
+    break;
+  }
+
+  short int i;
+  unsigned char msb, src1g;
+  unsigned long src1 = DSP_ALU_SRC1;
+  msb = DSP_ALU_SRC1G_BIT7;
+  src1g = (DSP_ALU_SRC1G_LSB8 << 1);
+  for (i = 38; ((msb == (src1g >> 7)) && (i >= 32)); i--)
+    src1g <<= 1;
+
+  if (i == 31)
+    for(i; ((msb == (src1 >> 31)) && (i >= 0)); i--)
+      src1 <<= 1;
+
+  DSP_ALU_DST = 0x0;
+  DSP_ALU_DST_HW = (short int)(30 - i);
+  if (DSP_ALU_DST_MSB)
+    DSP_ALU_DSTG_LSB8 = 0xFF;
+  else
+    DSP_ALU_DSTG_LSB8 = 0x0;
+
+  carry_bit = 0;
+  overflow_bit = 0;
+
+  #include "integer_unconditional_update.c"
+  #include "integer_plus_dc_bit.c"
+}
 )"})
 
   (example
@@ -23988,7 +24046,10 @@ void pinc_sy_dcf (void)
 
   (description
 {R"(
-
+Finds the first position to change in the lineup of Sy operand bits and stores
+the bit position in the Dz operand.  The DC bit of the DSR register is updated
+according to the specifications for the CS bits. The N, Z, V, and GT bits of the
+DSR register are also updated. 
 )"})
 
   (note
@@ -23998,7 +24059,57 @@ void pinc_sy_dcf (void)
 
   (operation
 {R"(
+void pdmsb_sy (void)
+{
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = Y0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = Y1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = M0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = M1;
+    break;
+  }
+
+  if (DSP_ALU_SRC1_MSB)
+    DSP_ALU_SRC1G = 0xFF;
+  else
+    DSP_ALU_SRC1G = 0x0;
+
+  short int i;
+  unsigned char msb, src1g;
+  unsigned long src1 = DSP_ALU_SRC1;
+  msb = DSP_ALU_SRC1G_BIT7;
+  src1g = (DSP_ALU_SRC1G_LSB8 << 1);
+  for (i = 38; ((msb == (src1g >> 7)) && (i >= 32)); i--)
+    src1g <<= 1;
+
+  if (i == 31)
+    for(i; ((msb == (src1 >> 31)) && (i >= 0)); i--)
+      src1 <<= 1;
+
+  DSP_ALU_DST = 0x0;
+  DSP_ALU_DST_HW = (short int)(30 - i);
+  if (DSP_ALU_DST_MSB)
+    DSP_ALU_DSTG_LSB8 = 0xFF;
+  else
+    DSP_ALU_DSTG_LSB8 = 0x0;
+
+  carry_bit = 0;
+  overflow_bit = 0;
+
+  #include "integer_unconditional_update.c"
+  #include "integer_plus_dc_bit.c"
+}
 )"})
 
   (example
@@ -24023,7 +24134,10 @@ void pinc_sy_dcf (void)
 
   (description
 {R"(
-
+Conditionally finds the first position to change in the lineup of Sx operand
+bits and stores the bit position in the Dz operand. The instruction is executed
+if the DC bit is set to 1.
+The DC, N, Z, V, and GT bits are not updated.
 )"})
 
   (note
@@ -24033,7 +24147,76 @@ void pinc_sy_dcf (void)
 
   (operation
 {R"(
+void pdmsb_sx_dct (void)
+{
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    DSP_ALU_SRC1G = A0G;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    DSP_ALU_SRC1G = A1G;
+    break;
+  }
+
+  short int i;
+  unsigned char msb, src1g;
+  unsigned long src1 = DSP_ALU_SRC1;
+  msb = DSP_ALU_SRC1G_BIT7;
+  src1g = (DSP_ALU_SRC1G_LSB8 << 1);
+  for (i = 38; ((msb == (src1g >> 7)) && (i >= 32)); i--)
+    src1g <<= 1;
+
+  if (i == 31)
+    for(i; ((msb == (src1 >> 31)) && (i >= 0)); i--)
+      src1 <<= 1;
+
+  DSP_ALU_DST = 0x0;
+  DSP_ALU_DST_HW = (short int)(30 - i);
+  if (DSP_ALU_DST_MSB)
+    DSP_ALU_DSTG_LSB8 = 0xFF;
+  else
+    DSP_ALU_DSTG_LSB8 = 0x0;
+
+  carry_bit = 0;
+
+  if (DC == 1)
+  {
+    DSP_REG_WD[ex2_dz_no*2] = DSP_ALU_DST_HW;
+    DSP_REG_WD[ex2_dz_no*2+1] = 0x0;  // clear LSW
+    if (ex2_dz_no == 0)
+    {
+      A0G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A0G = A0G | MASKFFFFFF00;
+    }
+    else if (ex2_dz_no == 1)
+    {
+      A1G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A1G = A1G | MASKFFFFFF00;
+    }
+  }
+}
 )"})
 
   (example
@@ -24058,7 +24241,10 @@ void pinc_sy_dcf (void)
 
   (description
 {R"(
-
+Conditionally finds the first position to change in the lineup of Sy operand
+bits and stores the bit position in the Dz operand. The instruction is executed
+if the DC bit is set to 1.
+The DC, N, Z, V, and GT bits are not updated.
 )"})
 
   (note
@@ -24068,7 +24254,71 @@ void pinc_sy_dcf (void)
 
   (operation
 {R"(
+void pdmsb_sy_dct (void)
+{
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = Y0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = Y1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = M0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = M1;
+    break;
+  }
+
+  if (DSP_ALU_SRC1_MSB)
+    DSP_ALU_SRC1G = 0xFF;
+  else
+    DSP_ALU_SRC1G = 0x0;
+
+  short int i;
+  unsigned char msb, src1g;
+  unsigned long src1 = DSP_ALU_SRC1;
+  msb = DSP_ALU_SRC1G_BIT7;
+  src1g = (DSP_ALU_SRC1G_LSB8 << 1);
+  for (i = 38; ((msb == (src1g >> 7)) && (i >= 32)); i--)
+    src1g <<= 1;
+
+  if (i == 31)
+    for(i; ((msb == (src1 >> 31)) && (i >= 0)); i--)
+      src1 <<= 1;
+
+  DSP_ALU_DST = 0x0;
+  DSP_ALU_DST_HW = (short int)(30 - i);
+  if (DSP_ALU_DST_MSB)
+    DSP_ALU_DSTG_LSB8 = 0xFF;
+  else
+    DSP_ALU_DSTG_LSB8 = 0x0;
+
+  carry_bit = 0;
+
+  if (DC == 1)
+  {
+    DSP_REG_WD[ex2_dz_no*2] = DSP_ALU_DST_HW;
+    DSP_REG_WD[ex2_dz_no*2+1] = 0x0;  // clear LSW
+    if (ex2_dz_no == 0)
+    {
+      A0G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A0G = A0G | MASKFFFFFF00;
+    }
+    else if (ex2_dz_no == 1)
+    {
+      A1G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A1G = A1G | MASKFFFFFF00;
+    }
+  }
+}
 )"})
 
   (example
@@ -24093,7 +24343,10 @@ void pinc_sy_dcf (void)
 
   (description
 {R"(
-
+Conditionally finds the first position to change in the lineup of Sx operand
+bits and stores the bit position in the Dz operand. The instruction is executed
+if the DC bit is set to 0.
+The DC, N, Z, V, and GT bits are not updated.
 )"})
 
   (note
@@ -24103,7 +24356,76 @@ void pinc_sy_dcf (void)
 
   (operation
 {R"(
+void pdmsb_sx_dcf (void)
+{
+  switch (EX2_SX)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = X0;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = X1;
+    if (DSP_ALU_SRC1_MSB)
+      DSP_ALU_SRC1G = 0xFF;
+    else
+      DSP_ALU_SRC1G = 0x0;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = A0;
+    DSP_ALU_SRC1G = A0G;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = A1;
+    DSP_ALU_SRC1G = A1G;
+    break;
+  }
+
+  short int i;
+  unsigned char msb, src1g;
+  unsigned long src1 = DSP_ALU_SRC1;
+  msb = DSP_ALU_SRC1G_BIT7;
+  src1g = (DSP_ALU_SRC1G_LSB8 << 1);
+  for (i = 38; ((msb == (src1g >> 7)) && (i >= 32)); i--)
+    src1g <<= 1;
+
+  if (i == 31)
+    for(i; ((msb == (src1 >> 31)) && (i >= 0)); i--)
+      src1 <<= 1;
+
+  DSP_ALU_DST = 0x0;
+  DSP_ALU_DST_HW = (short int)(30 - i);
+  if (DSP_ALU_DST_MSB)
+    DSP_ALU_DSTG_LSB8 = 0xFF;
+  else
+    DSP_ALU_DSTG_LSB8 = 0x0;
+
+  carry_bit = 0;
+
+  if (DC == 0)
+  {
+    DSP_REG_WD[ex2_dz_no*2] = DSP_ALU_DST_HW;
+    DSP_REG_WD[ex2_dz_no*2+1] = 0x0;  // clear LSW
+    if (ex2_dz_no == 0)
+    {
+      A0G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A0G = A0G | MASKFFFFFF00;
+    }
+    else if (ex2_dz_no == 1)
+    {
+      A1G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A1G = A1G | MASKFFFFFF00;
+    }
+  }
+}
 )"})
 
   (example
@@ -24128,7 +24450,10 @@ void pinc_sy_dcf (void)
 
   (description
 {R"(
-
+Conditionally finds the first position to change in the lineup of Sy operand
+bits and stores the bit position in the Dz operand. The instruction is executed
+if the DC bit is set to 0.
+The DC, N, Z, V, and GT bits are not updated.
 )"})
 
   (note
@@ -24138,7 +24463,71 @@ void pinc_sy_dcf (void)
 
   (operation
 {R"(
+void pdmsb_sy_dcf (void)
+{
+  switch (EX2_SY)
+  {
+  case 0x0:
+    DSP_ALU_SRC1 = Y0;
+    break;
 
+  case 0x1:
+    DSP_ALU_SRC1 = Y1;
+    break;
+
+  case 0x2:
+    DSP_ALU_SRC1 = M0;
+    break;
+
+  case 0x3:
+    DSP_ALU_SRC1 = M1;
+    break;
+  }
+
+  if (DSP_ALU_SRC1_MSB)
+    DSP_ALU_SRC1G = 0xFF;
+  else
+    DSP_ALU_SRC1G = 0x0;
+
+  short int i;
+  unsigned char msb, src1g;
+  unsigned long src1 = DSP_ALU_SRC1;
+  msb = DSP_ALU_SRC1G_BIT7;
+  src1g = (DSP_ALU_SRC1G_LSB8 << 1);
+  for (i = 38; ((msb == (src1g >> 7)) && (i >= 32)); i--)
+    src1g <<= 1;
+
+  if (i == 31)
+    for(i; ((msb == (src1 >> 31)) && (i >= 0)); i--)
+      src1 <<= 1;
+
+  DSP_ALU_DST = 0x0;
+  DSP_ALU_DST_HW = (short int)(30 - i);
+  if (DSP_ALU_DST_MSB)
+    DSP_ALU_DSTG_LSB8 = 0xFF;
+  else
+    DSP_ALU_DSTG_LSB8 = 0x0;
+
+  carry_bit = 0;
+
+  if (DC == 0)
+  {
+    DSP_REG_WD[ex2_dz_no*2] = DSP_ALU_DST_HW;
+    DSP_REG_WD[ex2_dz_no*2+1] = 0x0;  // clear LSW
+    if (ex2_dz_no == 0)
+    {
+      A0G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A0G = A0G | MASKFFFFFF00;
+    }
+    else if (ex2_dz_no == 1)
+    {
+      A1G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A1G = A1G | MASKFFFFFF00;
+    }
+  }
+}
 )"})
 
   (example
@@ -24163,7 +24552,12 @@ void pinc_sy_dcf (void)
 
   (description
 {R"(
-
+Does rounding. Adds the immediate data 0x00008000 to the contents of the Sx
+operand, stores the result in the upper word of the Dz operand, and clears the
+bottom word of Dz with zeros.
+<br/><br/>
+The DC bit of the DSR register is updated according to the specifications for
+the CS bits. The N, Z, V, and GT bits of the DSR register are also updated.
 )"})
 
   (note
@@ -24198,7 +24592,12 @@ void pinc_sy_dcf (void)
 
   (description
 {R"(
-
+Does rounding. Adds the immediate data 0x00008000 to the contents of the Sy
+operand, stores the result in the upper word of the Dz operand, and clears the
+bottom word of Dz with zeros.
+<br/><br/>
+The DC bit of the DSR register is updated according to the specifications for
+the CS bits. The N, Z, V, and GT bits of the DSR register are also updated.
 )"})
 
   (note
