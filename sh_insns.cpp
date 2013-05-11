@@ -17028,7 +17028,6 @@ void FTRV (int n)
 {
   if (FPSCR_PR != 0)
     undefined_operation ();
-
   else
   {
     float saved_vec[4];
@@ -17096,18 +17095,78 @@ void FTRV (int n)
 
   (description
 {R"(
-
+Takes the approximate inverse of the arithmetic square root (absolute error is
+within +-2^-21) of the single-precision floating-point in FRn and writes the
+result to FRn. Since the this instruction operates by approximation, an
+imprecision exception is required when the input is a normalized value. In
+other cases, the instruction does not require an imprecision exception.
+<br/><br/>
+When FPSCR.enable.I is set, an FPU exception trap is generated. When an
+exception occurs, correct exception information is reflected in FPSCR.cause and
+FPSCR.flag, and FRn is not updated. Appropriate processing should therefore be
+performed by software.
+<br/><br/><b><i>Operation result special cases</b></i>
+<br/><img src="fsrra.svg" height="128"/>
 )"})
 
   (note
 {R"(
 This instruction is also supported by the SH7091 (SH4).
-
 )"})
 
   (operation
 {R"(
+void FSRRA (int n)
+{
+  if (FPSCR_PR != 0)
+    undefined_operation ();
+  else
+  {
+    PC += 2;
+    clear_cause();
 
+    switch (data_type_of (n))
+    {
+    case NORM:
+      if (sign_of (n) == 0)
+      {
+        set_I ();
+        FR[n] = 1 / sqrt (FR[n]);
+      }
+      else
+        invalid (n);
+      break;
+
+    case DENORM:
+      if (sign_of (n) == 0)
+        fpu_error ();
+      else
+        invalid (n);
+      break;
+
+    case PZERO:
+    case NZERO:
+      dz (n, sign_of (n));
+      break;
+
+    case PINF:
+      FR[n] = 0;
+      break;
+
+    case NINF:
+      invalid (n);
+      break;
+
+    case qNAN:
+      qnan (n);
+      break;
+
+    case sNAN:
+      invalid (n);
+      break;
+    }
+  }
+}
 )"})
 
   (example
@@ -17117,7 +17176,10 @@ This instruction is also supported by the SH7091 (SH4).
 
   (exceptions
 {R"(
-
+<li>FPU error</li>
+<li>Invalid operation</li>
+<li>Division by zero</li>
+<li>Inexact</li>
 )"})
 )
 
