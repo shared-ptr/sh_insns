@@ -596,7 +596,7 @@ Last updated: )html" << __DATE__ << " " << __TIME__ << R"html(
 </div>
 <br/>
 <div style="float:right">
-<a href="mailto:olegendo@gcc.gnu.org?Subject=Renesas%20SuperH%20Instruction%20Set%20Summary">Contact</a>
+<a href="mailto:olegendo@gcc.gnu.org?Subject=Renesas%20SH%20Instruction%20Set%20Summary">Contact</a>
 <a href="sh_insns.cpp">Page Source</a>
 </div>
 
@@ -671,7 +671,6 @@ Last updated: )html" << __DATE__ << " " << __TIME__ << R"html(
 void build_insn_blocks (void)
 {
 
-#if 0
 __sexpr (insn_blocks.push_back
 (insns "Data Transfer Instructions"
 
@@ -19114,7 +19113,6 @@ void FPCHG (void)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ));
 
-#endif
 
 
 __sexpr (insn_blocks.push_back
@@ -26945,17 +26943,34 @@ void plds_macl_dcf (void)
 
   (description
 {R"(
-
+Stores the contents of the MACH register in the Dz operand. 
+The DC, N, Z, V, and GT bits of the DSR register are not updated.
 )"})
 
   (note
 {R"(
-
+Though PSTS, MOVX and MOVY can be designated in parallel, their execution may
+take 2 cycles.
 )"})
 
   (operation
 {R"(
-
+void psts_mach (void)
+{
+  DSP_REG[ex2_dz_no] = MACH;
+  if (ex2_dz_no == 0)
+  {
+    A0G = DSP_ALU_DSTG & MASK000000FF;
+    if (DSP_ALU_DSTG_BIT7)
+      A0G |= MASKFFFFFF00;
+  }
+  else if (ex2_dz_no == 1)
+  {
+    A1G = DSP_ALU_DSTG & MASK000000FF;
+    if (DSP_ALU_DSTG_BIT7)
+      A1G |= MASKFFFFFF00;
+  }
+}
 )"})
 
   (example
@@ -26980,17 +26995,34 @@ void plds_macl_dcf (void)
 
   (description
 {R"(
-
+Stores the contents of the MACL register in the Dz operand. 
+The DC, N, Z, V, and GT bits of the DSR register are not updated.
 )"})
 
   (note
 {R"(
-
+Though PSTS, MOVX and MOVY can be designated in parallel, their execution may
+take 2 cycles.
 )"})
 
   (operation
 {R"(
-
+void psts_macl (void)
+{
+  DSP_REG[ex2_dz_no] = MACL;
+  if (ex2_dz_no == 0)
+  {
+    A0G = DSP_ALU_DSTG & MASK000000FF;
+    if (DSP_ALU_DSTG_BIT7)
+      A0G |= MASKFFFFFF00;
+  }
+  else if (ex2_dz_no == 1)
+  {
+    A1G = DSP_ALU_DSTG & MASK000000FF;
+    if (DSP_ALU_DSTG_BIT7)
+      A1G |= MASKFFFFFF00;
+  }
+}
 )"})
 
   (example
@@ -27015,17 +27047,38 @@ void plds_macl_dcf (void)
 
   (description
 {R"(
-
+Conditionally stores the contents of the MACH register in the Dz operand.
+The instruction is executed if the DC bit is set to 1.
+The DC, N, Z, V, and GT bits of the DSR register are not updated.
 )"})
 
   (note
 {R"(
-
+Though PSTS, MOVX and MOVY can be designated in parallel, their execution may
+take 2 cycles.
 )"})
 
   (operation
 {R"(
-
+void psts_mach_dct (void)
+{
+  if (DC == 1)
+  {
+    DSP_REG[ex2_dz_no] = MACH;
+    if (ex2_dz_no == 0)
+    {
+      A0G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A0G |= MASKFFFFFF00;
+    }
+    else if (ex2_dz_no == 1)
+    {
+      A1G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A1G |= MASKFFFFFF00;
+    }
+  }
+}
 )"})
 
   (example
@@ -27050,17 +27103,38 @@ void plds_macl_dcf (void)
 
   (description
 {R"(
-
+Conditionally stores the contents of the MACL register in the Dz operand.
+The instruction is executed if the DC bit is set to 1.
+The DC, N, Z, V, and GT bits of the DSR register are not updated.
 )"})
 
   (note
 {R"(
-
+Though PSTS, MOVX and MOVY can be designated in parallel, their execution may
+take 2 cycles.
 )"})
 
   (operation
 {R"(
-
+void psts_macl_dct (void)
+{
+  if (DC == 1)
+  {
+    DSP_REG[ex2_dz_no] = MACL;
+    if (ex2_dz_no == 0)
+    {
+      A0G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A0G |= MASKFFFFFF00;
+    }
+    else if (ex2_dz_no == 1)
+    {
+      A1G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A1G |= MASKFFFFFF00;
+    }
+  }
+}
 )"})
 
   (example
@@ -27085,17 +27159,38 @@ void plds_macl_dcf (void)
 
   (description
 {R"(
-
+Conditionally stores the contents of the MACH register in the Dz operand.
+The instruction is executed if the DC bit is set to 0.
+The DC, N, Z, V, and GT bits of the DSR register are not updated.
 )"})
 
   (note
 {R"(
-
+Though PSTS, MOVX and MOVY can be designated in parallel, their execution may
+take 2 cycles.
 )"})
 
   (operation
 {R"(
-
+void psts_mach_dcf (void)
+{
+  if (DC == 0)
+  {
+    DSP_REG[ex2_dz_no] = MACH;
+    if (ex2_dz_no == 0)
+    {
+      A0G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A0G |= MASKFFFFFF00;
+    }
+    else if (ex2_dz_no == 1)
+    {
+      A1G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A1G |= MASKFFFFFF00;
+    }
+  }
+}
 )"})
 
   (example
@@ -27120,17 +27215,38 @@ void plds_macl_dcf (void)
 
   (description
 {R"(
-
+Conditionally stores the contents of the MACL register in the Dz operand.
+The instruction is executed if the DC bit is set to 0.
+The DC, N, Z, V, and GT bits of the DSR register are not updated.
 )"})
 
   (note
 {R"(
-
+Though PSTS, MOVX and MOVY can be designated in parallel, their execution may
+take 2 cycles.
 )"})
 
   (operation
 {R"(
-
+void psts_macl_dcf (void)
+{
+  if (DC == 0)
+  {
+    DSP_REG[ex2_dz_no] = MACL;
+    if (ex2_dz_no == 0)
+    {
+      A0G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A0G |= MASKFFFFFF00;
+    }
+    else if (ex2_dz_no == 1)
+    {
+      A1G = DSP_ALU_DSTG & MASK000000FF;
+      if (DSP_ALU_DSTG_BIT7)
+        A1G |= MASKFFFFFF00;
+    }
+  }
+}
 )"})
 
   (example
