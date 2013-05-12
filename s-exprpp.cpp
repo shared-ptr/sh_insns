@@ -189,10 +189,6 @@ struct expr
   }
 };
 
-
-#if !defined (__test__)
-
-
 int main (void)
 {
   char tmpbuf[8];
@@ -243,9 +239,7 @@ int main (void)
 
 #endif
 
-//..............................................................................
-#if defined (__test__)
-
+/*
 static const std::vector<std::string> test_inputs
 {
 
@@ -286,59 +280,5 @@ __sexpr (func { class test (void) } (return
 )_"
 
 };
-
-
-int main (void)
-{
-  for (const auto& s : test_inputs)
-  {
-    std::cout << std::endl << "\n------------------------";
-    std::cout << s;
-    std::cout << std::endl;
-    std::stringstream ss (s);
-
-    expr expr_tree;
-    expr_tree.parse (ss);
-
-    std::cout << std::endl;
-    expr_tree.print (std::cout);
-    std::cout << std::endl;
-    std::cout << std::endl;
-
-    expr_tree.transform_to_cpp (std::cout);
-    std::cout << std::endl;
-  }
-
-  return 0;
-}
-#endif
-
-
-
-/*
-
-__sexpr (var "static const arg"
-	 (arg_UIWindow (objc_type "UIWindow") (to_cpp "cocoa::ui::Window::attach_obj (%s)")
-		       (cpp_type "const obj_ptr<Window>&") (to_objc "%s->objc_obj<UIWindow> ()")))
-
-__sexpr (func "thing" define_thing "void"
-  (return (thing (name "hello") (text_a "text text"))))
-
-
-thing define_thing_2 (void)
-{
-  return __sexpr (code
-   (thing (name "hello") (text_a "text text")));
-}
-
-thing define_thing_3 (void)
-{
-  thing t = __sexpr (code
-    (thing (name "hello") (text_a "text text")));
-
-  return t;
-}
-
 */
-
 
