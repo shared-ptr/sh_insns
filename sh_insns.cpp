@@ -7095,7 +7095,7 @@ the result in Rn. That is, it inverts the Rm bits and stores the result in Rn.
 {R"(
 void NOT (int m, int n)
 {
-  R[n] = ∼R[m];
+  R[n] = ~R[m];
   PC += 2;
 }
 )"})
