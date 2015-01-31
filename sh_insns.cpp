@@ -7884,7 +7884,8 @@ right shift range, 1 to 32.
 
   (note
 {R"(
-
+On SH4, if there is a load of the shift amount immediately before an SHAD/SHLD
+instruction, the latency of the load is increased by 1 cycle.
 )"})
 
   (operation
@@ -8059,7 +8060,8 @@ right shift range, 1 to 32.
 
   (note
 {R"(
-
+On SH4, if there is a load of the shift amount immediately before an SHAD/SHLD
+instruction, the latency of the load is increased by 1 cycle.
 )"})
 
   (operation
