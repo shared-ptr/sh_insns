@@ -6372,7 +6372,7 @@ if the result overflows in the positive direction
 When the S bit is 0, the SH2 and SH-DSP CPU perform a 16 * 16 + 64 -> 64 bit
 multiply and accumulate operation and the SH1 CPU performs a 16 * 16 + 42 ->
 42 bit multiply and accumulate operation.
-
+<br/><br/>
 On SH4, when MAC*/MUL* is followed by an STS.L MAC*,@-Rn instruction, the
 latency of MAC*/MUL* is 5 cycles.  In the case of consecutive executions of
 MAC.W/MAC.L, the latency is decreased to 2 cycles.
@@ -10644,7 +10644,7 @@ Stores the source operand into the system register MACH.
   (note
 {R"(
 On SH1, only the lower 10 bits are stored in MACH.
-
+<br/><br/>
 On SH4, when an LDS to MAC* is followed by an STS.L MAC*,@-Rn instruction, the
 latency of the LDS to MAC* is 4 cycles.   When an LDS to MAC* is followed by
 MAC.W/MAC.L, the latency of the LDS to MAC* is 1 cycle.
@@ -13267,7 +13267,7 @@ Stores system register MACH in the destination.
 {R"(
 On SH1, the value of bit 9 is transferred to and stored in the higher 22 bits
 (bits 31 to 10) of the destination.
-
+<br/><br/>
 On SH4, when an LDS to MAC* is followed by an STS.L MAC*,@-Rn instruction, the
 latency of the LDS to MAC* is 4 cycles.
 )"})
@@ -13320,7 +13320,7 @@ Stores system register MACH in the destination.
 {R"(
 On SH1, the value of bit 9 is transferred to and stored in the higher 22 bits
 (bits 31 to 10) of the destination.
-
+<br/><br/>
 On SH4, when an LDS to MAC* is followed by an STS.L MAC*,@-Rn instruction, the
 latency of the LDS to MAC* is 4 cycles.
 )"})
