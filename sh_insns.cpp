@@ -8481,6 +8481,11 @@ BF in combination with a BRA or JMP instruction, for example.
 On some SH4 implementations a branch with a displacement value of zero does not
 cause the pipeline I-stage to be stalled even if the branch is taken.  This can
 be utilized for efficient conditional operations.
+<br/><br/>
+On some SH2E implementations (SH7055) there is an FPU related hardware bug
+which affects this instruction.  The recommended workaround is to use bt/s with
+a nop in the delay slot.
+See also documents "sh2eoc.pdf" and "win_update_a.pdf".
 )"})
 
   (operation
@@ -8612,6 +8617,11 @@ BT in combination with a BRA or JMP instruction, for example.
 On some SH4 implementations a branch with a displacement value of zero does not
 cause the pipeline I-stage to be stalled even if the branch is taken.  This can
 be utilized for efficient conditional operations.
+<br/><br/>
+On some SH2E implementations (SH7055) there is an FPU related hardware bug
+which affects this instruction.  The recommended workaround is to use bt/s with
+a nop in the delay slot.
+See also documents "sh2eoc.pdf" and "win_update_a.pdf".
 )"})
 
   (operation
@@ -14103,6 +14113,11 @@ recommended workarounds:
 <li>Put 5 "OR R0,R0" instructions following the TRAPA instruction</li>
 <br/>
 For more information see the document "tnsh7456ae.pdf".
+<br/><br/>
+Some SH2E implementations (SH7055) have an FPU related hardware bug which
+affects this instruction.  The recommended workaround is to align the addresses
+of trapa handlers to 4 bytes and not to place any FPU or FPU related
+instructions at addresses 4n + 2 in the handler.
 )"})
 
   (operation
