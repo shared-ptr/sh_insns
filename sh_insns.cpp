@@ -19874,9 +19874,8 @@ word, the top word of the register is stored as the word data.
 
   (note
 {R"(
-When one of the guard bit registers A0G and A1G is the source operand for store
-processing, the data is output to the bottom 8 bits (bits 0-7) and the top 24
-bits (bits 31-8) become undefined.
+When one of the guard bit registers A0G and A1G is the source operand it is
+sign extended and stored as a word.
 )"})
 
   (operation
@@ -19912,9 +19911,8 @@ word, the top word of the register is stored as the word data.
 
   (note
 {R"(
-When one of the guard bit registers A0G and A1G is the source operand for store
-processing, the data is output to the bottom 8 bits (bits 0-7) and the top 24
-bits (bits 31-8) become undefined.
+When one of the guard bit registers A0G and A1G is the source operand it is
+sign extended and stored as a word.
 )"})
 
   (operation
@@ -19950,9 +19948,8 @@ word, the top word of the register is stored as the word data.
 
   (note
 {R"(
-When one of the guard bit registers A0G and A1G is the source operand for store
-processing, the data is output to the bottom 8 bits (bits 0-7) and the top 24
-bits (bits 31-8) become undefined.
+When one of the guard bit registers A0G and A1G is the source operand it is
+sign extended and stored as a word.
 )"})
 
   (operation
@@ -19988,9 +19985,8 @@ word, the top word of the register is stored as the word data.
 
   (note
 {R"(
-When one of the guard bit registers A0G and A1G is the source operand for store
-processing, the data is output to the bottom 8 bits (bits 0-7) and the top 24
-bits (bits 31-8) become undefined.
+When one of the guard bit registers A0G and A1G is the source operand it is
+sign extended and stored as a word.
 )"})
 
   (operation
@@ -20174,9 +20170,8 @@ longword.
 
   (note
 {R"(
-When one of the guard bit registers A0G and A1G is the source operand for store
-processing, the data is output to the bottom 8 bits (bits 0-7) and the top 24
-bits (bits 31-8) become undefined.
+When one of the guard bit registers A0G and A1G is the source operand it is
+sign extended and stored as a word.
 )"})
 
   (operation
@@ -20212,9 +20207,8 @@ longword.
 
   (note
 {R"(
-When one of the guard bit registers A0G and A1G is the source operand for store
-processing, the data is output to the bottom 8 bits (bits 0-7) and the top 24
-bits (bits 31-8) become undefined.
+When one of the guard bit registers A0G and A1G is the source operand it is
+sign extended and stored as a word.
 )"})
 
   (operation
@@ -20250,9 +20244,8 @@ longword.
 
   (note
 {R"(
-When one of the guard bit registers A0G and A1G is the source operand for store
-processing, the data is output to the bottom 8 bits (bits 0-7) and the top 24
-bits (bits 31-8) become undefined.
+When one of the guard bit registers A0G and A1G is the source operand it is
+sign extended and stored as a word.
 )"})
 
   (operation
@@ -20288,9 +20281,8 @@ longword.
 
   (note
 {R"(
-When one of the guard bit registers A0G and A1G is the source operand for store
-processing, the data is output to the bottom 8 bits (bits 0-7) and the top 24
-bits (bits 31-8) become undefined.
+When one of the guard bit registers A0G and A1G is the source operand it is
+sign extended and stored as a word.
 )"})
 
   (operation
