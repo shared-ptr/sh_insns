@@ -559,9 +559,16 @@ function on_mouse_out (div_obj)
 
 var cur_opened = null;
 
-function on_mouse_click (div_obj)
+function on_mouse_click (div_obj, event)
 {
+  if (event.defaultPrevented === true)
+    return;
+
   var e = div_obj.children[8];
+  var s = window.getSelection ();
+ 
+ if (!s.isCollapsed)
+    return;
 
   if (e.style.display == 'block')
   {
@@ -640,7 +647,7 @@ Last updated: )html" << __DATE__ << " " << __TIME__ << R"html(
     {
       std::cout
 	<< "<div class=\"col_cont\" onmouseover=\"on_mouse_over(this);\""
-	   " onmouseout=\"on_mouse_out(this);\" onclick=\"on_mouse_click(this);\">" "\n"
+	   " onmouseout=\"on_mouse_out(this);\" onclick=\"on_mouse_click(this,event);\">" "\n"
 	<< "<div class=\"col_cont_1\">" << print_isa_compatibility (i) << "</div>" "\n"
 	<< "<div class=\"col_cont_2\">" << i.format_ << "</div>" "\n"
 	<< "<div class=\"col_cont_3\">" << i.abstract_ << "</div>" "\n"
