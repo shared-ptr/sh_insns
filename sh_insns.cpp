@@ -5815,7 +5815,8 @@ The multiplication is performed as a signed arithmetic operation.
 
   (note
 {R"(
-
+On SH4, when MAC*/MUL* is followed by an STS.L MAC*,@-Rn instruction, the
+latency of MAC*/MUL* is 5 cycles.
 )"})
 
   (operation
@@ -5911,7 +5912,8 @@ The multiplication is performed as an unsigned arithmetic operation.
 
   (note
 {R"(
-
+On SH4, when MAC*/MUL* is followed by an STS.L MAC*,@-Rn instruction, the
+latency of MAC*/MUL* is 5 cycles.
 )"})
 
   (operation
@@ -6219,7 +6221,9 @@ of 0xFFFF800000000000 (minimum) and 0x00007FFFFFFFFFFF (maximum).
 
   (note
 {R"(
-
+On SH4, when MAC*/MUL* is followed by an STS.L MAC*,@-Rn instruction, the
+latency of MAC*/MUL* is 5 cycles.  In the case of consecutive executions of
+MAC.W/MAC.L, the latency is decreased to 2 cycles.
 )"})
 
   (operation
@@ -6368,6 +6372,10 @@ if the result overflows in the positive direction
 When the S bit is 0, the SH2 and SH-DSP CPU perform a 16 * 16 + 64 -> 64 bit
 multiply and accumulate operation and the SH1 CPU performs a 16 * 16 + 42 ->
 42 bit multiply and accumulate operation.
+
+On SH4, when MAC*/MUL* is followed by an STS.L MAC*,@-Rn instruction, the
+latency of MAC*/MUL* is 5 cycles.  In the case of consecutive executions of
+MAC.W/MAC.L, the latency is decreased to 2 cycles.
 )"})
 
   (operation
@@ -6477,7 +6485,8 @@ of MACH are not changed.
 
   (note
 {R"(
-
+On SH4, when MAC*/MUL* is followed by an STS.L MAC*,@-Rn instruction, the
+latency of MAC*/MUL* is 5 cycles.
 )"})
 
   (operation
@@ -6560,7 +6569,8 @@ changed.
 
   (note
 {R"(
-
+On SH4, when MAC*/MUL* is followed by an STS.L MAC*,@-Rn instruction, the
+latency of MAC*/MUL* is 5 cycles.
 )"})
 
   (operation
@@ -6603,7 +6613,8 @@ changed.
 
   (note
 {R"(
-
+On SH4, when MAC*/MUL* is followed by an STS.L MAC*,@-Rn instruction, the
+latency of MAC*/MUL* is 5 cycles.
 )"})
 
   (operation
@@ -10631,6 +10642,10 @@ Stores the source operand into the system register MACH.
   (note
 {R"(
 On SH1, only the lower 10 bits are stored in MACH.
+
+On SH4, when an LDS to MAC* is followed by an STS.L MAC*,@-Rn instruction, the
+latency of the LDS to MAC* is 4 cycles.   When an LDS to MAC* is followed by
+MAC.W/MAC.L, the latency of the LDS to MAC* is 1 cycle.
 )"})
 
   (operation
@@ -10678,7 +10693,9 @@ Stores the source operand into the system register MACH.
 
   (note
 {R"(
-
+On SH4, when an LDS to MAC* is followed by an STS.L MAC*,@-Rn instruction, the
+latency of the LDS to MAC* is 4 cycles.   When an LDS to MAC* is followed by
+MAC.W/MAC.L, the latency of the LDS to MAC* is 1 cycle.
 )"})
 
   (operation
@@ -10730,7 +10747,9 @@ Stores the source operand into the system register MACL.
 
   (note
 {R"(
-
+On SH4, when an LDS to MAC* is followed by an STS.L MAC*,@-Rn instruction, the
+latency of the LDS to MAC* is 4 cycles.   When an LDS to MAC* is followed by
+MAC.W/MAC.L, the latency of the LDS to MAC* is 1 cycle.
 )"})
 
   (operation
@@ -10770,7 +10789,9 @@ Stores the source operand into the system register MACL.
 
   (note
 {R"(
-
+On SH4, when an LDS to MAC* is followed by an STS.L MAC*,@-Rn instruction, the
+latency of the LDS to MAC* is 4 cycles.   When an LDS to MAC* is followed by
+MAC.W/MAC.L, the latency of the LDS to MAC* is 1 cycle.
 )"})
 
   (operation
@@ -13244,6 +13265,9 @@ Stores system register MACH in the destination.
 {R"(
 On SH1, the value of bit 9 is transferred to and stored in the higher 22 bits
 (bits 31 to 10) of the destination.
+
+On SH4, when an LDS to MAC* is followed by an STS.L MAC*,@-Rn instruction, the
+latency of the LDS to MAC* is 4 cycles.
 )"})
 
   (operation
@@ -13294,6 +13318,9 @@ Stores system register MACH in the destination.
 {R"(
 On SH1, the value of bit 9 is transferred to and stored in the higher 22 bits
 (bits 31 to 10) of the destination.
+
+On SH4, when an LDS to MAC* is followed by an STS.L MAC*,@-Rn instruction, the
+latency of the LDS to MAC* is 4 cycles.
 )"})
 
   (operation
@@ -13349,7 +13376,8 @@ Stores system register MACL in the destination.
 
   (note
 {R"(
-
+On SH4, when an LDS to MAC* is followed by an STS.L MAC*,@-Rn instruction, the
+latency of the LDS to MAC* is 4 cycles.
 )"})
 
   (operation
@@ -13388,7 +13416,8 @@ Stores system register MACL in the destination.
 
   (note
 {R"(
-
+On SH4, when an LDS to MAC* is followed by an STS.L MAC*,@-Rn instruction, the
+latency of the LDS to MAC* is 4 cycles.
 )"})
 
   (operation
