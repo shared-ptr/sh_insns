@@ -17161,7 +17161,8 @@ performed by software.
 
   (note
 {R"(
-This instruction is also supported by the SH7091 (SH4).
+This instruction is also supported by the SH4 variant SH7091.  Other SH4
+variants such as SH7751, SH7760, SH7761 might also support it.
 )"})
 
   (operation
@@ -17266,7 +17267,8 @@ result of sin and cos is a single-precision floating-point number.
 
   (note
 {R"(
-This instruction is also supported by the SH7091 (SH4).
+This instruction is also supported by the SH4 variant SH7091.  Other SH4
+variants such as SH7751, SH7760, SH7761 might also support it.
 )"})
 
   (operation
