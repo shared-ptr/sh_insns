@@ -1,0 +1,7 @@
+This is a C++ program which outputs the SH instruction set summary HTML page.
+
+The compiled version can be found here: http://www.shared-ptr.com/sh_insns.html
+
+Most of the information herein has been collected from various hardware manuals,
+technical notes, and various source code that can be found on the internet.
+There might be some mistakes or misunderstandings.  Patches are welcome.

@@ -1,3 +1,23 @@
+/* 
+sh_insns - Renesas SH Instruction Set Summary
+
+Copyright (C) 2013-2015 Oleg Endo
+
+This is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+This software is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this software; see the file LICENSE.  If not see
+<http://www.gnu.org/licenses/>.
+
+*/
 
 #include <iostream>
 #include <string>
@@ -604,7 +624,7 @@ Last updated: )html" << __DATE__ << " " << __TIME__ << R"html(
 <br/>
 <div style="float:right">
 <a href="mailto:olegendo@gcc.gnu.org?Subject=Renesas%20SH%20Instruction%20Set%20Summary">Contact</a>
-<a href="sh_insns.cpp">Page Source</a>
+<a href="https://github.com/shared-ptr/sh_insns">Page Source</a>
 </div>
 
 </br></br>
