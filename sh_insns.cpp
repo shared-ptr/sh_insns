@@ -16849,6 +16849,10 @@ and stores the result in FPUL.
   (note
 {R"(
 The rounding mode is always truncation.
+
+The original SH4 has a pipeline exception.  If the FTRC instruction is followed
+by an STS FPUL, Rn instruction, the latency of the FTRC instruction is reduced
+to 1 cycle.
 )"})
 
   (operation
@@ -18927,11 +18931,14 @@ void LDSFPUL (int m)
   (description
 {R"(
 Stores FPU system register FPUL in the destination.
+
 )"})
 
   (note
 {R"(
-
+The original SH4 has a pipeline exception.  If the FTRC instruction is followed
+by an STS FPUL, Rn instruction, the latency of the FTRC instruction is reduced
+to 1 cycle.
 )"})
 
   (operation
