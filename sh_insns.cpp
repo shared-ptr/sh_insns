@@ -11432,7 +11432,7 @@ void LDSMY1 (int m)
 )
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-(insn "ldtbl"
+(insn "ldtlb"
   SH3 SH4 SH4A privileged
   (abstract "PTEH/PTEL -> TLB")
   (code "0000000000111000")
@@ -12123,7 +12123,7 @@ end:
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 (insn "sets"
   SH3 SH4 SH4A
-  (abstract "1 -> T")
+  (abstract "1 -> S")
   (code "0000000000011000")
 
   (group SH4A "EX" SH4 "CO")
@@ -17389,7 +17389,7 @@ void FABS (int n)
   (abstract "DRn ^ 0x8000000000000000 -> DRn")
   (code "1111nnn001001101")
 
-  (group SH4A "LS" SH4 "FS")
+  (group SH4A "LS" SH4 "LS")
   (issue SH4A "1" SH2A "1" SH4 "1")
   (latency SH4A "1" SH2A "0" SH4 "0")
 
