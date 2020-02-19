@@ -5694,7 +5694,8 @@ subc    r3,r2     ! If dividend is negative, subtract 1 to convert to one's comp
 div0s   r0,r1     ! Flag initialization
 
 .rept 32
-div1    r0,r1     ! Repeat 32 times
+rotcl   r2        ! Repeat 32 times
+div1    r0,r1
 .endr
 
 rotcl   r2        ! r2 = quotient (one's complement notation)
