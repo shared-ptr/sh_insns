@@ -18121,6 +18121,7 @@ void normal_fsqrt_double (int n)
   SH4 SH4A SH2A
   (abstract "If DRn = DRm: 1 -> T\nElse: 0 -> T")
   (code "1111nnn0mmm00100")
+  (t_bit "Result")
 
   (group SH4A "FE" SH4 "CO")
   (issue SH4A "1" SH2A "2" SH4 "2")
@@ -18240,6 +18241,7 @@ void fcmp_invalid (void)
   SH4 SH4A SH2A
   (abstract "If DRn > DRm: 1 -> T\nElse: 0 -> T")
   (code "1111nnn0mmm00101")
+  (t_bit "Result")
 
   (group SH4A "FE" SH4 "CO")
   (issue SH4A "1" SH2A "2" SH4 "2")
