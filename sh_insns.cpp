@@ -12125,7 +12125,7 @@ end:
 (insn "sets"
   SH3 SH4 SH4A
   (abstract "1 -> S")
-  (code "0000000000011000")
+  (code "0000000001011000")
 
   (group SH4A "EX" SH4 "CO")
   (issue SH3 "1" SH4A "1" SH4 "1")
