@@ -10354,7 +10354,7 @@ void LDCMSPC (int m)
 (insn "ldc	Rm,DBR"
   SH4 SH4A privileged
   (abstract "Rm -> DBR")
-  (code "0100mmmm11110110")
+  (code "0100mmmm11111010")
 
   (group SH4A "CO" SH4 "CO")
   (issue SH4A "4" SH4 "1")
