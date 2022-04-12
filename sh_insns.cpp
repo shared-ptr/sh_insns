@@ -21,11 +21,12 @@ along with this software; see the file LICENSE.  If not see
 
 #include <iostream>
 #include <string>
-#include <cstring>
+#include <string_view>
 #include <vector>
 #include <map>
 #include <array>
 #include <cctype>
+#include <regex>
 
 // ----------------------------------------------------------------------------
 
@@ -259,34 +260,57 @@ enum note_type
   note_code
 };
 
-void print_note (const char* name, const char* val, note_type t)
+void print_note (const char* name, std::string_view val, note_type t)
 {
   // skip leading line breaks in the input string.
-  while (*val != '\0' && *val == '\n')
-    val++;
 
-  if (std::strlen (val) == 0)
-    return;
+  std::size_t pos = val.find_first_not_of('\n');
 
-  std::cout << "<i><b>" << name << "</i></b><br/>";
-  if (t == note_normal)
-    std::cout << val << "<br/><br/>";
-  else if (t == note_code)
+  if(pos != std::string_view::npos)
   {
-    std::cout << "<pre><p class=\"precode\">"
-	      << val
-	      << "</p></pre>";
+    std::cout << "<i><b>" << name << "</i></b><br/>";
+    if (t == note_normal)
+      std::cout << val.substr(pos) << "<br/><br/>";
+    else if (t == note_code)
+    {
+      std::cout << "<pre><p class=\"precode\">"
+          << val.substr(pos)
+          << "</p></pre>";
+    }
+    std::cout << "\n\n";
   }
-
-  std::cout << "\n\n";
 }
 
-std::string isa_prop_str (const char* p)
+constexpr size_t property_length = 6;
+std::string isa_prop_str (std::string_view p)
 {
-  std::string s = p;
-  if (s.size () < 6)
-   s += std::string (6 - s.size (), ' ');
-  return std::move (s);
+  std::string s(p.begin(), p.end());
+  if (p.size() < property_length)
+    s += std::string (property_length - p.size(), ' ');
+  return s;
+}
+
+std::string isa_prop_wrap(isa id, std::string_view prop)
+{
+  if(prop.empty())
+    return std::string()
+        + "<span class=\"SH_ANY\" style=\"visibility:hidden\">"
+        + std::string(property_length, ' ')
+        + "</span>";
+
+  return std::string()
+      + "<span class=\"" + isa_name[id] + " SH_ANY\" title=\"" + isa_name[id] + "\">"
+       + isa_prop_str(prop)
+       + "</span>";
+}
+
+std::string print_list(const isa_property& prop, const std::string& newtext)
+{
+  std::string r;
+  for(auto val : prop.values)
+    if(std::strlen(val))
+      r += std::regex_replace(std::string(val), std::regex(val), newtext);
+  return std::move (r);
 }
 
 std::string print_isa_props (const insn& i, const isa_property& p)
@@ -294,18 +318,18 @@ std::string print_isa_props (const insn& i, const isa_property& p)
   // this one defines the order of the ISA matrices.
   std::string r;
 
-  r += isa_prop_str (i.is_isa (SH1) ? p.values[SH1] : "");
-  r += isa_prop_str (i.is_isa (SH2) ? p.values[SH2] : "");
-  r += isa_prop_str (i.is_isa (SH2E) ? p.values[SH2E] : "");
+  r += isa_prop_wrap (SH1,  i.is_isa (SH1)  ? p.values[SH1]  : "");
+  r += isa_prop_wrap (SH2,  i.is_isa (SH2)  ? p.values[SH2]  : "");
+  r += isa_prop_wrap (SH2E, i.is_isa (SH2E) ? p.values[SH2E] : "");
   r += '\n';
-  r += isa_prop_str (i.is_isa (SH3) ? p.values[SH3] : "");
-  r += isa_prop_str (i.is_isa (SH3E) ? p.values[SH3E] : "");
-  r += isa_prop_str (i.is_isa (SH_DSP) ? p.values[SH_DSP] : "");
+  r += isa_prop_wrap (SH3,    i.is_isa (SH3)    ? p.values[SH3]    : "");
+  r += isa_prop_wrap (SH3E,   i.is_isa (SH3E)   ? p.values[SH3E]   : "");
+  r += isa_prop_wrap (SH_DSP, i.is_isa (SH_DSP) ? p.values[SH_DSP] : "");
   r += '\n';
-  r += isa_prop_str (i.is_isa (SH4) ? p.values[SH4] : "");
-  r += isa_prop_str (i.is_isa (SH4A) ? p.values[SH4A] : "");
-  r += isa_prop_str (i.is_isa (SH2A) ? p.values[SH2A] : "");
-
+  r += isa_prop_wrap (SH4,  i.is_isa (SH4)  ? p.values[SH4]  : "");
+  r += isa_prop_wrap (SH4A, i.is_isa (SH4A) ? p.values[SH4A] : "");
+  r += isa_prop_wrap (SH2A, i.is_isa (SH2A) ? p.values[SH2A] : "");
+// */
   return std::move (r);
 }
 
@@ -313,18 +337,18 @@ std::string print_isa_compatibility (const insn& i)
 {
   std::string r;
 
-  r += isa_prop_str (i.is_isa (SH1) ? isa_name[SH1] : "");
-  r += isa_prop_str (i.is_isa (SH2) ? isa_name[SH2] : "");
-  r += isa_prop_str (i.is_isa (SH2E) ? isa_name[SH2E] : "");
+  r += isa_prop_wrap (SH1,  i.is_isa (SH1)  ? isa_name[SH1]  : "");
+  r += isa_prop_wrap (SH2,  i.is_isa (SH2)  ? isa_name[SH2]  : "");
+  r += isa_prop_wrap (SH2E, i.is_isa (SH2E) ? isa_name[SH2E] : "");
   r += '\n';
-  r += isa_prop_str (i.is_isa (SH3) ? isa_name[SH3] : "");
-  r += isa_prop_str (i.is_isa (SH3E) ? isa_name[SH3E] : "");
-  r += isa_prop_str (i.is_isa (SH_DSP) ? isa_name[SH_DSP] : "");
+  r += isa_prop_wrap (SH3,    i.is_isa (SH3)    ? isa_name[SH3]    : "");
+  r += isa_prop_wrap (SH3E,   i.is_isa (SH3E)   ? isa_name[SH3E]   : "");
+  r += isa_prop_wrap (SH_DSP, i.is_isa (SH_DSP) ? isa_name[SH_DSP] : "");
   r += '\n';
-  r += isa_prop_str (i.is_isa (SH4) ? isa_name[SH4] : "");
-  r += isa_prop_str (i.is_isa (SH4A) ? isa_name[SH4A] : "");
-  r += isa_prop_str (i.is_isa (SH2A) ? isa_name[SH2A] : "");
-
+  r += isa_prop_wrap (SH4,  i.is_isa (SH4)  ? isa_name[SH4]  : "");
+  r += isa_prop_wrap (SH4A, i.is_isa (SH4A) ? isa_name[SH4A] : "");
+  r += isa_prop_wrap (SH2A, i.is_isa (SH2A) ? isa_name[SH2A] : "");
+// */
   if (i.privileged_)
   {
     r += '\n';
@@ -518,6 +542,20 @@ p.precode
 
 <script language="javascript">
 
+function update_row_visibility ()
+{
+  document
+    .querySelectorAll('.col_cont') // find rows by class
+    .forEach(
+      function(element)
+      {
+        const segments = element.querySelectorAll('.SH_ANY');
+        let count = segments.length;
+        segments.forEach(function(seg) { if(seg.style.visibility == 'hidden') { count--; } });
+        element.style.display = count ? 'block' : 'none';
+      });
+}
+
 function on_page_load ()
 {
 
@@ -532,15 +570,13 @@ function on_page_load ()
     {
       var w_val = 0;
       if (r.style.width)
-	w_val += parseInt (r.style.width, 10);
+        w_val += parseInt (r.style.width, 10);
       if (r.style.paddingLeft)
-	w_val += parseInt (r.style.paddingLeft, 10);
+        w_val += parseInt (r.style.paddingLeft, 10);
       if (r.style.paddingRight)
-	w_val += parseInt (r.style.paddingRight, 10);
-
+        w_val += parseInt (r.style.paddingRight, 10);
       if (r.selectorText.indexOf ("col_isa_props") !== -1)
-	w_val *= 3;
-
+        w_val *= 3;
       w += w_val;
     }
   }
@@ -557,6 +593,24 @@ function on_page_load ()
 
   var page_head_div_h = page_head_div.clientHeight + "px";
   main_div.style.top = page_head_div_h;
+
+  const insns = [ )html"
+  << print_list(isa_name, "'$&', ")
+  << R"html(];
+
+  insns.forEach
+  (function(ins_id)
+  {
+    const checkbox = document.querySelector('#cb_' + ins_id); // find checkbox by ID
+    const elements = document.querySelectorAll('.' + ins_id) // find all by element Class
+    function show_hide_elements()
+    {
+      elements.forEach(function(value) { value.style.visibility = checkbox.checked ? "visible" : "hidden"; });
+      update_row_visibility();
+    }
+    checkbox.addEventListener('change', show_hide_elements);
+    show_hide_elements();
+  });
 }
 
 function on_page_unload ()
@@ -609,8 +663,13 @@ function on_mouse_click (div_obj, event)
 
 <div class="page_head_cont" id="page_head_cont">
 
-<div style="font-size:20px;float:left">
-<b>Renesas SH Instruction Set Summary</b>
+<div style="float:left">
+<span style="font-size:20px;font:bold">Renesas SH Instruction Set Summary</span>
+  <table><tr>)html"
+  << print_list(isa_name, R"(
+    <td><input type="checkbox" id="cb_$&" name="$&" checked><label for="cb_$&">$&</label></td>)")
+  << R"html(
+  </tr></table>
 </div>
 
 <div style="float:right">
@@ -662,17 +721,17 @@ Last updated: )html" << __DATE__ << " " << __TIME__ << R"html(
     for (const auto& i : b)
     {
       std::cout
-	<< "<div class=\"col_cont\" onmouseover=\"on_mouse_over(this);\""
-	   " onmouseout=\"on_mouse_out(this);\" onclick=\"on_mouse_click(this,event);\">" "\n"
-	<< "<div class=\"col_cont_1\">" << print_isa_compatibility (i) << "</div>" "\n"
-	<< "<div class=\"col_cont_2\">" << i.format_ << "</div>" "\n"
-	<< "<div class=\"col_cont_3\">" << i.abstract_ << "</div>" "\n"
-	<< "<div class=\"col_cont_4\">" << i.code_ << "</div>" "\n"
-	<< "<div class=\"col_cont_5\">" << print_t_bit_dc_bit_note (i) << "</div>" "\n"
-	<< "<div class=\"col_cont_6\">" << print_isa_props (i, i.group_) << "</div>" "\n"
-	<< "<div class=\"col_cont_7\">" << print_isa_props (i, i.issue_) << "</div>" "\n"
-	<< "<div class=\"col_cont_8\">" << print_isa_props (i, i.latency_) << "</div>" "\n"
-	<< "<div class=\"col_cont_note\" id=\"note\" style=\"display:none\">" "\n";
+          << "<div class=\"col_cont\" onmouseover=\"on_mouse_over(this);\""
+          << " onmouseout=\"on_mouse_out(this);\" onclick=\"on_mouse_click(this,event);\">" "\n"
+          << "<div class=\"col_cont_1\">" << print_isa_compatibility (i) << "</div>" "\n"
+          << "<div class=\"col_cont_2\">" << i.format_ << "</div>" "\n"
+          << "<div class=\"col_cont_3\">" << i.abstract_ << "</div>" "\n"
+          << "<div class=\"col_cont_4\">" << i.code_ << "</div>" "\n"
+          << "<div class=\"col_cont_5\">" << print_t_bit_dc_bit_note (i) << "</div>" "\n"
+          << "<div class=\"col_cont_6\">" << print_isa_props (i, i.group_) << "</div>" "\n"
+          << "<div class=\"col_cont_7\">" << print_isa_props (i, i.issue_) << "</div>" "\n"
+          << "<div class=\"col_cont_8\">" << print_isa_props (i, i.latency_) << "</div>" "\n"
+          << "<div class=\"col_cont_note\" id=\"note\" style=\"display:none\">" "\n";
 
       print_note ("Description", i.description_, note_normal);
       print_note ("Note", i.note_, note_normal);
